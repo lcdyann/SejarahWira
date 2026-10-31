@@ -1,0 +1,110 @@
+/* ============================================================================
+   theme.css  -  LIGHT mode for the teacher pages  (dark is the original look)
+   The other teacher stylesheets read colours as  var(--t-xxx, <dark colour>),
+   so this file only has to define the --t-xxx values for  data-theme="light".
+   Change a colour here and every teacher page follows.
+   ============================================================================ */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* surfaces and lines */
+  --t-bg: #ffeec8;
+  --t-surface: #ffffff;
+  --t-surface-2: #faf5ea;
+  --t-inset: #f0e8d7;
+  --t-line: #d8c9a8;
+  --t-line-2: #c4ad7c;
+  --t-line-bg: #e4d8c0;
+  /* text */
+  --t-heading: #724f1d;
+  --t-text: #d7843c;
+  --t-text-2: #4b3f33;
+  --t-muted: #6b5f52;
+  --t-muted2: #857869;
+  --t-accent: #9a4a06;
+  --t-amber-text: #a85a06;
+  --t-bad: #c0261f;
+  --t-ok: #137a3a;
+  --t-info: #1d5fb8;
+  /* soft shadows and hover tints */
+  --t-shadow-rgb: 110, 85, 45;
+  --t-tint-rgb: 90, 60, 20;
+
+  /* the variables the older stylesheets already use */
+  --bg-dark: #f4efe4;
+  --card-bg: #ffffff;
+  --card-border: #d8c9a8;
+  --text-main: #2b2118;
+  --text-muted: #6b5f52;
+  --text-sub: #a85a06;
+  --gold-light: #9a4a06;
+  --shadow-color: #cdbb94;
+  --an-ok: #137a3a;
+  --an-warn: #a85a06;
+  --an-bad: #c0261f;
+  --an-surface: #ffffff;
+  --an-line: #d8c9a8;
+  --tp-ok: #137a3a;
+  --tp-warn: #a85a06;
+  --tp-info: #1d5fb8;
+  --tp-mute: #6b5f52;
+  --tp-surface: #ffffff;
+  --tp-line: #d8c9a8;
+}
+
+:root[data-theme="light"] body,
+:root[data-theme="light"] .game-body {
+  background: var(--t-bg);
+  background-image: none;
+  color: var(--t-text);
+}
+
+/* ---- the light / dark switch (sits beside the SejarahWira title) ---- */
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; margin-left: 8px; padding: 0;
+  font-size: 1rem; line-height: 1; cursor: pointer;
+}
+.nav-left { display: flex; align-items: center; }
+
+/* tajuk + butang mod gelap di sebelahnya (sama di semua halaman guru) */
+.nav-brand { display: flex; align-items: center; gap: 12px; }
+.nav-brand .game-title { margin: 0; font-size: 1.2rem; }
+.nav-brand .game-title a { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+.nav-brand .theme-toggle { margin-left: 0; }
+
+/* ---- light top bar and tabs ---- */
+:root[data-theme="light"] .top-nav {
+  background: linear-gradient(180deg, #fff8ea 0%, #f1e4c6 100%);
+  border-bottom: 2px solid #c98a2b;
+  box-shadow: 0 3px 10px rgba(110, 85, 45, 0.25);
+}
+:root[data-theme="light"] .game-title,
+:root[data-theme="light"] .welcome-text { color: #5c3510; text-shadow: none; }
+:root[data-theme="light"] .welcome-text strong { color: #3a2a14; }
+:root[data-theme="light"] .user-role { color: #8a5a10; }
+:root[data-theme="light"] .teacher-tab { background: #efe5cf; color: #4b3f33; border-color: #d8c9a8; }
+:root[data-theme="light"] .teacher-tab.is-current { background: #f59e0b; color: #2b1a05; border-color: #b45309; }
+:root[data-theme="light"] .teacher-tab:hover { background: #f8e3b4; }
+:root[data-theme="light"] .pixel-btn.theme-toggle { color: #2b1a05; }
+
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.nav-right .theme-toggle { margin-left: 0; }
+
+/* dashboard cards: pale cards with dark text in light mode */
+:root[data-theme="light"] .game-card {
+  background: linear-gradient(180deg, #fffaf0 0%, #bf973b 100%);
+  border-color: #c98a2b;
+  box-shadow: 0 5px 0 #d8c59a, 0 8px 14px rgba(110, 85, 45, 0.22);
+}
+:root[data-theme="light"] .game-card h3 { color: #3e2501; }
+:root[data-theme="light"] .game-card span { color: #532b00; }
+:root[data-theme="light"] .game-card .icon-wrapper { color: #f5bf85; }
+
+/* Logout stays red with white text in both themes (--t-text turns dark in light mode) */
+.pixel-btn.pixel-btn-logout,
+.pixel-btn.pixel-btn-logout:hover { color: #ffffff; }
+
+/* quest editor in light mode: readable selected type + completion note */
+:root[data-theme="light"] .qe-type.is-selected { background: #e3f5e6; }
+:root[data-theme="light"] .qe-done { color: #15803d; }

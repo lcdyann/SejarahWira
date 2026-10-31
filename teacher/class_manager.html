@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SejarahWira - Urus Kelas &amp; Pelajar</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/classManager.css">
+  <link rel="stylesheet" href="../assets/css/teacher.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="../assets/js/theme.js"></script>
+</head>
+
+<body class="game-body cl-body">
+
+  <div id="top-nav-placeholder"></div>
+
+  <main class="cl-wrapper">
+    <header class="cl-header">
+      <h1><i class="fas fa-users-gear"></i> Urus Kelas &amp; Pelajar</h1>
+      <p>Cipta kelas, tambah pelajar dan urus akaun log masuk mereka.</p>
+    </header>
+
+    <div id="cl-toast" class="cl-toast is-hidden" role="status" aria-live="polite"></div>
+
+    <section id="cl-denied" class="cl-state is-hidden" role="alert">
+      <i class="fas fa-lock"></i>
+      <p id="cl-denied-text">Halaman ini hanya untuk guru.</p>
+      <a class="cl-btn cl-btn-primary" href="../index.html"><i class="fas fa-right-to-bracket"></i> Log Masuk</a>
+    </section>
+
+    <section id="cl-loading" class="cl-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>Memuatkan kelas...</p>
+    </section>
+
+    <section id="cl-error" class="cl-state is-hidden" role="alert">
+      <i class="fas fa-triangle-exclamation"></i>
+      <p id="cl-error-text">Gagal memuatkan data.</p>
+      <button type="button" class="cl-btn cl-btn-primary" id="btn-retry"><i class="fas fa-rotate-right"></i> Cuba Lagi</button>
+    </section>
+
+    <div id="cl-main" class="cl-layout is-hidden">
+      <aside class="cl-card cl-side" aria-labelledby="cl-classes-title">
+        <div class="cl-card-head">
+          <h2 id="cl-classes-title"><i class="fas fa-school"></i> Kelas</h2>
+          <button type="button" class="cl-btn cl-btn-primary cl-btn-sm" id="btn-new-class"><i class="fas fa-plus"></i> Kelas Baharu</button>
+        </div>
+        <button type="button" class="cl-btn cl-btn-ghost cl-btn-sm cl-side-reset" id="btn-reset-code"><i class="fas fa-key"></i> Kod Lupa Kata Laluan</button>
+        <div id="cl-class-list"></div>
+      </aside>
+
+      <section class="cl-card" id="cl-detail" aria-live="polite"></section>
+    </div>
+  </main>
+
+  <!-- dialog (built by classManagerEngine.js) -->
+  <div id="cl-overlay" class="cl-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="cl-modal-title">
+    <div class="cl-modal" id="cl-modal">
+      <header class="cl-modal-head">
+        <h3 id="cl-modal-title">Dialog</h3>
+        <button type="button" class="cl-icon-btn" id="btn-modal-close" aria-label="Tutup"><i class="fas fa-times"></i></button>
+      </header>
+      <div id="cl-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="../assets/js/topNav.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTopNav({ homeUrl: 'index.html', logoutUrl: '../index.html' });
+    });
+  </script>
+  <script src="../assets/js/passwordRules.js"></script>
+  <script src="../assets/js/classManagerEngine.js"></script>
+</body>
+</html>

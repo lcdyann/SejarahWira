@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SejarahWira - Urus Kandungan Pembelajaran</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/contentManager.css">
+  <link rel="stylesheet" href="../assets/css/contentBoard.css">
+  <link rel="stylesheet" href="../assets/css/teacher.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="../assets/js/theme.js"></script>
+</head>
+
+<body class="game-body cm-body">
+
+  <!-- Menu atas (sama seperti halaman pelajar) -->
+  <div id="top-nav-placeholder"></div>
+
+  <main class="cm-wrapper">
+
+    <header class="cm-header">
+      <h1><i class="fas fa-pen-ruler"></i> Urus Kandungan Pembelajaran</h1>
+      <p id="cm-subtitle">Pilih era untuk melihat dan mengemas kini kandungannya.</p>
+      <button type="button" class="cm-btn cm-btn-ghost cm-guide-btn" id="btn-guide"><i class="fas fa-circle-question"></i> Cara ia berfungsi</button>
+    </header>
+
+    <!-- Mesej ringkas (berjaya / ralat) -->
+    <div id="cm-toast" class="cm-toast is-hidden" role="status" aria-live="polite"></div>
+
+    <!-- AKSES DITOLAK  --> 
+    <section id="cm-denied" class="cm-state is-hidden" role="alert">
+      <i class="fas fa-lock"></i>
+      <p id="cm-denied-text">Halaman ini hanya untuk guru.</p>
+      <a class="cm-btn cm-btn-primary" href="../index.html"><i class="fas fa-right-to-bracket"></i> Log Masuk</a>
+    </section>
+
+    <!-- MEMUATKAN -->
+    <section id="cm-loading" class="cm-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>Memuatkan kandungan...</p>
+    </section>
+
+    <!-- RALAT PEMUATAN (E3) -->
+    <section id="cm-error" class="cm-state is-hidden" role="alert">
+      <i class="fas fa-triangle-exclamation"></i>
+      <p id="cm-error-text">Kandungan tidak dapat dimuatkan.</p>
+      <button type="button" class="cm-btn cm-btn-primary" id="btn-error-back">Cuba Lagi</button>
+    </section>
+
+    <!-- LANGKAH 1: SENARAI ERA -->
+    <section id="view-eras" class="is-hidden">
+      <div class="cm-layout">
+        <div>
+          <h2 class="cm-section-title"><i class="fas fa-map-marked-alt"></i> Pilih Era</h2>
+          <p class="cm-muted cm-firststep"><strong>Mula di sini:</strong> klik satu era di bawah. Anda akan dapat melihat dan mengubah cerita, quest, soalan dan suara Pendekar Bayang untuk era itu.</p>
+          <div class="cm-era-grid" id="era-grid"></div>
+        </div>
+
+        <aside class="cm-side" aria-labelledby="recent-title">
+          <h2 class="cm-section-title" id="recent-title"><i class="fas fa-clock-rotate-left"></i> Perubahan Terkini</h2>
+          <p class="cm-muted">Semua guru berkongsi kandungan yang sama. Senarai ini menunjukkan siapa mengubah apa.</p>
+          <ul class="cm-change-list" id="recent-changes"></ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- LANGKAH 2: KANDUNGAN ERA -->
+    <section id="view-era" class="is-hidden">
+      <nav class="cm-breadcrumb" aria-label="Navigasi">
+        <button type="button" class="cm-link-btn" id="btn-back-eras"><i class="fas fa-arrow-left"></i> Semua Era</button>
+        <span class="cm-crumb-sep">/</span>
+        <h2 id="era-title" class="cm-era-title">Era</h2>
+      </nav>
+
+      <!-- Kesediaan era -->
+      <section class="cm-readiness" id="readiness-panel" aria-live="polite"></section>
+
+      <!-- Jenis kandungan -->
+      <div class="cm-tabs" id="content-tabs" role="tablist" aria-label="Jenis kandungan"></div>
+
+      <div id="tab-content" class="cm-tab-content"></div>
+    </section>
+
+  </main>
+
+  <!-- ===== EDITOR SOALAN ===== -->
+  <div id="q-modal" class="cm-overlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="q-modal-title">
+    <div class="cm-modal-card cm-modal-wide">
+      <header class="cm-modal-head">
+        <h3 id="q-modal-title">Tambah Soalan</h3>
+        <button type="button" class="cm-icon-btn" id="btn-q-close" aria-label="Tutup"><i class="fas fa-times"></i></button>
+      </header>
+
+      <div class="cm-editor-grid">
+        <form id="q-form" class="cm-form" novalidate>
+          <div id="q-form-banner" class="cm-form-banner is-hidden" role="alert"></div>
+
+          <div class="cm-field">
+            <label for="f-questionText">Soalan <span class="cm-req">*</span></label>
+            <textarea id="f-questionText" rows="3" maxlength="2000" placeholder="Contoh: Siapakah Bapa Kemerdekaan Malaysia?"></textarea>
+            <span class="cm-error" id="err-questionText"></span>
+          </div>
+
+          <fieldset class="cm-field cm-options">
+            <legend>Pilihan Jawapan <span class="cm-req">*</span></legend>
+            <p class="cm-hint">Tandakan bulatan di sebelah jawapan yang betul.</p>
+
+            <div class="cm-option-row">
+              <input type="radio" name="correctAnswer" id="f-correct-A" value="A" aria-label="Pilihan A ialah jawapan betul">
+              <span class="cm-opt-letter">A</span>
+              <input type="text" id="f-optionA" maxlength="255" placeholder="Pilihan A">
+            </div>
+            <span class="cm-error" id="err-optionA"></span>
+
+            <div class="cm-option-row">
+              <input type="radio" name="correctAnswer" id="f-correct-B" value="B" aria-label="Pilihan B ialah jawapan betul">
+              <span class="cm-opt-letter">B</span>
+              <input type="text" id="f-optionB" maxlength="255" placeholder="Pilihan B">
+            </div>
+            <span class="cm-error" id="err-optionB"></span>
+
+            <div class="cm-option-row">
+              <input type="radio" name="correctAnswer" id="f-correct-C" value="C" aria-label="Pilihan C ialah jawapan betul">
+              <span class="cm-opt-letter">C</span>
+              <input type="text" id="f-optionC" maxlength="255" placeholder="Pilihan C">
+            </div>
+            <span class="cm-error" id="err-optionC"></span>
+
+            <div class="cm-option-row">
+              <input type="radio" name="correctAnswer" id="f-correct-D" value="D" aria-label="Pilihan D ialah jawapan betul">
+              <span class="cm-opt-letter">D</span>
+              <input type="text" id="f-optionD" maxlength="255" placeholder="Pilihan D">
+            </div>
+            <span class="cm-error" id="err-optionD"></span>
+            <span class="cm-error" id="err-correctAnswer"></span>
+          </fieldset>
+
+          <div class="cm-field">
+            <label for="f-hint">Petunjuk Adaptif <span class="cm-opt">(pilihan)</span></label>
+            <input type="text" id="f-hint" maxlength="255" placeholder="Bantuan ringkas apabila pelajar menekan butang Petunjuk">
+            <span class="cm-error" id="err-hint"></span>
+          </div>
+
+          <div class="cm-field">
+            <label for="f-explanation">Penerangan <span class="cm-opt">(pilihan)</span></label>
+            <textarea id="f-explanation" rows="3" maxlength="2000" placeholder="Dipaparkan selepas pelajar menjawab"></textarea>
+            <span class="cm-error" id="err-explanation"></span>
+          </div>
+
+          <p class="cm-hint">Aksara &lt; dan &gt; tidak dibenarkan.</p>
+
+          <div class="cm-modal-actions">
+            <button type="button" class="cm-btn cm-btn-ghost" id="btn-q-cancel">Batal</button>
+            <button type="submit" class="cm-btn cm-btn-primary" id="btn-q-save"><i class="fas fa-floppy-disk"></i> Simpan Soalan</button>
+          </div>
+        </form>
+
+        <!-- Pratonton seperti yang dilihat pelajar -->
+        <aside class="cm-preview" aria-label="Pratonton soalan">
+          <h4><i class="fas fa-eye"></i> Pratonton Pelajar</h4>
+          <div id="q-preview"></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PENGESAHAN ===== -->
+  <div id="cm-confirm" class="cm-overlay cm-overlay-top is-hidden" role="alertdialog" aria-modal="true" aria-labelledby="cm-confirm-title">
+    <div class="cm-modal-card cm-modal-small">
+      <h3 id="cm-confirm-title">Pasti?</h3>
+      <p id="cm-confirm-text"></p>
+      <div class="cm-modal-actions">
+        <button type="button" class="cm-btn cm-btn-ghost" id="btn-confirm-cancel">Batal</button>
+        <button type="button" class="cm-btn cm-btn-primary" id="btn-confirm-ok">Teruskan</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/topNav.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTopNav({ homeUrl: 'index.html', logoutUrl: '../index.html' });
+    });
+  </script>
+  <script src="../assets/js/questRules.js"></script>
+  <script src="../assets/js/contentManagerEngine.js"></script>
+  <script src="../assets/js/contentUi.js"></script>
+  <script src="../assets/js/contentLibrary.js"></script>
+  <script src="../assets/js/contentQuest.js"></script>
+  <script src="../assets/js/contentTurns.js"></script>
+  <script src="../assets/js/contentPlayer.js"></script>
+  <script src="../assets/js/contentBoard.js"></script>
+  <script src="../assets/js/contentEntity.js"></script>
+  <script src="../assets/js/contentGuide.js"></script>
+</body>
+</html>

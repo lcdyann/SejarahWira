@@ -1,0 +1,1742 @@
+/* ==========================================
+1. GLOBAL VARIABLES, FONTS & RESET
+========================================== */
+@import url('https: //fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+:root {
+  /* RPG Palette */
+  --primary-gold: #c78107;
+  --primary-gold-hover: #fab301;
+  --gold-light: #fef08a;
+  --gold-border: #b45309;
+  --pixel-red: #a82200;
+  --pixel-red-hover: #c82a00;
+  --pixel-border: #000000;
+  /* Dark / Wood Backgrounds */
+  --bg-dark: #1e1b18;
+  --card-bg: #2d2823;
+  --card-border: #524636;
+  --wood-card: #6b4928;
+  --wood-card-hover: #6b4014;
+  --shadow-color: #0b0704;
+  /* Typography */
+  --text-main: #f5f5f4;
+  --text-muted: #a8a29e;
+  --text-sub: #d97706;
+  /* Accent & Utility Colors */
+  --btn-green: #16a34a;
+  --btn-amber: #d97706;
+  --btn-red: #ef4444;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  /* Font Families */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-body);
+}
+
+/* ==========================================
+2. PAGE BACKGROUNDS (SCOPED BY BODY CLASS)
+========================================== */
+/* Main Menu / Game Screen Background */
+body.game-body {
+  background-color: var(--bg-dark);
+  background-image: radial-gradient(circle at center, #2e1d0c 0%, #0f0904 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  padding: 20px 10px;
+}
+
+/* Story Scene Background Page */
+body.story-page-body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #020617;
+  position: relative;
+}
+
+/* Map Screen Background Body */
+body.map-body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background-color: var(--bg-dark);
+}
+
+/* ==========================================
+REUSABLE PIXEL & RPG BUTTONS & BADGES
+========================================== */
+/* ==========================================
+1. BASE PIXEL BUTTON (Shared Engine)
+========================================== */
+.pixel-btn {
+  font-family: var(--font-pixel);
+  font-size: 0.7rem;
+  color: var(--t-text, #ffffff);
+  background-color: var(--primary-gold);
+  /* Default: Red */
+  border: 3px solid var(--pixel-border);
+  border-radius: 12px;
+  padding: 10px 22px;
+  gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  box-shadow: inset -3px -3px 0px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.4), inset 3px 3px 0px rgba(255, 255, 255, 0.25);
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+/* Hover & Active Press States */
+.pixel-btn:hover {
+  background-color: var(--primary-gold-hover);
+  color: var(--t-text, #ffffff);
+}
+
+.pixel-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: inset 2px 2px 0px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.5);
+}
+
+/* ==========================================
+2. COLOR MODIFIERS (.red)
+========================================== */
+/* Red Color Modifier  */
+.pixel-btn-logout {
+  background-color: var(--pixel-red);
+  color: var(--t-text, #ffffff);
+}
+
+.pixel-btn-logout:hover {
+  background-color: var(--pixel-red-hover);
+}
+
+/* ==========================================
+3. SIZE & SHAPE MODIFIERS (.sm, .icon)
+========================================== */
+/* Small Button (Logout / Compact controls) */
+.pixel-btn.sm {
+  font-size: 0.75rem;
+  padding: 8px 18px;
+  border-radius: 10px;
+  gap: 6px;
+}
+
+/* Square Icon Block (Help ? Button) */
+.pixel-btn.icon {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  font-size: 1.2rem;
+  border-radius: 8px;
+}
+
+/* Floating Position Helper for Help Button */
+.pixel-help-pos {
+  position: absolute;
+  top: 24px;
+  right: 215px;
+  z-index: 20;
+}
+
+/* ==========================================
+4. PIXEL BADGE (Static Label Variant)
+========================================== */
+.pixel-badge {
+  font-family: var(--font-pixel);
+  font-size: 0.72rem;
+  color: var(--t-text, #ffffff);
+  background-color: var(--pixel-red);
+  border: 3px solid var(--pixel-border);
+  border-radius: 10px;
+  padding: 8px 18px;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: inset -2px -2px 0px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.4);
+  display: inline-block;
+}
+
+.pixel-badge.gold {
+  background-color: var(--primary-gold);
+  color: #3b1d00;
+  box-shadow: inset -2px -2px 0px #b45309;
+}
+
+/* Standard Buttons & Utility */
+.btn {
+  font-family: var(--font-pixel);
+  font-size: 0.8rem;
+  color: var(--t-text, #ffffff);
+  background-color: var(--pixel-red);
+  /* Default: Red */
+  border: 3px solid var(--pixel-border);
+  border-radius: 12px;
+  padding: 10px 22px;
+  gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  box-shadow: inset -3px -3px 0px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.4), inset 3px 3px 0px rgba(255, 255, 255, 0.25);
+  transition: transform 0.1s ease, background-color 0.1s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-gold);
+  color: #000000;
+  border: 2px solid var(--gold-border);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-gold-hover);
+}
+
+.btn-disabled {
+  background-color: #3f3f46;
+  color: var(--t-muted, #a1a1aa);
+  cursor: not-allowed;
+  border: none;
+}
+
+.btn-sm {
+  color: var(--t-text, #ffffff);
+  padding: 10px 22px;
+  font-size: 0.5rem;
+}
+
+.btn-block {
+  width: 100%;
+  display: block;
+}
+
+/* ==========================================
+MODULE 0: AUTHENTICATION STYLES (FIXED)
+========================================== */
+/* 1. Body Flex Container */
+body.auth-bg {
+  position: relative;
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin: 0;
+  padding: 20px;
+  background-color: var(--bg-dark, var(--t-bg, #1e1b18));
+}
+
+/* 2. Background Image Viewport (Fixed to Background Layer) */
+.auth-bg-viewport {
+  position: absolute;
+  /* Takes image out of document flow */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.auth-bg-viewport img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 3. Main Login Box Overlay */
+.auth-card {
+  position: relative;
+  /* Lifts box above background layer */
+  z-index: 10;
+  /* Higher than viewport z-index: 1 */
+  background-color: var(--card-bg, #2d2823);
+  border: 3px solid var(--gold-border, #b45309);
+  border-radius: var(--radius-md, 12px);
+  width: 100%;
+  max-width: 440px;
+  padding: 28px;
+  box-shadow: 0 12px 35px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.85);
+}
+
+/* Auth Header */
+.auth-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.auth-header .logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-gold, #f59e0b);
+  margin-bottom: 10px;
+}
+
+.auth-header .game-title {
+  font-family: var(--font-pixel, monospace);
+  font-size: 1.3rem;
+  color: var(--primary-gold, var(--t-amber-text, #f59e0b));
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.auth-header .game-subtitle {
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+  font-size: 0.78rem;
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.75rem;
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+}
+
+/* Role Navigation Tabs */
+.role-tabs {
+  display: flex;
+  background-color: var(--t-surface-2, #1c1814);
+  border: 2px solid var(--card-border, var(--t-line, #524636));
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 20px;
+  gap: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+  padding: 10px 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.is-active {
+  background-color: var(--card-border, var(--t-line, #524636));
+  color: var(--primary-gold, var(--t-amber-text, #f59e0b));
+}
+
+/* Forms & Inputs */
+.form-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 7px 0;
+}
+
+.form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main, var(--t-text, #f5f5f4));
+}
+
+.form-group input {
+  background-color: var(--t-inset, #191613);
+  border: 2px solid var(--card-border, var(--t-line, #524636));
+  color: var(--text-main, var(--t-text, #f5f5f4));
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: var(--primary-gold, #f59e0b);
+}
+
+/* State Helper */
+.is-hidden {
+  display: none !important;
+}
+
+/* ==========================================
+5. HOME MAIN MENU GRID
+========================================== */
+.hero {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.logo {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-gold);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+  margin-bottom: 12px;
+}
+
+.hero .game-title {
+  color: var(--gold-light);
+  font-family: var(--font-pixel);
+  font-size: 1.6rem;
+  margin: 12px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 3px 3px 0px #000000;
+}
+
+.hero .game-subtitle {
+  color: var(--t-text-2, #d1d5db);
+  font-size: 0.88rem;
+  font-style: italic;
+  margin: 0;
+}
+
+.main-content {
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.menu-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.menu-header h2 {
+  font-family: var(--font-pixel);
+  font-size: 0.95rem;
+  color: var(--primary-gold);
+  margin-bottom: 6px;
+}
+
+.menu-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* 2x2 Menu Grid Layout */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 10px;
+}
+
+/* 3D Game Button Styling */
+.game-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, var(--wood-card) 0%, #1a120a 100%);
+  border: 2px solid var(--gold-border);
+  border-radius: 14px;
+  padding: 22px 14px;
+  text-decoration: none;
+  color: var(--text-main);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 6px 0 var(--shadow-color), 0 10px 15px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.7);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  position: relative;
+  top: 0;
+}
+
+.game-card:hover {
+  background: linear-gradient(180deg, var(--wood-card-hover) 0%, #281c10 100%);
+  border-color: var(--primary-gold);
+  top: -2px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 8px 0 var(--shadow-color), 0 12px 20px rgba(245, 158, 11, 0.25);
+}
+
+.game-card:active {
+  top: 4px;
+  box-shadow: inset 0 1px 3px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.8), 0 2px 0 var(--shadow-color), 0 4px 6px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.5);
+}
+
+.icon-wrapper {
+  font-size: 2.2rem;
+  color: var(--primary-gold);
+  margin-bottom: 10px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+  transition: transform 0.2s ease;
+}
+
+.game-card:hover .icon-wrapper {
+  transform: scale(1.15);
+  color: var(--gold-light);
+}
+
+.card-details {
+  text-align: center;
+}
+
+.card-details h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  letter-spacing: 0.5px;
+}
+
+.card-details span {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-sub);
+  margin-top: 4px;
+}
+
+/* ==========================================
+6. TOP NAVIGATION BAR STYLES
+========================================== */
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(180deg, #2a1f14 0%, #1c130b 100%);
+  border-bottom: 2px solid var(--gold-border);
+  padding: 12px 24px;
+  margin: -20px -10px 20px -10px;
+  box-shadow: 0 4px 12px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.7);
+  position: relative;
+  z-index: 20;
+}
+
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.nav-center .game-title {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--gold-light);
+  font-family: var(--font-pixel);
+  font-size: 1.2rem;
+  margin: 12px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 3px 3px 0px #000000;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.welcome-text {
+  font-size: 0.95rem;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.welcome-text strong {
+  color: var(--primary-gold);
+}
+
+.user-role {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-role i {
+  color: var(--primary-gold);
+}
+
+/* ==========================================
+7. MODULE 1: HISTORICAL ERA MAP & POPUPS
+========================================== */
+.era-map-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.map-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.map-title {
+  font-family: var(--font-pixel);
+  font-size: 1.2rem;
+  color: var(--gold-light, var(--t-accent, #fef08a));
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.map-header p {
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+  font-size: 0.85rem;
+}
+
+/* 1. Map Container - overflow: visible ALLOWS popups to extend outside */
+.era-map-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  margin: 0 auto;
+  overflow: visible;
+  /* CRITICAL: Prevents popup clipping */
+}
+
+/* 2. Map Background - Holds the border and rounded corners */
+.era-map-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  border-radius: var(--radius-md, 14px);
+  border: 3px solid var(--pixel-border, #000);
+  box-shadow: 0 10px 30px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.7);
+}
+
+/* 3. SVG Line Overlay */
+.map-svg-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.path-line-bg {
+  fill: none;
+  stroke: var(--t-line, #443425);
+  stroke-width: 6;
+  stroke-dasharray: 10, 10;
+  stroke-linecap: round;
+}
+
+.path-line-active {
+  fill: none;
+  stroke: #f59e0b;
+  /* Primary Gold */
+  stroke-width: 8;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.8));
+}
+
+/* 4. Node Wrapper Base */
+.era-node-wrapper {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+}
+
+.era-node-wrapper:hover {
+  z-index: 1000;
+}
+
+/* 5. Synchronized Node Coordinates (900x1600 SVG Grid) */
+.node-pos-1 {
+  top: 5.0%;
+  left: 50.0%;
+}
+
+/* Node 1: Top Center */
+.node-pos-2 {
+  top: 14.0%;
+  left: 78.0%;
+}
+
+/* Node 2: Curve Right */
+.node-pos-3 {
+  top: 24.0%;
+  left: 50.0%;
+}
+
+/* Node 3: Center */
+.node-pos-4 {
+  top: 34.0%;
+  left: 22.0%;
+}
+
+/* Node 4: Curve Left */
+.node-pos-5 {
+  top: 44.0%;
+  left: 50.0%;
+}
+
+/* Node 5: Center */
+.node-pos-6 {
+  top: 54.0%;
+  left: 78.0%;
+}
+
+/* Node 6: Curve Right */
+.node-pos-7 {
+  top: 64.0%;
+  left: 50.0%;
+}
+
+/* Node 7: Center */
+.node-pos-8 {
+  top: 74.0%;
+  left: 22.0%;
+}
+
+/* Node 8: Curve Left */
+.node-pos-9 {
+  top: 80.0%;
+  left: 78.0%;
+}
+
+/* Node 9: Curve Right */
+.node-pos-10 {
+  top: 93.0%;
+  left: 50.0%;
+}
+
+/* Node 10: Bottom Center */
+/* 6. Node Orb Styling */
+.era-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  position: relative;
+}
+
+.node-orb {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #3d2d1d 0%, #1a120a 10%);
+  border: 3px solid var(--pixel-border, #000);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+  box-shadow: 0 6px 12px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.8);
+  transition: all 0.2s ease;
+}
+
+.node-number {
+  font-family: var(--font-pixel);
+  font-size: 0.55rem;
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+  margin-top: 4px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 2px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border, var(--t-line, #524636));
+}
+
+/* Node States */
+.era-completed .node-orb {
+  background: radial-gradient(circle at 30% 30%, #15803d 0%, #064e3b 100%);
+  border-color: #22c55e;
+  color: var(--t-text, #ffffff);
+}
+
+.era-unlocked .node-orb {
+  background: radial-gradient(circle at 30% 30%, #f59e0b 0%, #78350f 100%);
+  border-color: var(--gold-light, #fef08a);
+  color: #ffffff;
+  animation: pulseGlow 2s infinite alternate;
+}
+
+.era-locked .node-orb {
+  background: var(--t-surface-2, #1c1814);
+  border-color: #3f3f46;
+  color: #52525b;
+}
+
+.era-node-wrapper:hover .node-orb {
+  transform: scale(1.15);
+}
+
+/* ==========================================
+7. NEAT & RESTYLED RPG POPOVER CARD
+========================================== */
+.era-details-popover {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  width: 230px;
+  background: linear-gradient(180deg, var(--t-surface, #2d2823) 0%, var(--t-surface-2, #1c1814) 100%);
+  border: 2px solid var(--gold-border, #b45309);
+  border-radius: 12px;
+  padding: 14px;
+  box-shadow: 0 12px 28px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 100;
+  text-align: left;
+}
+
+/* Tooltip Arrow Pointer (Top) */
+.era-details-popover::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--gold-border, #b45309);
+}
+
+/* Hover Activation */
+.era-node-wrapper:hover .era-details-popover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+/* Status Badge inside Popover */
+.era-status {
+  display: inline-block;
+  font-family: var(--font-pixel);
+  font-size: 0.52rem;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.status-completed {
+  background-color: rgba(34, 197, 94, 0.25);
+  color: var(--t-ok, #4ade80);
+  border-color: #22c55e;
+}
+
+.status-active {
+  background-color: rgba(245, 158, 11, 0.25);
+  color: var(--t-accent, #fef08a);
+  border-color: #f59e0b;
+}
+
+.status-locked {
+  background-color: rgba(113, 113, 122, 0.25);
+  color: var(--t-muted, #a1a1aa);
+  border-color: #52525b;
+}
+
+/* Popover Typography */
+.era-details-popover h3 {
+  font-family: var(--font-pixel);
+  font-size: 0.75rem;
+  color: var(--gold-light, var(--t-accent, #fef08a));
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.era-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+/* ==========================================
+8. VISUAL NOVEL STORY SCENE
+========================================== */
+/* Fullscreen Background */
+.bg-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.bg-viewport img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.back-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 20;
+}
+
+.pixel-help-btn {
+  font-size: 1.5rem;
+  position: absolute;
+  top: 24px;
+  right: 215px;
+  z-index: 20;
+  padding: 16px;
+}
+
+/* ==========================================
+CLEAN QUEST NODE ORBS (NO SQUARE BOXES)
+========================================== */
+/* Outer Panel Container */
+.quest-floating-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  bottom: 20px;
+  width: 150px;
+  background: #ffffff;
+  border: 3px solid var(--t-line, #3e3227);
+  border-radius: 20px;
+  z-index: 15;
+  padding: 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 10px 30px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.65);
+}
+
+.quest-badge {
+  width: 90%;
+  height: 28px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 4px;
+  margin-top: 10px;
+  background: #f50b0b;
+  color: var(--t-text, #ffffff);
+  border: 2px solid #78350f;
+  border-radius: 8px;
+}
+
+.quest-items-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: 22px;
+  width: 100%;
+  height: 100%;
+  gap: 40px;
+  overflow-y: auto;
+  padding: 10px 4px;
+}
+
+/* 1. Invisible Parent Slot (Removes Square Borders/Backgrounds) */
+.quest-item-slot {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 20px !important;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* 2. The Only Visible Shape: Circular Node Orb */
+.quest-item-slot .node-orb-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #332a22 0%, #1e1813 100%);
+  border: 3px solid var(--t-line, #524636);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.5);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+/* Quest Icon Inside Orb */
+.quest-item-slot img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  background: transparent;
+  border: none;
+}
+
+.quest-item-slot:hover .node-orb-wrapper {
+  transform: scale(1.08);
+}
+
+/* Quest Text Label */
+.quest-label {
+  margin-top: 6px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--t-text, #e7e5e4);
+  text-align: center;
+}
+
+/* ==========================================
+NODE ORB STATES
+========================================== */
+/* LOCKED STATE */
+.quest-item-slot.is-locked {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.quest-item-slot.is-locked .node-orb-wrapper {
+  background: radial-gradient(circle, #262626 0%, #0d0d0d 100%);
+  border-color: #404040;
+}
+
+.quest-item-slot.is-locked img {
+  filter: grayscale(100%);
+  opacity: 0.2;
+}
+
+/* Clean Centered Lock Icon */
+.quest-lock-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ef4444;
+  font-size: 1rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* GLOWING ACTIVE STATE */
+.quest-item-slot.is-glowing .node-orb-wrapper {
+  background: radial-gradient(circle, #78350f 0%, #451a03 100%);
+  border-color: #f59e0b;
+  animation: questOrbGlow 1.8s infinite ease-in-out;
+}
+
+.quest-item-slot.is-glowing .quest-label {
+  color: var(--t-accent, #fef08a);
+}
+
+@keyframes questOrbGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+    border-color: #d97706;
+  }
+
+  50% {
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.9);
+    border-color: #fef08a;
+  }
+}
+
+/* COMPLETED STATE */
+.quest-item-slot.is-completed .node-orb-wrapper {
+  background: radial-gradient(circle, #14532d 0%, #052e16 100%);
+  border-color: #22c55e;
+}
+
+.quest-item-slot.is-completed .quest-label {
+  color: var(--t-ok, #86efac);
+}
+
+/* Bottom Floating Dialogue Box */
+.bottom-dialogue-container {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 215px;
+  z-index: 10;
+}
+
+.dialogue-card {
+  position: relative;
+  background-color: #ffffff;
+  border: 3px solid var(--pixel-border);
+  border-radius: 28px;
+  padding: 28px 32px 28px 240px;
+  min-height: 180px;
+  box-shadow: 0 12px 30px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.35);
+  display: flex;
+  align-items: center;
+}
+
+/* Character Portrait Overlay (Left Side) */
+.character-portrait-wrapper {
+  position: absolute;
+  left: 20px;
+  bottom: -3px;
+  width: 200px;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.character-portrait-img {
+  width: 200%;
+  max-height: 350px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.4));
+  transition: transform 0.2s ease;
+}
+
+.name-badge {
+  margin-top: -12px;
+  margin-bottom: 6px;
+  background-color: var(--wood-card);
+  font-size: 0.68rem;
+  z-index: 13;
+  width: auto;
+  max-width: 250px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Dialogue Speech Area */
+.dialogue-content-area {
+  flex: 1;
+  padding-right: 120px;
+}
+
+.dialogue-speech {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.6;
+}
+
+/* NEXT Button Positioned at Bottom Right Inside Card */
+.next-btn {
+  position: absolute;
+  right: 24px;
+  bottom: 20px;
+  padding: 10px 28px;
+}
+
+/* ==========================================
+QUEST PANEL & GLOW ANIMATION STYLES
+========================================== */
+/* Quest Item Slot Base */
+.quest-item-slot {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  background: var(--t-bg, #1e1b18);
+  border: 2px solid var(--t-line, #524636);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 4px;
+}
+
+.quest-item-slot img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.quest-label {
+  font-size: 0.6rem;
+  color: var(--t-muted, #a8a29e);
+  margin-top: 2px;
+  text-align: center;
+}
+
+/* 1. Locked State */
+.quest-item-slot.is-locked {
+  opacity: 0.5;
+  filter: grayscale(100%);
+  cursor: not-allowed;
+}
+
+.quest-lock-icon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ef4444;
+  font-size: 0.65rem;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* 2. Glowing State (Triggered after Dialogue completes) */
+.quest-item-slot.is-glowing {
+  opacity: 1;
+  filter: grayscale(0%);
+  border-color: #f59e0b;
+  animation: questGlowPulse 1.5s infinite ease-in-out;
+}
+
+.quest-item-slot.is-glowing:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.9);
+}
+
+@keyframes questGlowPulse {
+  0% {
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+    border-color: #b45309;
+  }
+
+  50% {
+    box-shadow: 0 0 16px rgba(245, 158, 11, 1);
+    border-color: #f59e0b;
+  }
+
+  100% {
+    box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+    border-color: #b45309;
+  }
+}
+
+/* Active Badge Highlight */
+.pixel-badge.active-badge {
+  background-color: #f59e0b !important;
+  color: #1e1b18 !important;
+  font-weight: bold;
+}
+
+/* Close Modal Button */
+.close-modal-btn {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--t-text, #f5f5f4);
+  cursor: pointer;
+}
+
+/* NPC Portrait & Bio Overlay */
+.character-portrait-wrapper {
+  transition: transform 0.2s ease;
+}
+
+.character-portrait-wrapper:hover {
+  transform: scale(1.03);
+}
+
+.character-portrait-wrapper:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 4px;
+}
+
+.bio-icon {
+  margin-left: 6px;
+  color: var(--t-amber-text, #f59e0b);
+  font-size: 0.85rem;
+}
+
+/* Bio Modal Layout */
+.bio-card {
+  max-width: 500px;
+  text-align: left;
+  padding: 24px;
+}
+
+.bio-header {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.bio-status-badge {
+  background: #16a34a !important;
+  color: #ffffff !important;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+.bio-avatar-img {
+  width: min(100%, 300px);
+  height: min(300px, 35vh);
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 10px auto;
+  filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.6));
+}
+
+.bio-section {
+  background: var(--t-bg, #1e1b18);
+  border: 1px solid var(--t-line, #443425);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.bio-section h3 {
+  font-size: 0.85rem;
+  color: var(--t-amber-text, #f59e0b);
+  margin-bottom: 6px;
+}
+
+.bio-section p {
+  font-size: 0.82rem;
+  color: var(--t-text-2, #d6d3d1);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.panel-divider {
+  border: 0;
+  height: 1px;
+  background: #443425;
+  margin: 12px 0;
+}
+
+.artifact-badge {
+  background: #3b82f6 !important;
+  color: var(--t-text, #ffffff) !important;
+}
+
+/* ==========================================================================
+ERA COMPLETION POPUP & REUSABLE RED CLOSE BUTTON
+========================================================================== */
+.modal-overlay,
+.assessment-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 6, 0.88);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.assessment-modal-card {
+  position: relative;
+  width: min(100%, 540px);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24px;
+  border: 3px solid #f59e0b;
+  border-radius: 18px;
+  background: var(--t-inset, #181512);
+  color: var(--t-text, #ffffff);
+  box-shadow: 0 16px 48px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.9), 0 0 20px rgba(245, 158, 11, 0.25);
+}
+
+/* Era completion popup - SAME look as the Great Siege artifact popup */
+#assessment-modal.modal-overlay,
+#era-action-modal.modal-overlay {
+  background: rgba(12, 10, 9, 0.88);
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+}
+
+.assessment-card {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: auto;
+  background: var(--t-inset, #181512);
+  border: 3px solid #f59e0b;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  color: var(--t-text, #ffffff);
+  box-sizing: border-box;
+  box-shadow: 0 16px 50px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.9);
+  animation: popupScale 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), badgeCardGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes popupScale {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes badgeCardGlow {
+  0%,
+  100% {
+    box-shadow: 0 16px 50px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.9), 0 0 25px rgba(245, 158, 11, 0.35);
+  }
+
+  50% {
+    box-shadow: 0 16px 50px rgba(var(--t-shadow-rgb, 0, 0, 0), 0.9), 0 0 65px rgba(251, 191, 36, 0.8);
+  }
+}
+
+/* Reusable Red Top-Right Close Button */
+.modal-close-btn {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 38px;
+  height: 38px;
+  background: #ef4444;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+  transition: all 0.2s ease;
+  z-index: 20;
+}
+
+.modal-close-btn:hover {
+  background: #dc2626;
+  transform: scale(1.12) rotate(90deg);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.7);
+}
+
+/* Game Title Font */
+.game-font-title {
+  font-family: 'Press Start 2P', 'Impact', 'Segoe UI', sans-serif;
+  color: var(--t-amber-text, #f59e0b);
+  font-size: 2rem;
+  margin: 0 0 8px 0;
+  letter-spacing: 2px;
+  text-shadow: 3px 3px 0px #000, 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+.congrats-subtitle {
+  color: var(--t-heading, #fef3c7);
+  font-size: 1rem;
+  margin: 0 0 20px 0;
+}
+
+/* Badge Unlocked (mirrors the artifact popup: ribbon, glowing ring, rotating rays) */
+.badge-unlocked-card {
+  position: relative;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin-bottom: 22px;
+}
+
+.badge-unlocked-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* slowly rotating light rays behind the badge */
+.badge-unlocked-card::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(251, 191, 36, 0.2) 0deg 10deg, transparent 10deg 20deg);
+  -webkit-mask-image: radial-gradient(circle, #000 15%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 15%, transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+  animation: badgeRaysSpin 16s linear infinite;
+}
+
+@keyframes badgeRaysSpin {
+  from {
+    transform: translateX(-50%) rotate(0deg);
+  }
+
+  to {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+.badge-ribbon {
+  display: inline-block;
+  background: #b45309;
+  color: var(--t-heading, #fef3c7);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 5px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.badge-icon-wrapper {
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  border: 3px solid #fbbf24;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(24, 21, 18, 0.95) 70%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: badgeRingPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes badgeRingPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 22px rgba(251, 191, 36, 0.55), inset 0 0 18px rgba(251, 191, 36, 0.25);
+  }
+
+  50% {
+    box-shadow: 0 0 52px rgba(251, 191, 36, 1), inset 0 0 32px rgba(251, 191, 36, 0.5);
+  }
+}
+
+.badge-img {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.85));
+  animation: badgeFloat 3s ease-in-out infinite;
+}
+
+@keyframes badgeFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.badge-title {
+  color: var(--t-heading, #fef3c7);
+  font-size: 1.4rem;
+  margin: 0 0 4px 0;
+  font-weight: bold;
+  text-shadow: 0 0 14px rgba(251, 191, 36, 0.6);
+}
+
+.badge-subtitle {
+  color: var(--t-text-2, #d6d3d1);
+  font-size: 0.85rem;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Dual Battle Buttons - warm card palette, mode colour kept as accent */
+.battle-buttons-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn-battle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: var(--t-surface, #211c17);
+  border: 2px solid var(--t-line, #3e3227);
+  cursor: pointer;
+  text-align: left;
+  color: var(--t-heading, #fef3c7);
+  transition: all 0.2s ease;
+}
+
+.btn-battle:hover {
+  transform: translateY(-2px);
+  background: var(--t-surface-2, #2a2219);
+}
+
+.btn-replay .btn-battle-icon {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--t-accent, #fbbf24);
+}
+
+.btn-training .btn-battle-icon {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--t-info, #60a5fa);
+}
+
+.btn-siege .btn-battle-icon {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a78bfa;
+}
+
+.btn-replay:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.35);
+}
+
+.btn-training:hover {
+  border-color: #60a5fa;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+.btn-siege:hover {
+  border-color: #a78bfa;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
+}
+
+.btn-battle-icon {
+  font-size: 1.5rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.btn-battle-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.battle-title {
+  font-weight: bold;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.battle-desc {
+  font-size: 0.78rem;
+  color: var(--t-text-2, #d6d3d1);
+  margin-top: 2px;
+}
+
+/* short screens: shrink the ring so the whole popup still fits */
+@media (max-height: 720px) {
+  .badge-icon-wrapper {
+    width: 108px;
+    height: 108px;
+  }
+
+  .badge-img {
+    width: 74px;
+    height: 74px;
+  }
+
+  .assessment-card {
+    padding: 22px;
+  }
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+/* ==========================================
+9. UTILITY HELPERS & RESPONSIVE BREAKPOINTS
+========================================== */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 5px rgba(245, 158, 11, 0.5);
+  }
+
+  100% {
+    box-shadow: 0 0 22px rgba(245, 158, 11, 0.9), 0 0 8px var(--gold-light);
+  }
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+.auth-footer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.alert-box {
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+}
+
+.alert-error {
+  background-color: rgba(239, 68, 68, 0.4);
+  border: 1px solid var(--error-red);
+  color: var(--error-red);
+}
+
+.footer-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-dialogue-container {
+    right: 24px;
+    bottom: 16px;
+  }
+
+  .dialogue-card {
+    padding: 20px 20px 70px 120px;
+  }
+
+  .character-portrait-wrapper {
+    left: 8px;
+    width: 100px;
+  }
+
+  .character-portrait-img {
+    max-height: 150px;
+  }
+
+  .name-badge {
+    max-width: 120px;
+    font-size: 0.42rem;
+    padding: 6px 4px;
+  }
+
+  .quest-floating-panel {
+    display: none;
+  }
+}

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07040d">
+  <title>SejarahWira - Log Masuk</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Crimson+Pro:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/login.css">
+  <!-- tema cerah / gelap: dibaca awal supaya tiada kelipan.
+       Pilihan pengguna disimpan dalam pelayar ini (kunci sw_login_theme).
+       Jika belum pernah memilih, ikut tetapan cerah / gelap sistem. -->
+  <script>
+    (function () {
+      var tema = 'dark';
+      try {
+        var simpan = localStorage.getItem('sw_login_theme');
+        if (simpan === 'light' || simpan === 'dark') tema = simpan;
+        else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) tema = 'light';
+      } catch (e) { /* tetap gelap */ }
+      document.documentElement.setAttribute('data-theme', tema);
+    })();
+  </script>
+</head>
+<body class="login-body">
+  <div class="login-bg" aria-hidden="true"></div>
+  <div class="login-dust" aria-hidden="true"></div>
+
+  <!-- susun atur dua lajur: kiri = jenama SejarahWira, kanan = borang log masuk -->
+  <div class="login-split">
+
+    <!-- LAJUR KIRI: logo, tajuk, ayat penerangan, senarai ciri -->
+    <aside class="login-brand">
+      <img src="assets/gameAsset/logo.jpg" alt="" class="login-logo" onerror="this.style.display='none'">
+      <h1 class="login-title">SEJARAH<span>WIRA</span></h1>
+      <p class="login-sub">Buku itu menunggu. Siapa yang membukanya?</p>
+      <ul class="login-features">
+        <li><span class="feat-icon" aria-hidden="true">&#128220;</span>10 Era Sejarah Malaysia</li>
+        <li><span class="feat-icon" aria-hidden="true">&#9876;</span>Latihan Wira &amp; Kepungan Agung</li>
+        <li><span class="feat-icon" aria-hidden="true">&#127942;</span>Koleksi Lencana &amp; Artifak</li>
+        <li><span class="feat-icon" aria-hidden="true">&#128202;</span>Pencapaian dan Kemajuan Murid</li>
+      </ul>
+    </aside>
+
+    <!-- LAJUR KANAN: tajuk sambutan, tab Murid / Guru, borang -->
+    <main class="login-card">
+      <header class="login-welcome">
+        <div class="login-welcome-text">
+          <h2>Selamat Datang</h2>
+          <p>Log masuk untuk meneruskan pengembaraan sejarah</p>
+        </div>
+        <!-- butang tema: ikon dilukis oleh skrip di bawah (matahari / bulan) -->
+        <button type="button" class="login-theme-btn" id="theme-toggle" aria-label="Tukar tema"></button>
+      </header>
+
+    <nav class="login-tabs" role="tablist">
+      <button type="button" class="tab is-active" id="tab-student" role="tab" aria-selected="true">Murid</button>
+      <button type="button" class="tab" id="tab-teacher" role="tab" aria-selected="false">Guru</button>
+    </nav>
+
+    <section class="login-panel" id="panel-student">
+      <form id="form-student" autocomplete="on">
+        <label for="student-username">E-mel atau nama pengguna</label>
+        <input type="text" id="student-username" maxlength="50" placeholder="e-mel anda" autocomplete="username" required>
+        <label for="student-password">Kata laluan</label>
+        <input type="password" id="student-password" placeholder="••••••••" autocomplete="current-password" required>
+        <button type="submit" class="btn-px gold">Buka Buku</button>
+        <button type="button" class="link-btn" data-signup data-show="form-student-new">Belum ada akaun? Daftar</button>
+        <button type="button" class="link-btn" data-show="form-student-reset">Lupa kata laluan?</button>
+      </form>
+
+      <form id="form-student-new" class="is-hidden" autocomplete="off" novalidate>
+        <p class="form-note">Daftar akaun murid. Kod kelas daripada guru adalah pilihan; boleh dimasukkan sekarang atau kemudian di Profil.</p>
+        <label for="sn-name">Nama kamu</label>
+        <input type="text" id="sn-name" maxlength="100" autocomplete="name" required>
+        <span class="field-error" data-for="name"></span>
+        <label for="sn-username">E-mel (digunakan untuk log masuk)</label>
+        <input type="text" id="sn-username" maxlength="50" autocomplete="username" placeholder="nama@contoh.com" required>
+        <span class="field-error" data-for="username"></span>
+        <label for="sn-password">Kata laluan (sekurang-kurangnya 8 aksara)</label>
+        <input type="password" id="sn-password" maxlength="72" autocomplete="new-password" required>
+        <!-- amaran kata laluan: diurus oleh assets/js/passwordRules.js (hijau = lulus, merah = belum lulus) -->
+        <div class="pw-help is-hidden" id="pwh-sn" aria-live="polite">
+          <div class="pw-meter"><span class="pw-meter-bar" data-score="0"></span><span class="pw-meter-label">Kekuatan: Lemah</span></div>
+          <ul class="pw-rules">
+            <li data-rule="length">Panjang 8 hingga 72 aksara.</li>
+            <li data-rule="letter">Ada sekurang-kurangnya satu huruf.</li>
+            <li data-rule="digit">Ada sekurang-kurangnya satu nombor.</li>
+            <li data-rule="common">Bukan kata laluan biasa yang mudah diteka.</li>
+            <li data-rule="username">Tidak mengandungi nama pengguna atau e-mel anda.</li>
+            <li data-rule="pattern">Bukan aksara berulang atau urutan mudah (contoh: aaaaaaaa, 12345678).</li>
+          </ul>
+          <p class="pw-tip"></p>
+        </div>
+        <span class="field-error" data-for="password"></span>
+        <!-- pilihan: hanya dibuka jika guru memberi kod kelas -->
+        <details class="opt-code" id="sn-class-box">
+          <summary>Ada kod kelas daripada guru?</summary>
+          <input type="text" id="sn-class" maxlength="12" autocomplete="off" placeholder="contoh: K7Q2-M9XD" style="text-transform:uppercase" aria-label="Kod kelas">
+        </details>
+        <span class="field-error" data-for="classCode"></span>
+        <button type="submit" class="btn-px gold">Daftar dan Mula</button>
+        <button type="button" class="link-btn" data-show="form-student">Sudah ada akaun? Log masuk</button>
+      </form>
+
+      <form id="form-student-reset" class="is-hidden" autocomplete="off" novalidate>
+        <p class="form-note">Lupa kata laluan? Masukkan e-mel anda dan tekan <b>Hantar kod</b>; kod dihantar ke e-mel itu. Jika anda tidak guna e-mel, minta kod daripada guru kelas anda atau admin. Kod sah 30 minit.</p>
+        <label for="studentr-username">E-mel atau nama pengguna</label>
+        <input type="text" id="studentr-username" maxlength="50" autocomplete="username" required>
+        <span class="field-error" data-for="username"></span>
+        <button type="button" class="btn-px small" data-send-code="student">Hantar kod ke e-mel saya</button>
+        <label for="studentr-code">Kod tetapan semula</label>
+        <input type="text" id="studentr-code" maxlength="12" autocomplete="off" placeholder="contoh: K7Q2-M9XD" style="text-transform:uppercase" required>
+        <span class="field-error" data-for="code"></span>
+        <label for="studentr-password">Kata laluan baharu (sekurang-kurangnya 8 aksara)</label>
+        <input type="password" id="studentr-password" maxlength="72" autocomplete="new-password" required>
+        <!-- amaran kata laluan: diurus oleh assets/js/passwordRules.js (hijau = lulus, merah = belum lulus) -->
+        <div class="pw-help is-hidden" id="pwh-sr" aria-live="polite">
+          <div class="pw-meter"><span class="pw-meter-bar" data-score="0"></span><span class="pw-meter-label">Kekuatan: Lemah</span></div>
+          <ul class="pw-rules">
+            <li data-rule="length">Panjang 8 hingga 72 aksara.</li>
+            <li data-rule="letter">Ada sekurang-kurangnya satu huruf.</li>
+            <li data-rule="digit">Ada sekurang-kurangnya satu nombor.</li>
+            <li data-rule="common">Bukan kata laluan biasa yang mudah diteka.</li>
+            <li data-rule="username">Tidak mengandungi nama pengguna atau e-mel anda.</li>
+            <li data-rule="pattern">Bukan aksara berulang atau urutan mudah (contoh: aaaaaaaa, 12345678).</li>
+          </ul>
+          <p class="pw-tip"></p>
+        </div>
+        <span class="field-error" data-for="password"></span>
+        <button type="submit" class="btn-px gold">Tukar Kata Laluan</button>
+        <button type="button" class="link-btn" data-show="form-student">Kembali ke log masuk</button>
+      </form>
+    </section>
+
+    <section class="login-panel is-hidden" id="panel-teacher">
+      <form id="form-teacher" autocomplete="on">
+        <label for="teacher-email">E-mel guru</label>
+        <input type="text" id="teacher-email" maxlength="50" placeholder="cikgu@sekolah.edu.my" autocomplete="username" required>
+        <label for="teacher-password">Kata laluan</label>
+        <input type="password" id="teacher-password" placeholder="••••••••" autocomplete="current-password" required>
+        <button type="submit" class="btn-px gold">Masuk Portal Guru</button>
+        <button type="button" class="link-btn" data-signup data-show="form-teacher-new">Guru baharu? Daftar akaun</button>
+        <button type="button" class="link-btn" data-show="form-teacher-reset">Lupa kata laluan?</button>
+      </form>
+
+      <form id="form-teacher-new" class="is-hidden" autocomplete="off" novalidate>
+        <p class="form-note">Daftar sebagai guru: masukkan e-mel, tekan <b>Hantar kod pengesahan</b>, kemudian taip kod yang tiba di e-mel anda. Selepas itu cipta kelas dan tambah murid anda sendiri.</p>
+        <label for="tn-name">Nama guru</label>
+        <input type="text" id="tn-name" maxlength="100" autocomplete="name" required>
+        <span class="field-error" data-for="name"></span>
+        <label for="tn-username">E-mel guru (digunakan untuk log masuk)</label>
+        <input type="text" id="tn-username" maxlength="50" autocomplete="username" placeholder="cikgu@sekolah.edu.my" required>
+        <span class="field-error" data-for="username"></span>
+        <label for="tn-password">Kata laluan (sekurang-kurangnya 8 aksara)</label>
+        <input type="password" id="tn-password" maxlength="72" autocomplete="new-password" required>
+        <!-- amaran kata laluan: diurus oleh assets/js/passwordRules.js (hijau = lulus, merah = belum lulus) -->
+        <div class="pw-help is-hidden" id="pwh-tn" aria-live="polite">
+          <div class="pw-meter"><span class="pw-meter-bar" data-score="0"></span><span class="pw-meter-label">Kekuatan: Lemah</span></div>
+          <ul class="pw-rules">
+            <li data-rule="length">Panjang 8 hingga 72 aksara.</li>
+            <li data-rule="letter">Ada sekurang-kurangnya satu huruf.</li>
+            <li data-rule="digit">Ada sekurang-kurangnya satu nombor.</li>
+            <li data-rule="common">Bukan kata laluan biasa yang mudah diteka.</li>
+            <li data-rule="username">Tidak mengandungi nama pengguna atau e-mel anda.</li>
+            <li data-rule="pattern">Bukan aksara berulang atau urutan mudah (contoh: aaaaaaaa, 12345678).</li>
+          </ul>
+          <p class="pw-tip"></p>
+        </div>
+        <span class="field-error" data-for="password"></span>
+        <!-- pengesahan e-mel: kod dihantar ke e-mel di atas, guru taip kod itu di sini -->
+        <button type="button" class="btn-px small" id="tn-send-code">Hantar kod pengesahan ke e-mel</button>
+        <label for="tn-verify">Kod pengesahan (daripada e-mel)</label>
+        <input type="text" id="tn-verify" maxlength="12" autocomplete="off" placeholder="contoh: K7Q2-M9XD" style="text-transform:uppercase">
+        <span class="field-error" data-for="verifyCode"></span>
+        <!-- pilihan: kod rahsia daripada admin untuk langkau pengesahan e-mel -->
+        <details class="opt-code" id="tn-code-box">
+          <summary>Ada kod pendaftaran daripada admin? (ganti pengesahan e-mel)</summary>
+          <input type="text" id="tn-code" maxlength="100" autocomplete="off" aria-label="Kod pendaftaran guru">
+        </details>
+        <span class="field-error" data-for="code"></span>
+        <button type="submit" class="btn-px gold">Daftar Guru</button>
+        <button type="button" class="link-btn" data-show="form-teacher">Sudah ada akaun? Log masuk</button>
+      </form>
+
+      <form id="form-teacher-reset" class="is-hidden" autocomplete="off" novalidate>
+        <p class="form-note">Lupa kata laluan? Masukkan e-mel anda dan tekan <b>Hantar kod</b>; kod dihantar ke e-mel itu. Jika tidak sampai, minta kod daripada admin SejarahWira. Kod sah 30 minit.</p>
+        <label for="teacherr-username">E-mel atau nama pengguna</label>
+        <input type="text" id="teacherr-username" maxlength="50" autocomplete="username" required>
+        <span class="field-error" data-for="username"></span>
+        <button type="button" class="btn-px small" data-send-code="teacher">Hantar kod ke e-mel saya</button>
+        <label for="teacherr-code">Kod tetapan semula</label>
+        <input type="text" id="teacherr-code" maxlength="12" autocomplete="off" placeholder="contoh: K7Q2-M9XD" style="text-transform:uppercase" required>
+        <span class="field-error" data-for="code"></span>
+        <label for="teacherr-password">Kata laluan baharu (sekurang-kurangnya 8 aksara)</label>
+        <input type="password" id="teacherr-password" maxlength="72" autocomplete="new-password" required>
+        <!-- amaran kata laluan: diurus oleh assets/js/passwordRules.js (hijau = lulus, merah = belum lulus) -->
+        <div class="pw-help is-hidden" id="pwh-tr" aria-live="polite">
+          <div class="pw-meter"><span class="pw-meter-bar" data-score="0"></span><span class="pw-meter-label">Kekuatan: Lemah</span></div>
+          <ul class="pw-rules"> <!-- Password constraints for better security-->
+            <li data-rule="length">Panjang 8 hingga 72 aksara.</li>
+            <li data-rule="letter">Ada sekurang-kurangnya satu huruf.</li>
+            <li data-rule="digit">Ada sekurang-kurangnya satu nombor.</li>
+            <li data-rule="common">Bukan kata laluan biasa yang mudah diteka.</li>
+            <li data-rule="username">Tidak mengandungi nama pengguna atau e-mel anda.</li>
+            <li data-rule="pattern">Bukan aksara berulang atau urutan mudah (contoh: aaaaaaaa, 12345678).</li>
+          </ul>
+          <p class="pw-tip"></p>
+        </div>
+        <span class="field-error" data-for="password"></span>
+        <button type="submit" class="btn-px gold">Tukar Kata Laluan</button>
+        <button type="button" class="link-btn" data-show="form-teacher">Kembali ke log masuk</button>
+      </form>
+    </section>
+
+    <div class="login-error is-hidden" id="auth-error" role="alert"></div>
+    <p class="login-foot">Wira Muda, harapan bangsa dan negara</p>
+    </main>
+  </div>
+
+  <script>
+    /* butang tema cerah / gelap */
+    document.addEventListener('DOMContentLoaded', () => {
+      // ikon matahari (ditunjuk semasa mod gelap) dan bulan (ditunjuk semasa mod cerah)
+      const MOON = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+      const SUN = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+      const root = document.documentElement;
+      const btn = document.getElementById('theme-toggle');
+      const warnaBar = document.querySelector('meta[name="theme-color"]');
+
+      // tema semasa: 'light' atau 'dark'
+      const temaSemasa = () => (root.getAttribute('data-theme') === 'light' ? 'light' : 'dark');
+
+      // lukis semula butang mengikut tema semasa
+      const lukisButang = () => {
+        const gelap = temaSemasa() === 'dark';
+        btn.innerHTML = gelap ? SUN : MOON;                       // gelap -> tunjuk matahari (tekan untuk cerah)
+        const label = gelap ? 'Tukar ke mod cerah' : 'Tukar ke mod gelap';
+        btn.setAttribute('aria-label', label);
+        btn.title = label;
+        if (warnaBar) warnaBar.setAttribute('content', gelap ? '#07040d' : '#f6efe0');
+      };
+
+      // tetapkan tema; simpan hanya jika pengguna yang memilih
+      const tetapTema = (tema, simpan) => {
+        root.setAttribute('data-theme', tema);
+        if (simpan) {
+          try { localStorage.setItem('sw_login_theme', tema); } catch (e) { /* tetap berfungsi tanpa simpanan */ }
+        }
+        lukisButang();
+      };
+
+      // klik butang: tukar tema dan simpan
+      btn.addEventListener('click', () => tetapTema(temaSemasa() === 'light' ? 'dark' : 'light', true));
+
+      // jika pengguna belum pernah memilih, ikut perubahan tetapan sistem
+      const sistem = window.matchMedia ? window.matchMedia('(prefers-color-scheme: light)') : null;
+      if (sistem && sistem.addEventListener) {
+        sistem.addEventListener('change', (e) => {
+          let pernahPilih = false;
+          try { pernahPilih = !!localStorage.getItem('sw_login_theme'); } catch (err) { /* abaikan */ }
+          if (!pernahPilih) tetapTema(e.matches ? 'light' : 'dark', false);
+        });
+      }
+
+      // jika tab lain menukar tema, ikut sama
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'sw_login_theme' && (e.newValue === 'light' || e.newValue === 'dark')) tetapTema(e.newValue, false);
+      });
+
+      lukisButang();
+      // aktifkan animasi tukar warna selepas lukisan pertama (supaya tiada kelipan semasa muat)
+      requestAnimationFrame(() => root.classList.add('tema-sedia'));
+    });
+  </script>
+  <script>
+    /* show / hide password: an eye button inside every password box */
+    document.addEventListener('DOMContentLoaded', () => {
+      const EYE = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+      const EYE_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M17.9 17.9A10.9 10.9 0 0 1 12 19C5 19 1 12 1 12a18.5 18.5 0 0 1 5.1-5.9M9.9 5.2A10.4 10.4 0 0 1 12 5c7 0 11 7 11 7a18.6 18.6 0 0 1-2.2 3.2M1 1l22 22M14.1 14.1a3 3 0 1 1-4.2-4.2"/></svg>';
+      document.querySelectorAll('input[type="password"]').forEach((input) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'pw-field';
+        input.parentNode.insertBefore(wrap, input);
+        wrap.appendChild(input);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pw-toggle';
+        const paint = () => {
+          const shown = input.type === 'text';
+          btn.innerHTML = shown ? EYE_OFF : EYE;
+          btn.setAttribute('aria-label', shown ? 'Sembunyikan kata laluan' : 'Tunjukkan kata laluan');
+          btn.setAttribute('aria-pressed', shown ? 'true' : 'false');
+          btn.title = shown ? 'Sembunyikan kata laluan' : 'Tunjukkan kata laluan';
+        };
+        btn.addEventListener('click', () => {
+          const start = input.selectionStart, end = input.selectionEnd;
+          input.type = input.type === 'password' ? 'text' : 'password';
+          paint();
+          input.focus();
+          try { input.setSelectionRange(start, end); } catch (e) { /* not needed */ }
+        });
+        paint();
+        wrap.appendChild(btn);
+      });
+    });
+  </script>
+  <script src="assets/js/passwordRules.js"></script>
+  <script>
+    /* amaran kata laluan langsung (mesti sebelum skrip log masuk di bawah supaya boleh menghalang borang yang belum lulus) */
+    document.addEventListener('DOMContentLoaded', () => {
+      const nilai = (id) => (document.getElementById(id) ? document.getElementById(id).value.trim() : '');
+      // [ruangan kata laluan, kotak amaran, borang, ruangan nama pengguna, ruangan nama]
+      const senarai = [
+        ['sn-password', 'pwh-sn', 'form-student-new', 'sn-username', 'sn-name'],
+        ['studentr-password', 'pwh-sr', 'form-student-reset', 'studentr-username', null],
+        ['tn-password', 'pwh-tn', 'form-teacher-new', 'tn-username', 'tn-name'],
+        ['teacherr-password', 'pwh-tr', 'form-teacher-reset', 'teacherr-username', null]
+      ];
+      senarai.forEach(([kataLaluan, kotak, borang, pengguna, nama]) => {
+        SWPassword.bind(
+          document.getElementById(kataLaluan),
+          document.getElementById(kotak),
+          () => ({ username: nilai(pengguna), name: nama ? nilai(nama) : '' }),
+          document.getElementById(borang));
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let activeRole = 'Student';
+      const errorBox = document.getElementById('auth-error');
+      const tabs = {
+        student: { btn: document.getElementById('tab-student'), panel: document.getElementById('panel-student') },
+        teacher: { btn: document.getElementById('tab-teacher'), panel: document.getElementById('panel-teacher') }
+      };
+      const showError = (msg) => { errorBox.textContent = msg; errorBox.classList.remove('is-ok', 'is-hidden'); };
+      const showOk = (msg) => { errorBox.textContent = msg; errorBox.classList.add('is-ok'); errorBox.classList.remove('is-hidden'); };
+      const clearErrors = () => {
+        errorBox.classList.add('is-hidden');
+        errorBox.classList.remove('is-ok');
+        document.querySelectorAll('.field-error').forEach((n) => { n.textContent = ''; });
+      };
+
+      Object.keys(tabs).forEach((role) => {
+        tabs[role].btn.addEventListener('click', () => {
+          activeRole = role === 'student' ? 'Student' : 'Teacher';
+          Object.values(tabs).forEach((t) => {
+            t.btn.classList.remove('is-active');
+            t.btn.setAttribute('aria-selected', 'false');
+            t.panel.classList.add('is-hidden');
+          });
+          tabs[role].btn.classList.add('is-active');
+          tabs[role].btn.setAttribute('aria-selected', 'true');
+          tabs[role].panel.classList.remove('is-hidden');
+          clearErrors();
+        });
+      });
+
+      // the sign-up links are shown; they are hidden only when the server says sign-up is closed (ENABLE_SIGNUP=false)
+      fetch('/api/auth/config').then((r) => r.json()).then((c) => {
+        if (c && c.signup === false) document.querySelectorAll('[data-signup]').forEach((b) => { b.hidden = true; });
+      }).catch(() => {});
+      // "Daftar" / "Log masuk" links swap the form inside the panel
+      document.querySelectorAll('[data-show]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const panel = btn.closest('.login-panel');
+          panel.querySelectorAll('form').forEach((f) => f.classList.toggle('is-hidden', f.id !== btn.dataset.show));
+          clearErrors();
+        });
+      });
+
+      const enter = (data) => {
+        localStorage.setItem('sejarahwira_user', JSON.stringify(data));
+        window.location.href = data.role === 'Student' ? 'student/game.html' : 'teacher/index.html';
+      };
+
+      async function send(url, body, button) {
+        clearErrors();
+        button.disabled = true;
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          const result = await res.json();
+          if (result.success && result.data) { enter(result.data); return; }   // login / sign-up: go in. Reset has no data.
+          return result;
+        } catch (err) {
+          showError('Ralat sambungan pelayan. Sila cuba lagi.');
+        } finally {
+          button.disabled = false;
+        }
+        return null;
+      }
+
+      async function handleLogin(username, password, button) {
+        const result = await send('/api/auth/login', { username, password, role: activeRole }, button);
+        if (result) showError(result.message || 'Nama pengguna atau kata laluan tidak sah!');
+      }
+
+      async function handleRegister(form, url, fields) {
+        const body = {};
+        Object.entries(fields).forEach(([key, id]) => { body[key] = document.getElementById(id).value; });
+        const result = await send(url, body, form.querySelector('button[type=submit]'));
+        if (!result) return;
+        const errs = result.errors || {};
+        Object.entries(errs).forEach(([key, msg]) => {
+          const slot = form.querySelector(`[data-for="${key}"]`);
+          if (slot) slot.textContent = msg;
+        });
+        form.querySelectorAll('details.opt-code').forEach((d) => { if (errs.classCode || errs.code) d.open = true; });   // tunjuk kotak kod jika kodnya salah
+        if (!Object.keys(errs).length) showError(result.message || 'Pendaftaran gagal.');
+      }
+
+      document.getElementById('form-student').addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleLogin(document.getElementById('student-username').value.trim(), document.getElementById('student-password').value.trim(), e.target.querySelector('button[type=submit]'));
+      });
+      document.getElementById('form-teacher').addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleLogin(document.getElementById('teacher-email').value.trim(), document.getElementById('teacher-password').value.trim(), e.target.querySelector('button[type=submit]'));
+      });
+      /* daftar guru: hantar kod pengesahan ke e-mel yang ditaip */
+      document.getElementById('tn-send-code').addEventListener('click', async (e) => {
+        const form = document.getElementById('form-teacher-new');
+        const result = await send('/api/auth/verify-teacher-email', { username: document.getElementById('tn-username').value.trim() }, e.currentTarget);
+        if (!result) return;
+        const errs = result.errors || {};
+        Object.entries(errs).forEach(([key, msg]) => { const slot = form.querySelector(`[data-for="${key}"]`); if (slot) slot.textContent = msg; });
+        if (result.success) showOk(result.message);
+        else if (!Object.keys(errs).length) showError(result.message || 'Kod tidak dapat dihantar.');
+      });
+
+      /* butang "Hantar kod ke e-mel saya" */
+      document.querySelectorAll('[data-send-code]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const pre = btn.dataset.sendCode;
+          const username = document.getElementById(`${pre}r-username`).value.trim();
+          if (!username) return showError('Sila masukkan e-mel anda dahulu.');
+          const result = await send('/api/auth/forgot', { username }, btn);
+          if (result) result.success ? showOk(result.message) : showError(result.message || 'Permintaan gagal.');
+        });
+      });
+
+      /* pautan dalam e-mel (?reset=Student&u=...&c=...) terus membuka borang dengan ruangan terisi */
+      const qs = new URLSearchParams(location.search);
+      if (qs.get('reset') && qs.get('u')) {
+        const pre = qs.get('reset') === 'Teacher' ? 'teacher' : 'student';
+        document.getElementById(`tab-${pre}`).click();
+        document.querySelectorAll(`#panel-${pre} form`).forEach((f) => f.classList.toggle('is-hidden', f.id !== `form-${pre}-reset`));
+        document.getElementById(`${pre}r-username`).value = qs.get('u');
+        document.getElementById(`${pre}r-code`).value = qs.get('c') || '';
+        history.replaceState(null, '', location.pathname);   // buang kod daripada alamat
+      }
+
+      /* lupa kata laluan: nama pengguna + kod daripada e-mel/guru/admin + kata laluan baharu */
+      [['student', 'student-username'], ['teacher', 'teacher-email']].forEach(([pre, loginField]) => {
+        document.getElementById(`form-${pre}-reset`).addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const form = e.target;
+          const username = document.getElementById(`${pre}r-username`).value.trim();
+          const result = await send('/api/auth/reset-password', {
+            username, code: document.getElementById(`${pre}r-code`).value.trim(), password: document.getElementById(`${pre}r-password`).value
+          }, form.querySelector('button[type=submit]'));
+          if (!result) return;
+          const errs = result.errors || {};
+          Object.entries(errs).forEach(([key, msg]) => { const slot = form.querySelector(`[data-for="${key}"]`); if (slot) slot.textContent = msg; });
+          if (!result.success && !Object.keys(errs).length) return showError(result.message || 'Kata laluan tidak dapat ditukar.');
+          if (result.success) {
+            form.reset();
+            document.getElementById(loginField).value = username;
+            document.getElementById(`form-${pre}`).classList.remove('is-hidden');
+            form.classList.add('is-hidden');
+            showOk(result.message);
+          }
+        });
+      });
+      document.getElementById('form-student-new').addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleRegister(e.target, '/api/auth/register-student', { name: 'sn-name', username: 'sn-username', password: 'sn-password', classCode: 'sn-class' });
+      });
+      document.getElementById('form-teacher-new').addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleRegister(e.target, '/api/auth/register-teacher', { name: 'tn-name', username: 'tn-username', password: 'tn-password', code: 'tn-code', verifyCode: 'tn-verify' });
+      });
+    });
+  </script>
+</body>
+</html>

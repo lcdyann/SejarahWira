@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SejarahWira - Analitik Prestasi Pelajar</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/analytics.css">
+  <link rel="stylesheet" href="../assets/css/teacher.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="../assets/js/theme.js"></script>
+</head>
+
+<body class="game-body an-body">
+
+  <div id="top-nav-placeholder"></div>
+
+  <main class="an-wrapper">
+    <header class="an-header">
+      <h1><i class="fas fa-chart-column"></i> Analitik Prestasi Pelajar</h1>
+      <p>Berdasarkan keputusan Pentaksiran Sumatif (The Great Siege). Skor lulus dan skor artifak Kepungan Agung boleh ditetapkan di bawah; data prestasi pelajar hanya untuk dibaca.</p>
+    </header>
+
+    <!-- AKSES DITOLAK (security from breached) --> 
+    <section id="cm-denied" class="cm-state is-hidden" role="alert">
+      <i class="fas fa-lock"></i>
+      <p id="cm-denied-text">Halaman ini hanya untuk guru.</p>
+      <a class="cm-btn cm-btn-primary" href="../index.html"><i class="fas fa-right-to-bracket"></i> Log Masuk</a>
+    </section>
+
+    <!-- MEMUATKAN -->
+    <section id="an-loading" class="an-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>Memuatkan analitik...</p>
+    </section>
+
+    <!-- E1: DATA TIDAK DAPAT DIAMBIL -->
+    <section id="an-error" class="an-state is-hidden" role="alert">
+      <i class="fas fa-triangle-exclamation"></i>
+      <p id="an-error-text">Data prestasi tidak dapat diambil.</p>
+      <div class="an-actions">
+        <button type="button" class="an-btn an-btn-primary" id="btn-retry"><i class="fas fa-rotate"></i> Cuba Lagi</button>
+        <a class="an-btn an-btn-ghost" href="index.html"><i class="fas fa-house"></i> Menu Utama</a>
+      </div>
+    </section>
+
+    <!-- A1: TIADA DATA -->
+    <section id="an-empty" class="an-state is-hidden">
+      <i class="fas fa-inbox"></i>
+      <p id="an-empty-text">Tiada data prestasi tersedia.</p>
+      <button type="button" class="an-btn an-btn-ghost is-hidden" id="btn-clear-filter">Papar Semua Era</button>
+    </section>
+
+    <!-- PAPAN PEMUKA -->
+    <!-- Kepungan Agung: skor lulus + skor artifak -->
+      <section class="an-card is-hidden" id="an-thresholds" aria-labelledby="t-thr">
+        <h2 id="t-thr"><i class="fas fa-sliders"></i> Skor Kepungan Agung</h2>
+        <p class="an-note">Satu set skor untuk semua era. Skor lulus (asal 40) membuka era seterusnya. Skor artifak (asal 80) ialah skor untuk mendapat artifak era (tidak boleh lebih rendah daripada skor lulus). Latihan Wira (formatif) tiada skor lulus: pemain yang kehabisan HP dahulu kalah. Perubahan terpakai pada percubaan seterusnya.</p>
+        <div id="thr-body"></div>
+      </section>
+
+    <section id="an-dashboard" class="is-hidden">
+
+      <div class="an-filters" role="group" aria-label="Tapis">
+        <label>Era
+          <select id="f-era"></select>
+        </label>
+        <label>Kelas
+          <select id="f-class"></select>
+        </label>
+      </div>
+
+      <!-- E2: laporan separa -->
+      <div id="an-partial" class="an-banner is-hidden" role="alert"></div>
+
+      <div class="an-kpis" id="an-kpis"></div>
+
+      <div class="an-grid">
+        <section class="an-card" aria-labelledby="t-eras">
+          <h2 id="t-eras"><i class="fas fa-landmark"></i> Purata Mengikut Era</h2>
+          <p class="an-muted">Garis menunjukkan markah lulus. Klik satu era untuk menapis.</p>
+          <div id="chart-eras"></div>
+        </section>
+
+        <section class="an-card" aria-labelledby="t-dist">
+          <h2 id="t-dist"><i class="fas fa-chart-simple"></i> Taburan Skor Pelajar</h2>
+          <p class="an-muted">Bilangan pelajar bagi setiap julat skor.</p>
+          <div id="chart-dist"></div>
+        </section>
+      </div>
+
+      <section class="an-card" aria-labelledby="t-weak">
+        <h2 id="t-weak"><i class="fas fa-triangle-exclamation"></i> Topik Lemah</h2>
+        <div id="weak-list"></div>
+      </section>
+
+      <section class="an-card" aria-labelledby="t-students">
+        <h2 id="t-students"><i class="fas fa-user-graduate"></i> Skor Pelajar</h2>
+        <p class="an-muted">Skor ialah purata markah terbaik pelajar bagi setiap era. Pilih pelajar untuk butiran.</p>
+        <div class="an-table-wrap" id="student-table"></div>
+      </section>
+
+      <!-- A3: butiran pelajar -->
+      <section class="an-card is-hidden" id="an-detail" aria-live="polite" aria-labelledby="detail-title">
+        <div class="an-detail-head">
+          <h2 id="detail-title"><i class="fas fa-id-card"></i> Butiran Pelajar</h2>
+          <button type="button" class="an-btn an-btn-ghost an-btn-sm" id="btn-close-detail"><i class="fas fa-xmark"></i> Tutup</button>
+        </div>
+        <div id="detail-body"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="../assets/js/topNav.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTopNav({ homeUrl: 'index.html', logoutUrl: '../index.html' });
+    });
+  </script>
+  <script src="../assets/js/analyticsEngine.js"></script>
+</body>
+</html>

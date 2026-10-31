@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SejarahWira - Profil Guru</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/teacherProfile.css">
+  <link rel="stylesheet" href="../assets/css/teacher.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="../assets/js/theme.js"></script>
+</head>
+
+<body class="game-body tpf-body">
+
+  <div id="top-nav-placeholder"></div>
+
+  <main class="tpf-wrapper">
+    <header class="tpf-header">
+      <h1><i class="fas fa-chalkboard-teacher"></i> Profil Guru</h1>
+      <p>Maklumat akaun dan kelas anda.</p>
+    </header>
+
+    <!-- AKSES DITOLAK (security from breached) --> 
+    <section id="cm-denied" class="cm-state is-hidden" role="alert">
+      <i class="fas fa-lock"></i>
+      <p id="cm-denied-text">Halaman ini hanya untuk guru.</p>
+      <a class="cm-btn cm-btn-primary" href="../index.html"><i class="fas fa-right-to-bracket"></i> Log Masuk</a>
+    </section>
+    
+    <section id="tpf-loading" class="tpf-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>Memuatkan profil...</p>
+    </section>
+
+    <section id="tpf-error" class="tpf-state is-hidden" role="alert">
+      <i class="fas fa-triangle-exclamation"></i>
+      <p id="tpf-error-text">Gagal memuatkan profil.</p>
+      <button type="button" class="tpf-btn tpf-btn-primary" id="btn-retry"><i class="fas fa-rotate-right"></i> Cuba Lagi</button>
+    </section>
+
+    <div id="tpf-content" class="is-hidden">
+
+      <section class="tpf-card tpf-identity" aria-labelledby="tpf-name">
+        <div class="tpf-avatar" id="tpf-avatar" aria-hidden="true">G</div>
+        <div class="tpf-identity-info">
+          <h2 id="tpf-name">Guru</h2>
+          <dl class="tpf-info">
+            <div><dt><i class="fas fa-id-badge"></i> ID Guru</dt><dd id="info-teacherID">-</dd></div>
+            <div><dt><i class="fas fa-at"></i> Nama Pengguna</dt><dd id="info-username">-</dd></div>
+          </dl>
+        </div>
+        <div class="tpf-stats" id="tpf-stats"></div>
+      </section>
+
+      <section class="tpf-card" aria-labelledby="tpf-classes-title">
+        <div class="tpf-card-head">
+          <h2 id="tpf-classes-title"><i class="fas fa-school"></i> Kelas Saya</h2>
+          <a class="tpf-btn tpf-btn-primary tpf-btn-sm" href="class_manager.html"><i class="fas fa-plus"></i> Urus Kelas &amp; Pelajar</a>
+        </div>
+        <div id="tpf-classes"></div>
+      </section>
+
+      <section aria-labelledby="tpf-links-title">
+        <h2 class="tpf-section-title" id="tpf-links-title"><i class="fas fa-compass"></i> Menu Guru</h2>
+        <div class="tpf-links">
+          <a class="tpf-link" href="content_manager.html"><i class="fas fa-pen-ruler"></i><strong>Urus Kandungan</strong><span>Soalan, naratif, dialog dan quest</span></a>
+          <a class="tpf-link" href="monitor_analytics.html"><i class="fas fa-chart-column"></i><strong>Analitik Prestasi</strong><span>Skor sumatif dan topik lemah</span></a>
+          <a class="tpf-link" href="learning_progress_teacher.html"><i class="fas fa-chart-line"></i><strong>Kemajuan Pelajar</strong><span>Era, quest, lencana dan artifak</span></a>
+          <a class="tpf-link" href="class_manager.html"><i class="fas fa-users-gear"></i><strong>Kelas &amp; Pelajar</strong><span>Cipta kelas, tambah pelajar</span></a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="../assets/js/topNav.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTopNav({ homeUrl: 'index.html', logoutUrl: '../index.html' });
+    });
+  </script>
+  <script src="../assets/js/teacherProfileEngine.js"></script>
+</body>
+</html>

@@ -1,0 +1,242 @@
+/* ==========================================================================
+   teacher.css  -  what ALL teacher pages share (load it LAST on every teacher page)
+
+   ONE WIDTH:  change --teacher-width here and every teacher page follows.
+   ONE LINK BAR: the row of page links under the top bar (drawn by topNav.js).
+   ========================================================================== */
+:root {
+  --teacher-width: 1320px;
+  --teacher-gutter: 20px;
+}
+
+/* the page body of every teacher page */
+.cm-wrapper,
+.an-wrapper,
+.cl-wrapper,
+.tp-wrapper,
+.tpf-wrapper,
+.th-wrapper {
+  width: 100%;
+  max-width: var(--teacher-width);
+  margin: 0 auto;
+  padding: 24px var(--teacher-gutter) 60px;
+}
+
+/* the heading of every teacher page */
+.cm-header h1,
+.an-header h1,
+.cl-header h1,
+.tp-header h1,
+.tpf-header h1,
+.th-header h1 {
+  font-family: var(--font-pixel, inherit);
+  color: var(--heading, var(--gold-light, var(--t-accent, #fcd34d)));
+  font-size: 1.4rem;
+  margin: 0 0 6px;
+}
+
+.cm-header p,
+.an-header p,
+.cl-header p,
+.tp-header p,
+.tpf-header p,
+.th-header p {
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+  font-size: .9rem;
+  margin: 0 0 14px;
+}
+
+/* ---- the link bar: Kandungan | Kelas | Kemajuan | Analitik | Profil ---- */
+.teacher-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: var(--teacher-width);
+  margin: -8px auto 6px;
+  padding: 0 var(--teacher-gutter);
+}
+
+.teacher-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .92rem;
+  color: var(--text-main, var(--t-text, #f5f5f4));
+  background: rgba(0, 0, 0, .25);
+  border: 1px solid var(--card-border, var(--t-line, #443425));
+}
+
+.teacher-tab:hover {
+  border-color: var(--primary-gold, #f59e0b);
+  background: rgba(245, 158, 11, .14);
+}
+
+.teacher-tab.is-current {
+  background: var(--primary-gold, #f59e0b);
+  border-color: var(--primary-gold, #f59e0b);
+  color: #1c1713;
+  cursor: default;
+}
+
+@media (max-width: 700px) {
+  .teacher-tab span {
+    display: none;
+  }
+}
+
+
+/* ==========================================================================
+   KOTAK KEADAAN (memuatkan / ralat / kosong / akses ditolak)
+   Sama seperti halaman Kandungan: kad berbingkai, ikon emas di tengah.
+   Ralat dan akses ditolak: ikon merah.
+   ========================================================================== */
+.cm-state,
+.cl-state,
+.tp-state,
+.an-state,
+.tpf-state {
+  background: var(--card-bg, var(--t-surface, #26211c));
+  border: 1px solid var(--card-border, var(--t-line, #443425));
+  border-radius: var(--radius-md, 10px);
+  padding: 40px 24px;
+  margin-bottom: 18px;
+  text-align: center;
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+}
+
+.cm-state > i,
+.cl-state > i,
+.tp-state > i,
+.an-state > i,
+.tpf-state > i {
+  display: block;
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+  color: var(--primary-gold, var(--t-amber-text, #f59e0b));
+}
+
+.cm-state p,
+.cl-state p,
+.tp-state p,
+.an-state p,
+.tpf-state p {
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+
+.cm-state p:last-child,
+.cl-state p:last-child,
+.tp-state p:last-child,
+.an-state p:last-child,
+.tpf-state p:last-child {
+  margin-bottom: 0;
+}
+
+[id$="-error"].cm-state > i, [id$="-denied"].cm-state > i,
+[id$="-error"].cl-state > i, [id$="-denied"].cl-state > i,
+[id$="-error"].tp-state > i, [id$="-denied"].tp-state > i,
+[id$="-error"].an-state > i, [id$="-denied"].an-state > i,
+[id$="-error"].tpf-state > i, [id$="-denied"].tpf-state > i {
+  color: var(--bad, var(--t-bad, #f87171));
+}
+
+/* ==========================================================================
+   HALAMAN UTAMA GURU (teacher/index.html)
+   Pengepala + kad berkotak, sama gaya senarai era di halaman Kandungan.
+   ========================================================================== */
+.th-header {
+  margin-bottom: 18px;
+}
+
+.th-section-title {
+  color: var(--heading, var(--t-accent, #fcd34d));
+  font-size: 1.05rem;
+  margin: 0 0 12px;
+}
+
+.th-section-title i {
+  color: var(--primary-gold, var(--t-amber-text, #f59e0b));
+  margin-right: 8px;
+}
+
+.th-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.th-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--card-bg, var(--t-surface, #26211c));
+  border: 1px solid var(--card-border, var(--t-line, #443425));
+  border-radius: var(--radius-md, 10px);
+  color: var(--text-main, var(--t-text, #fff));
+  text-decoration: none;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+
+.th-card:hover {
+  border-color: var(--primary-gold, #f59e0b);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-soft, 0 8px 22px rgba(var(--t-shadow-rgb, 0, 0, 0), .3));
+}
+
+.th-card:focus-visible {
+  outline: 2px solid var(--heading, var(--t-accent, #fcd34d));
+  outline-offset: 2px;
+}
+
+.th-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.th-icon {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--surface, var(--t-bg, #1e1b18));
+  border: 2px solid var(--primary-gold, #f59e0b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--heading, var(--t-heading, #fef3c7));
+}
+
+.th-name {
+  color: var(--heading, var(--t-heading, #fef3c7));
+  font-weight: 700;
+  font-size: .95rem;
+  line-height: 1.25;
+}
+
+.th-desc {
+  color: var(--text-muted, var(--t-muted, #a8a29e));
+  font-size: .85rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.th-open {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-size: .74rem;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  color: var(--ok, var(--t-ok, #4ade80));
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <title>Templat susun atur permainan</title>
+</head>
+<body>
+<!--
+  ============================================================================
+  templates.html  -  SUSUN ATUR (HTML) BAGI KOTAK-KOTAK PERMAINAN
+  ============================================================================
+  Fail ini ialah tempat anda membaca dan mengubah rupa (susun atur) permainan.
+  Setiap <template> ialah satu "kotak". JavaScript (core.js: fungsi tpl()) hanya
+  menyalin kotak ini dan mengisi teksnya. Warna dan saiz pula ada dalam game.css.
+
+  Cara membaca:
+    id="tpl-xxx"      nama kotak
+    data-ref="xxx"    tempat yang JavaScript akan isi atau tambah gambar
+    data-text="xxx"   tempat teks yang diisi oleh JavaScript (selamat, bukan HTML)
+
+  Kotak dalam fail ini:
+    1. tpl-dialogue    kotak dialog (nama, teks, potret kiri / kanan, pilihan Giliran Anda)
+    2. tpl-aftermath   adegan "Akibat" (apa yang berlaku bila jawapan salah)
+    3. tpl-possession  kad "KAU KINI IALAH ..." (jiwa pelajar masuk ke jasad tokoh)
+    4. tpl-diary       halaman diari + nota lekat selepas misi
+    5. tpl-hotspot     misi Cari Bukti (gambar + panel bukti di kanan yang boleh ditutup)
+  ============================================================================
+-->
+
+  <!-- 1. KOTAK DIALOG ------------------------------------------------------
+       Tokoh lain: potret di kiri. Kau (pelajar): potret di kanan, kotak biru
+       (data-tone="me" ditetapkan oleh JavaScript, rupanya dalam game.css). -->
+  <template id="tpl-dialogue">
+    <div class="dlg hidden">
+      <div class="dlg-portrait" data-ref="portrait"></div>      <!-- potret penutur -->
+      <div class="dlg-portrait dlg-me" data-ref="mePortrait"></div> <!-- potret kau, hanya semasa Giliran Anda -->
+      <div class="dlg-panel px" data-ref="panel">
+        <div class="dlg-name" data-ref="name"></div>             <!-- nama penutur -->
+        <div class="dlg-text" data-ref="text"></div>             <!-- ayat (ditaip satu-satu) -->
+        <div class="dlg-more" data-ref="more">▼</div>           <!-- tanda "tekan Enter" -->
+      </div>
+      <div class="dlg-choices" data-ref="choices"></div>         <!-- butang pilihan jawapan -->
+    </div>
+  </template>
+
+  <!-- 2. ADEGAN AKIBAT -------------------------------------------------------
+       Gambar latar dikuncupkan warnanya, retak, cop "SEJARAH BERUBAH",
+       kemudian akibat ditaip. -->
+  <template id="tpl-aftermath">
+    <div class="am-wrap">
+      <div class="am-pic" data-ref="pic"></div>                  <!-- gambar latar babak -->
+      <div class="am-crack"><i></i><i></i></div>                 <!-- retakan benang cerita -->
+      <div class="am-card px">
+        <div class="am-stamp" data-text="title"></div>           <!-- cop: SEJARAH BERUBAH -->
+        <div class="am-label">Apa yang berlaku...</div>
+        <p class="am-text" data-ref="text"></p>                  <!-- akibat (ditaip) -->
+        <div class="am-go">Tekan Enter ▶</div>
+      </div>
+    </div>
+  </template>
+
+  <!-- 3. KAD PERASUKAN (POSSESSION) -----------------------------------------
+       Avatar pelajar  ⟶  tokoh sebenar. Kemudian Pendekar Bayang menerangkan. -->
+  <template id="tpl-possession">
+    <div class="pos-wrap">
+      <div class="pos-glow"></div>
+      <div class="pos-stage">
+        <div class="pos-from" data-ref="from"></div>             <!-- avatar pelajar -->
+        <div class="pos-arrow">⟶</div>
+        <div class="pos-to" data-ref="to"></div>                 <!-- tokoh peranan -->
+      </div>
+      <div class="pos-card px">
+        <div class="pos-label">KAU KINI IALAH</div>
+        <div class="pos-name" data-text="name"></div>            <!-- nama tokoh -->
+        <div class="pos-task" data-text="task"></div>            <!-- sumbangan tokoh -->
+        <div class="pos-go" data-ref="go">Tekan Enter ▶</div>
+      </div>
+    </div>
+  </template>
+
+  <!-- 4. HALAMAN DIARI + NOTA LEKAT -----------------------------------------
+       Dipaparkan dalam tetingkap selepas misi berjaya. Kertas = halaman.png
+       (ditetapkan sebagai --paper-img dalam game.css). -->
+  <template id="tpl-diary">
+    <div class="diary-page">
+      <span class="diary-tab" data-text="tab"></span>            <!-- "Diari <nama tokoh>" -->
+      <p class="sticky" data-text="note"></p>                    <!-- catatan (nota lekat kuning) -->
+    </div>
+  </template>
+
+  <!-- 5. MISI CARI BUKTI ---------------------------------------------------
+       Gambar penuh untuk dicari. Senarai bukti ada di PANEL KANAN yang boleh
+       ditutup (butang ◀/▶), supaya tiada bukti tersembunyi di bawah nama. -->
+  <template id="tpl-hotspot">
+    <div class="hs-root">
+      <div class="hs-scene" data-ref="scene"></div>             <!-- gambar yang diklik -->
+      <aside class="hs-side px" data-ref="side">                 <!-- panel kanan -->
+        <button class="hs-toggle" data-ref="toggle" type="button" title="Buka / tutup senarai bukti">▶</button>
+        <div class="hs-side-title">BUKTI <span data-ref="count"></span></div>
+        <ol class="hs-slots" data-ref="slots"></ol>             <!-- 1. ??? / nama bukti yang dijumpai -->
+      </aside>
+    </div>
+  </template>
+
+</body>
+</html>

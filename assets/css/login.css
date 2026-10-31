@@ -1,0 +1,403 @@
+/* SejarahWira - login (same pixel look as the game; used only by index.html) */
+:root {
+  --wood-d: #1a0f07;
+  --wood: #2b1a0e;
+  --gold: #e2a120;
+  --gold-l: #f3c76b;
+  --parch: #f0e2c8;
+  --ink: #2b1402;
+  --glow: #8a5cff;
+  --px: 'Press Start 2P', monospace;
+  --text: 'Crimson Pro', Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+.login-body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: var(--text);
+  color: #f4e4c1;
+  background: #07040d;
+  overflow: auto;
+}
+
+.login-bg {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(rgba(10,5,20,.72), rgba(10,5,20,.9)), url('../gameAsset/background/village.jpg') center / cover no-repeat;
+  filter: saturate(.8);
+}
+
+.login-dust {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(2px 2px at 20% 30%, #f3c76b88, #0000), radial-gradient(2px 2px at 70% 20%, #8a5cff88, #0000), radial-gradient(2px 2px at 40% 75%, #f3c76b66, #0000), radial-gradient(2px 2px at 85% 65%, #8a5cff66, #0000);
+  animation: dust 9s ease-in-out infinite alternate;
+}
+
+@keyframes dust {
+  to {
+    transform: translateY(-18px);
+    opacity: .55;
+  }
+}
+
+.px {
+  background: var(--wood);
+  border: 4px solid var(--wood-d);
+  box-shadow: inset 0 0 0 2px #7a5a30, 0 6px 0 rgba(0,0,0,.55), 0 0 40px #8a5cff33;
+}
+
+.login-card {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  padding: 26px 30px 20px;
+}
+
+.login-head {
+  text-align: center;
+}
+
+.login-logo {
+  width: 84px;
+  height: 84px;
+  object-fit: cover;
+  border: 4px solid var(--gold);
+  image-rendering: pixelated;
+}
+
+.login-title {
+  margin: 12px 0 6px;
+  font-family: var(--px);
+  font-size: 22px;
+  color: var(--gold-l);
+  text-shadow: 0 4px 0 #000, 0 0 22px var(--glow);
+}
+
+.login-title span {
+  color: #fff;
+}
+
+.login-sub {
+  margin: 0 0 14px;
+  font-size: 19px;
+  font-style: italic;
+  color: #cdbff3;
+}
+
+.login-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.tab {
+  flex: 1;
+  font-family: var(--px);
+  font-size: 10px;
+  padding: 11px 6px;
+  color: #f4e4c1;
+  background: #1a0f07;
+  border: 3px solid #5c3510;
+  cursor: pointer;
+}
+
+.tab.is-active {
+  background: linear-gradient(180deg, #f3c76b, #c98a2b);
+  color: var(--ink);
+  border-color: #fff3c9;
+}
+
+.login-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login-panel label {
+  font-family: var(--px);
+  font-size: 8px;
+  color: var(--gold-l);
+  margin-top: 6px;
+}
+
+.login-panel input {
+  font-family: var(--text);
+  font-size: 21px;
+  padding: 9px 12px;
+  color: var(--ink);
+  background: var(--parch);
+  border: 3px solid #5c3510;
+  outline: none;
+}
+
+.login-panel input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px #e2a12055;
+}
+
+.btn-px {
+  margin-top: 14px;
+  font-family: var(--px);
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 13px 14px;
+  color: #fff;
+  border: 3px solid #e28a2b;
+  border-radius: 2px;
+  box-shadow: 0 4px 0 #2b0a02;
+  cursor: pointer;
+  background: linear-gradient(180deg, #8a3a1c, #5c1103);
+}
+
+.btn-px.gold {
+  background: linear-gradient(180deg, #f3c76b, #c98a2b);
+  color: var(--ink);
+  border-color: #fff3c9;
+}
+
+.btn-px:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.btn-px:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #2b0a02;
+}
+
+.btn-px:disabled {
+  opacity: .5;
+  cursor: wait;
+}
+
+.login-error {
+  margin-top: 14px;
+  padding: 9px 12px;
+  font-size: 18px;
+  background: #8a2412;
+  color: #fff;
+  border: 3px solid #f8717166;
+}
+
+.login-foot {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 16px;
+  opacity: .7;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+/* ---- sign-up forms and the swap links ---- */
+.link-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 6px;
+  background: none;
+  border: 0;
+  color: var(--gold-light, #fcd34d);
+  font: inherit;
+  font-size: 15px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  color: #fff;
+}
+
+.form-note {
+  margin: 0 0 8px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #d9cfe8;
+}
+
+.field-error {
+  display: block;
+  min-height: 0;
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: #ff9b9b;
+}
+.link-btn[hidden] { display: none; }
+
+
+/* ---- show / hide password ---- */
+.pw-field { position: relative; display: block; }
+.pw-field input { width: 100%; box-sizing: border-box; padding-right: 46px; }
+.pw-toggle {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; padding: 0; margin: 0;
+  background: transparent; border: 0; border-radius: 6px; color: #5c3510; cursor: pointer;
+}
+.pw-toggle:hover, .pw-toggle:focus-visible { color: #2b0a02; background: rgba(92, 53, 16, .14); outline: 2px solid #c98a2b; }
+.pw-toggle[aria-pressed="true"] { color: #a1500c; }
+
+/* mesej berjaya (contoh: kata laluan sudah ditukar) guna kotak yang sama dengan ralat */
+.login-error.is-ok {
+  background: #1f5a24;
+  border-color: #4caf50;
+  color: #c8f2c9;
+}
+
+/* kotak kod pilihan (kod kelas / kod pendaftaran guru): tertutup melainkan dibuka */
+.opt-code { margin: 10px 0 4px; }
+.opt-code summary { cursor: pointer; font-size: 17px; color: inherit; opacity: 0.85; }
+.opt-code summary:hover { opacity: 1; text-decoration: underline; }
+.opt-code input { margin-top: 8px; }
+
+/* ===== susun atur dua lajur (kiri jenama, kanan borang) ===== */
+.login-body { padding: 0; align-items: stretch; }
+.login-split { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; width: 100%; min-height: 100vh; }
+
+.login-brand {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 48px; text-align: center;
+  background: linear-gradient(135deg, rgba(10, 5, 20, .55), rgba(26, 15, 40, .85));
+}
+.login-brand .login-logo { width: 120px; height: 120px; border-radius: 50%; }
+.login-brand .login-title { font-size: 28px; margin: 22px 0 10px; }
+.login-brand .login-sub { font-size: 21px; margin: 0 0 30px; }
+.login-features { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; text-align: left; }
+.login-features li { display: flex; align-items: center; gap: 14px; font-size: 20px; color: #cdbff3; }
+.feat-icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; background: #3a2a14; border: 2px solid #5c3510; font-size: 18px; }
+
+.login-split .login-card {
+  max-width: none; width: 100%;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 40px max(24px, 8vw);
+  background: rgba(7, 4, 13, .88);
+  border: 0; box-shadow: none;
+}
+.login-split .login-card > * { width: 100%; max-width: 480px; margin-left: auto; margin-right: auto; }
+.login-welcome { text-align: left; margin-bottom: 18px; }
+.login-welcome h2 { margin: 0 0 6px; font-size: 30px; color: var(--gold-l); }
+.login-welcome p { margin: 0; font-size: 19px; color: #cdbff3; }
+
+/* telefon / skrin sempit: jenama di atas, borang di bawah */
+@media (max-width: 820px) {
+  .login-split { grid-template-columns: 1fr; }
+  .login-brand { padding: 28px 20px; }
+  .login-features { display: none; }
+  .login-split .login-card { padding: 28px 20px 40px; }
+}
+
+/* ===== baris tajuk: "Selamat Datang" di kiri, butang tema di kanan (sejajar dengan borang) ===== */
+.login-split .login-card { position: relative; }
+.login-split .login-card > .login-welcome {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.login-welcome-text { min-width: 0; }
+.login-welcome p { text-wrap: balance; }
+
+.login-theme-btn {
+  flex: 0 0 auto; width: 44px; height: 44px; margin: 4px 0 0; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--gold-l); background: rgba(255, 255, 255, .08);
+  border: 2px solid #5c3510; border-radius: 12px; cursor: pointer;
+  transition: background .2s, transform .15s, border-color .2s;
+}
+.login-theme-btn:hover { background: rgba(255, 255, 255, .16); border-color: var(--gold); }
+.login-theme-btn:active { transform: scale(.94); }
+.login-theme-btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* tukar warna dengan lembut (hanya selepas halaman siap dimuat) */
+:root.tema-sedia .login-body, :root.tema-sedia .login-bg, :root.tema-sedia .login-brand,
+:root.tema-sedia .login-card, :root.tema-sedia .login-panel input, :root.tema-sedia .tab {
+  transition: background-color .25s, color .25s, border-color .25s;
+}
+
+/* ===== kemas: label, pautan dan butang kecil ===== */
+:root { color-scheme: dark; }
+:root[data-theme="light"] { color-scheme: light; }
+.login-panel label { font-size: 9px; letter-spacing: .04em; margin-top: 12px; }
+.login-panel form > label:first-of-type { margin-top: 0; }
+.login-panel input { width: 100%; }
+.login-panel input::placeholder { opacity: .55; }
+.login-panel .btn-px { width: 100%; }
+.btn-px.small { margin-top: 8px; padding: 10px 12px; font-size: 9px; }
+.link-btn { margin-top: 4px; padding: 5px 6px; font-size: 16px; }
+.login-panel form > .btn-px.gold + .link-btn { margin-top: 14px; }
+.login-foot { margin-top: 20px; padding-top: 14px; border-top: 1px solid rgba(243, 199, 107, .18); }
+.login-split .login-card { border-left: 1px solid rgba(243, 199, 107, .12); }
+
+/* skrin sempit: butang tema tetap di sebelah tajuk, tajuk dikecilkan sedikit */
+@media (max-width: 820px) {
+  .login-welcome h2 { font-size: 26px; }
+  .login-welcome p { font-size: 17px; }
+}
+
+/* ===== mod cerah: hanya menukar warna halaman log masuk ini ===== */
+:root[data-theme="light"] .login-body { color: #3a2a14; background: #f6efe0; }
+:root[data-theme="light"] .login-bg { background: linear-gradient(rgba(246, 239, 224, .88), rgba(246, 239, 224, .94)), url('../gameAsset/background/village.jpg') center / cover no-repeat; filter: none; }
+:root[data-theme="light"] .login-dust { display: none; }
+:root[data-theme="light"] .login-brand { background: linear-gradient(135deg, rgba(255, 248, 231, .75), rgba(243, 226, 190, .85)); }
+:root[data-theme="light"] .login-split .login-card { background: rgba(255, 252, 244, .92); }
+:root[data-theme="light"] .login-title { color: #9a5b0c; text-shadow: none; }
+:root[data-theme="light"] .login-title span { color: #3a2a14; }
+:root[data-theme="light"] .login-sub,
+:root[data-theme="light"] .login-welcome p,
+:root[data-theme="light"] .login-features li,
+:root[data-theme="light"] .form-note { color: #5a4630; }
+:root[data-theme="light"] .login-welcome h2 { color: #9a5b0c; }
+:root[data-theme="light"] .feat-icon { background: #f3e2bd; border-color: #c9a566; }
+:root[data-theme="light"] .login-panel label { color: #7a4a0a; }
+:root[data-theme="light"] .tab { color: #5a4630; background: #efe2c3; border-color: #c9a566; }
+:root[data-theme="light"] .tab.is-active { color: var(--ink); background: linear-gradient(180deg, #f3c76b, #c98a2b); border-color: #8a4b00; }
+:root[data-theme="light"] .link-btn { color: #8a4b00; }
+:root[data-theme="light"] .link-btn:hover { color: #000; }
+:root[data-theme="light"] .login-foot { color: #6b5a40; }
+:root[data-theme="light"] .field-error { color: #b3261e; }
+:root[data-theme="light"] .login-theme-btn { color: #8a4b00; background: rgba(0, 0, 0, .05); border-color: #c9a566; }
+:root[data-theme="light"] .login-theme-btn:focus-visible { outline-color: #8a4b00; }
+:root[data-theme="light"] .btn-px { box-shadow: 0 4px 0 #8a4b00; }
+:root[data-theme="light"] .btn-px:active:not(:disabled) { box-shadow: 0 2px 0 #8a4b00; }
+:root[data-theme="light"] .login-split .login-card { border-left-color: rgba(138, 75, 0, .18); }
+:root[data-theme="light"] .login-foot { border-top-color: rgba(138, 75, 0, .2); }
+:root[data-theme="light"] .login-panel input { border-color: #b8893f; }
+:root[data-theme="light"] .login-theme-btn:hover { background: rgba(0, 0, 0, .1); }
+
+/* ===== amaran kata laluan langsung (assets/js/passwordRules.js) ===== */
+.pw-help { margin: 6px 0 2px; padding: 10px 12px; font-size: 15px; line-height: 1.35;
+  background: rgba(255, 255, 255, .06); border: 1px solid rgba(243, 199, 107, .25); border-radius: 6px; }
+.pw-help.is-ok { border-color: #4caf50; }
+.pw-meter { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.pw-meter-bar { position: relative; flex: 1; height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .15); overflow: hidden; }
+.pw-meter-bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 8%; border-radius: 4px; background: #d9534f; transition: width .25s, background-color .25s; }
+.pw-meter-bar[data-score="1"]::after { width: 40%; background: #e2a120; }
+.pw-meter-bar[data-score="2"]::after { width: 62%; background: #b8c235; }
+.pw-meter-bar[data-score="3"]::after { width: 82%; background: #4caf50; }
+.pw-meter-bar[data-score="4"]::after { width: 100%; background: #2e9e4f; }
+.pw-meter-label { min-width: 120px; font-size: 14px; opacity: .9; text-align: right; }
+.pw-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.pw-rules li { position: relative; padding-left: 22px; }
+.pw-rules li::before { position: absolute; left: 0; top: 0; font-weight: 700; }
+.pw-rules li.is-fail { color: #ff9b9b; }
+.pw-rules li.is-fail::before { content: "\2717"; }
+.pw-rules li.is-pass { color: #8fd694; }
+.pw-rules li.is-pass::before { content: "\2713"; }
+.pw-tip { margin: 8px 0 0; font-size: 14px; font-style: italic; opacity: .85; }
+.pw-tip:empty { display: none; }
+:root[data-theme="light"] .pw-help { background: rgba(138, 75, 0, .05); border-color: rgba(138, 75, 0, .3); }
+:root[data-theme="light"] .pw-meter-bar { background: rgba(0, 0, 0, .12); }
+:root[data-theme="light"] .pw-rules li.is-fail { color: #b3261e; }
+:root[data-theme="light"] .pw-rules li.is-pass { color: #1f6b2a; }

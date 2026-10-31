@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SejarahWira - Kemajuan Pembelajaran Pelajar</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/teacherProgress.css">
+  <link rel="stylesheet" href="../assets/css/teacher.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/theme.css">
+  <script src="../assets/js/theme.js"></script>
+</head>
+
+<body class="game-body tp-body">
+
+  <div id="top-nav-placeholder"></div>
+
+  <main class="tp-wrapper">
+    <header class="tp-header">
+      <h1><i class="fas fa-chart-line"></i> Kemajuan Pembelajaran Pelajar</h1>
+      <p id="tp-subtitle">Pantau kemajuan era, quest, pentaksiran, lencana dan artifak. Halaman ini hanya untuk dibaca.</p>
+    </header>
+
+    <div id="tp-warning" class="tp-alert is-hidden" role="alert"></div>
+
+    <!-- AKSES DITOLAK (security from breached) --> 
+    <section id="cm-denied" class="cm-state is-hidden" role="alert">
+      <i class="fas fa-lock"></i>
+      <p id="cm-denied-text">Halaman ini hanya untuk guru.</p>
+      <a class="cm-btn cm-btn-primary" href="../index.html"><i class="fas fa-right-to-bracket"></i> Log Masuk</a>
+    </section>
+
+    <section id="tp-loading" class="tp-state">
+      <i class="fas fa-circle-notch fa-spin"></i>
+      <p>Mengumpulkan rekod pembelajaran...</p>
+    </section>
+
+    <!-- A3 / E1 -->
+    <section id="tp-error" class="tp-state is-hidden" role="alert">
+      <i class="fas fa-triangle-exclamation"></i>
+      <p id="tp-error-text">Gagal mendapatkan data kemajuan pembelajaran.</p>
+      <div class="tp-actions">
+        <button type="button" class="tp-btn tp-btn-primary" id="btn-retry"><i class="fas fa-rotate"></i> Cuba Lagi</button>
+        <button type="button" class="tp-btn tp-btn-ghost" id="btn-error-back"><i class="fas fa-arrow-left"></i> Kembali</button>
+      </div>
+    </section>
+
+    <!-- A1 -->
+    <section id="tp-empty" class="tp-state is-hidden">
+      <i class="fas fa-seedling"></i>
+      <p id="tp-empty-text">Kemajuan pembelajaran belum tersedia.</p>
+    </section>
+
+    <!-- A2: PANDANGAN KELAS -->
+    <section id="tp-class" class="is-hidden">
+      <div class="tp-filters">
+        <label>Kelas <select id="f-class"></select></label>
+        <label>Cari pelajar <input type="search" id="f-search" placeholder="Nama pelajar" maxlength="100"></label>
+        <label>Susun mengikut
+          <select id="f-sort">
+            <option value="name">Nama</option>
+            <option value="completion">Kemajuan (tertinggi)</option>
+            <option value="completion-asc">Kemajuan (terendah)</option>
+            <option value="best">Skor terbaik</option>
+          </select>
+        </label>
+      </div>
+      <div class="tp-kpis" id="tp-kpis"></div>
+      <section class="tp-card">
+        <h2><i class="fas fa-users"></i> Senarai Pelajar</h2>
+        <p class="tp-muted">Pilih seorang pelajar untuk melihat butiran kemajuannya.</p>
+        <div class="tp-table-wrap" id="tp-students"></div>
+      </section>
+    </section>
+
+    <!-- A2 step 4: BUTIRAN PELAJAR -->
+    <section id="tp-student" class="is-hidden">
+      <button type="button" class="tp-btn tp-btn-ghost" id="btn-back-class"><i class="fas fa-arrow-left"></i> Semua Pelajar</button>
+
+      <section class="tp-summary" aria-labelledby="tp-name">
+        <div class="tp-ring" id="tp-ring" style="--pct:0"><div class="tp-ring-inner"><strong id="tp-rate">0%</strong><span>Kemajuan</span></div></div>
+        <div>
+          <h2 id="tp-name">Pelajar</h2>
+          <p class="tp-muted" id="tp-class-name"></p>
+          <div class="tp-stats" id="tp-stats"></div>
+        </div>
+      </section>
+
+      <div class="tp-tabs" role="tablist" aria-label="Kategori kemajuan" id="tp-tabs"></div>
+      <section class="tp-card" id="tp-detail" role="tabpanel" aria-live="polite"></section>
+    </section>
+  </main>
+
+  <script src="../assets/js/topNav.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTopNav({ homeUrl: 'index.html', logoutUrl: '../index.html' });
+    });
+  </script>
+  <script src="../assets/js/teacherProgressEngine.js"></script>
+</body>
+</html>
