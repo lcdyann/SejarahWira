@@ -1,0 +1,1 @@
+SejarahWira is my first and the fyp project idea that i've been building and perfecting the mechanics, its still and not a perfect system but it's something i've dedicated my passion to and the reason in the first place of my career so any suggestion, recommandation or some advice that can make this system better is open
