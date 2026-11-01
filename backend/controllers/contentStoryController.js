@@ -61,7 +61,7 @@ const getNarrative = (id, conn = db) =>
 const MIN_QUEST_SCENES = 3;
 const questSceneCount = async (narrativeID) => Number((await first(db,
   `SELECT COUNT(DISTINCT q.sceneID) AS c FROM Quest q INNER JOIN Scene s ON q.sceneID = s.sceneID WHERE s.narrativeID = ?`, [narrativeID])).c);
-const QUEST_MIN_MSG = `Naratif mesti mempunyai sekurang-kurangnya ${MIN_QUEST_SCENES} babak yang ada quest. Tambah quest pada babak lain dahulu.`;
+const QUEST_MIN_MSG = `Naratif mesti mempunyai sekurang-kurangnya ${MIN_QUEST_SCENES} babak yang ada misi. Tambah misi pada babak lain dahulu.`;
 
 const getScene = (sceneID, conn = db) =>
   first(conn,
@@ -512,14 +512,14 @@ const checkQuest = (body) => {
     const file = result.value.content.bgImage.split('/').pop();
     if (!assetExists('background', file)) {
       result.valid = false;
-      result.contentErrors.push('Gambar latar quest tidak dijumpai. Sila pilih semula.');
+      result.contentErrors.push('Gambar latar misi tidak dijumpai. Sila pilih semula.');
     }
   }
   return result;
 };
 
 const questPayload = (res, { errors, contentErrors }) =>
-  fail(res, 422, 'Sila betulkan maklumat quest.', { errors, contentErrors });
+  fail(res, 422, 'Sila betulkan maklumat misi.', { errors, contentErrors });
 
 /** ContentManager.addQuest() */
 export const addQuest = async (req, res) => {
@@ -534,7 +534,7 @@ export const addQuest = async (req, res) => {
 
     const existing = Number((await first(db, `SELECT COUNT(*) AS c FROM Quest WHERE sceneID = ?`, [sceneID])).c);
     if (existing >= MAX_QUESTS_PER_SCENE) {
-      return fail(res, 409, `Satu babak boleh mempunyai maksimum ${MAX_QUESTS_PER_SCENE} quest.`);
+      return fail(res, 409, `Satu babak boleh mempunyai maksimum ${MAX_QUESTS_PER_SCENE} misi.`);
     }
 
     const v = result.value;
@@ -546,12 +546,12 @@ export const addQuest = async (req, res) => {
       return ins.insertId;
     });
 
-    await saveChanges(req.teacher, scene.eraID, 'Tambah quest',
+    await saveChanges(req.teacher, scene.eraID, 'Tambah misi',
       `"${clip(scene.narrativeTitle, 50)}" babak ${scene.sceneOrder}: "${clip(v.questName, 60)}" (${Rules.TYPES[v.questType].label})`);
-    return res.status(201).json({ success: true, message: 'Quest berjaya ditambah.', questID });
+    return res.status(201).json({ success: true, message: 'Misi berjaya ditambah.', questID });
   } catch (err) {
     console.error('addQuest error:', err);
-    return failServer(res, err, 'Quest gagal disimpan. Tiada perubahan dibuat.');
+    return failServer(res, err, 'Misi gagal disimpan. Tiada perubahan dibuat.');
   }
 };
 
@@ -559,9 +559,9 @@ export const addQuest = async (req, res) => {
 export const editQuest = async (req, res) => {
   try {
     const questID = toID(req.params.questID);
-    if (!questID) return fail(res, 400, 'Quest tidak sah.');
+    if (!questID) return fail(res, 400, 'Misi tidak sah.');
     const existing = await getQuest(questID);
-    if (!existing) return fail(res, 404, 'Quest tidak dijumpai.');
+    if (!existing) return fail(res, 404, 'Misi tidak dijumpai.');
 
     const result = checkQuest(req.body);
     if (!result.valid) return questPayload(res, result);
@@ -574,12 +574,12 @@ export const editQuest = async (req, res) => {
       await setSupport(conn, 'quest', questID, v);
     });
 
-    await saveChanges(req.teacher, existing.eraID, 'Kemas kini quest',
+    await saveChanges(req.teacher, existing.eraID, 'Kemas kini misi',
       `"${clip(existing.narrativeTitle, 50)}" babak ${existing.sceneOrder}: "${clip(v.questName, 60)}"`);
-    return res.status(200).json({ success: true, message: 'Quest berjaya dikemas kini.' });
+    return res.status(200).json({ success: true, message: 'Misi berjaya dikemas kini.' });
   } catch (err) {
     console.error('editQuest error:', err);
-    return failServer(res, err, 'Quest gagal disimpan. Tiada perubahan dibuat.');
+    return failServer(res, err, 'Misi gagal disimpan. Tiada perubahan dibuat.');
   }
 };
 
@@ -587,20 +587,20 @@ export const editQuest = async (req, res) => {
 export const removeQuest = async (req, res) => {
   try {
     const questID = toID(req.params.questID);
-    if (!questID) return fail(res, 400, 'Quest tidak sah.');
+    if (!questID) return fail(res, 400, 'Misi tidak sah.');
     const existing = await getQuest(questID);
-    if (!existing) return fail(res, 404, 'Quest tidak dijumpai.');
+    if (!existing) return fail(res, 404, 'Misi tidak dijumpai.');
 
     // the last quest of a scene makes that scene a plain story scene: keep enough quest scenes
     const siblings = Number((await first(db, `SELECT COUNT(*) AS c FROM Quest WHERE sceneID = ?`, [existing.sceneID])).c);
     if (siblings <= 1 && (await questSceneCount(existing.narrativeID)) - 1 < MIN_QUEST_SCENES) return fail(res, 409, QUEST_MIN_MSG);
 
     await db.query(`DELETE FROM Quest WHERE questID = ?`, [questID]);   // completions + support cascade
-    await saveChanges(req.teacher, existing.eraID, 'Padam quest',
+    await saveChanges(req.teacher, existing.eraID, 'Padam misi',
       `"${clip(existing.narrativeTitle, 50)}" babak ${existing.sceneOrder}: "${clip(existing.questName, 60)}" dipadam`);
-    return res.status(200).json({ success: true, message: 'Quest berjaya dipadam.' });
+    return res.status(200).json({ success: true, message: 'Misi berjaya dipadam.' });
   } catch (err) {
     console.error('removeQuest error:', err);
-    return failServer(res, err, 'Quest gagal dipadam. Tiada perubahan dibuat.');
+    return failServer(res, err, 'Misi gagal dipadam. Tiada perubahan dibuat.');
   }
 };

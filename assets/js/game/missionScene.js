@@ -38,6 +38,7 @@ import { Narrative, Quest, QuestCompletion, LearningSupport, DialogueReader } fr
 import { ShelfComponent } from './shelf.js';
 import { fillMarkers, ROLE_LINES, ENTITY_NAME } from './entityLines.js';
 import { buildAftermath } from './aftermath.js';
+import { sound } from './sound.js';
 
 export class MissionScene extends GameScene {
   async enter({ eraID }) {
@@ -176,7 +177,9 @@ export class MissionScene extends GameScene {
         storyDone = true;
       }
       const support = new LearningSupport(quest);
-      await this.gate(this.entity.speak('taklimat', { taklimat: quest.instructions || quest.description || quest.questName }, { eraID: this.eraID }));
+      // Padanan: sentiasa ingatkan bahawa semua kad boleh dipadankan (bukan hanya atas-bawah)
+      const padanNota = Number(quest.questType) === 4 ? ' Ingat: mana-mana dua kad boleh dipadankan, tidak kira di mana kedudukannya.' : '';
+      await this.gate(this.entity.speak('taklimat', { taklimat: (quest.instructions || quest.description || quest.questName) + padanNota }, { eraID: this.eraID }));
 
       const result = await this.runQuest(quest, scene, fails);
       if (result.ok) {
@@ -376,6 +379,7 @@ export class MissionScene extends GameScene {
   async showAftermath(text, scene) {
     const a = buildAftermath(text, { background: scene.asset });
     this.layer.appendChild(a.el);
+    sound.sfx('benangPutus', { maxMs: 3500 });         // benang terputus: bunyi kalah, dipotong supaya tidak menutup bacaan
     const typed = () => a.el.classList.contains('typed');
     let off = () => {};
     // first Enter / click finishes the typing, the next one carries on

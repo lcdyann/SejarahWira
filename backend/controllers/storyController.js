@@ -373,7 +373,7 @@ export const loadQuest = async (req, res) => {
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ success: false, message: 'Quest tidak dijumpai.' });
+      return res.status(404).json({ success: false, message: 'Misi tidak dijumpai.' });
     }
 
     const quest = rows[0];
@@ -417,7 +417,7 @@ export const verifyCompletion = async (req, res) => {
       progress = await checkNarrativeQuests(studentID, eraID, narrativeID, questIDs);
     }
 
-    return res.status(200).json({ success: true, message: 'Quest berjaya diselesaikan!', progress });
+    return res.status(200).json({ success: true, message: 'Misi berjaya diselesaikan!', progress });
   } catch (err) {
     console.error('verifyCompletion error:', err);
     return res.status(500).json({ success: false, message: 'Ralat pelayan. Sila cuba lagi.' });
@@ -523,7 +523,7 @@ export const evaluateUnlockAssessment = async (req, res) => {
       totalQuests: check.total,
       reason: check.isComplete
         ? 'Akses dibenarkan.'
-        : `Sila selesaikan semua quest penceritaan (${check.completed}/${check.total}) dahulu.`
+        : `Sila selesaikan semua misi penceritaan (${check.completed}/${check.total}) dahulu.`
     });
   } catch (err) {
     console.error('evaluateUnlockAssessment error:', err);
@@ -573,7 +573,7 @@ export const resetReplay = async (req, res) => {
       [studentID, eraID]
     );
 
-    return res.status(200).json({ success: true, message: 'Kemajuan quest telah dilesapkan.' });
+    return res.status(200).json({ success: true, message: 'Kemajuan misi telah dilesapkan.' });
   } catch (err) {
     console.error('resetReplay error:', err);
     return res.status(500).json({ success: false, message: 'Ralat pelayan. Sila cuba lagi.' });

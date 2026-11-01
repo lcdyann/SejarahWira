@@ -32,7 +32,7 @@ const QuestRules = (() => {
     1: { label: 'Susun Garis Masa', icon: 'fa-timeline', help: 'Tarikh disembunyikan. Pelajar menyusun peristiwa mengikut sebab dan akibat, satu pautan demi satu.', done: 'Selesai apabila semua pautan dirantai dengan betul.' },
     2: { label: 'Cari Bukti', icon: 'fa-magnifying-glass-location', help: 'Pelajar mencari semua bahan bukti yang tersembunyi pada sebuah gambar.', done: 'Selesai apabila semua titik ditemui.' },
     3: { label: 'Bantu Tokoh', icon: 'fa-comment-dots', help: 'Pelajar memilih tindakan yang paling tepat untuk membantu seorang tokoh.', done: 'Selesai apabila jawapan yang betul dipilih.' },
-    4: { label: 'Padanan', icon: 'fa-clone', help: 'Pelajar memadankan setiap kad dengan pasangannya.', done: 'Selesai apabila semua pasangan dipadankan.' },
+    4: { label: 'Padanan', icon: 'fa-clone', help: 'Pelajar memadankan setiap kad dengan pasangannya. Mana-mana dua kad boleh dipadankan, tidak kira kedudukannya (bukan hanya atas dan bawah).', done: 'Selesai apabila semua pasangan dipadankan.' },
     5: { label: 'Nyahkod Clue', icon: 'fa-key', help: 'Pelajar membaca satu petunjuk dan memilih jawapan yang betul.', done: 'Selesai apabila jawapan yang betul dipilih.' }
   };
 
@@ -169,7 +169,7 @@ const QuestRules = (() => {
   /** Rules for the mechanic-specific part. Returns a list of messages (empty = valid). */
   const validateContentBase = (type, f) => {
     const errors = [];
-    if (!isObj(f)) return ['Maklumat quest tidak lengkap.'];
+    if (!isObj(f)) return ['Maklumat misi tidak lengkap.'];
 
     switch (Number(type)) {
       case 1: {
@@ -229,7 +229,7 @@ const QuestRules = (() => {
         break;
       }
       default:
-        errors.push('Jenis quest tidak sah.');
+        errors.push('Jenis misi tidak sah.');
     }
     return errors;
   };
@@ -346,7 +346,7 @@ const QuestRules = (() => {
       if (!v[field]) errors[field] = `${label} wajib diisi.`;
       else if (v[field].length > LIMITS[field]) errors[field] = `${label} terlalu panjang (maksimum ${LIMITS[field]} aksara).`;
     };
-    need('questName', 'Nama quest');
+    need('questName', 'Nama misi');
     need('instruction', 'Arahan');
     ['description', 'hint', 'explanation', 'feedback'].forEach((f) => {
       if (v[f].length > LIMITS[f]) errors[f] = `Terlalu panjang (maksimum ${LIMITS[f]} aksara).`;
@@ -355,7 +355,7 @@ const QuestRules = (() => {
       if (!errors[f] && MARKUP.test(v[f])) errors[f] = 'Aksara < dan > tidak dibenarkan.';
     });
 
-    if (![1, 2, 3, 4, 5].includes(v.questType)) errors.questType = 'Sila pilih jenis quest.';
+    if (![1, 2, 3, 4, 5].includes(v.questType)) errors.questType = 'Sila pilih jenis misi.';
 
     const contentErrors = errors.questType ? [] : validateContent(v.questType, input.form);
     const valid = Object.keys(errors).length === 0 && contentErrors.length === 0;

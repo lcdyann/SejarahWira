@@ -32,7 +32,7 @@ class ContentGuide {
         title: 'Cerita dibina dalam lapisan',
         body: [
           h('p', { text: 'Setiap era ada beberapa naratif (versi cerita). Setiap naratif terdiri daripada babak, dan setiap babak ialah satu peristiwa sejarah.' }),
-          flow('Era', 'Naratif', 'Babak', 'Quest + Dialog'),
+          flow('Era', 'Naratif', 'Babak', 'Misi + Dialog'),
           h('p', { class: 'cm-muted', text: 'Contoh: Era Kesultanan Melaka, naratif "Serangan Portugis", babak 1 ialah 24 Ogos 1511 di Melaka.' }),
           h('p', { text: 'Pada halaman era, anda bekerja dari kiri ke kanan: pilih naratif (1), pilih babak (2), kemudian edit isi babak (3).' })
         ]
@@ -44,8 +44,8 @@ class ContentGuide {
           h('ul', { class: 'guide-list' },
             li('1 Kad garis masa:', 'apa, bila dan di mana. Pelajar membacanya dahulu.'),
             li('2 Cerita:', 'dialog antara beberapa watak. Pada baris tertentu watak berpaling kepada pelajar dan pelajar memilih apa yang hendak dikatakan (Giliran Anda). Pelajar tidak boleh menekan Enter sahaja.'),
-            li('3 Misi:', 'quest (permainan) yang mengukuhkan apa yang baru diceritakan. Jika salah, cerita rosak dan misi diulang. Pelajar mendapat petunjuk selepas gagal kali kedua dan ketiga.')),
-          h('p', { class: 'cm-muted', text: 'Babak yang tiada Giliran Anda dimainkan seperti dahulu: kad, misi, kemudian dialog selepas misi. Babak tanpa quest ialah cerita biasa. Jika sebuah babak ada lebih daripada satu quest, satu sahaja dimainkan secara rawak.' })
+            li('3 Misi:', 'permainan yang mengukuhkan apa yang baru diceritakan. Jika salah, cerita rosak dan misi diulang. Pelajar mendapat petunjuk selepas gagal kali kedua dan ketiga.')),
+          h('p', { class: 'cm-muted', text: 'Babak yang tiada Giliran Anda dimainkan seperti dahulu: kad, misi, kemudian dialog selepas misi. Babak tanpa misi ialah cerita biasa. Jika sebuah babak ada lebih daripada satu misi, satu sahaja dimainkan secara rawak.' })
         ]
       },
       {
@@ -71,27 +71,27 @@ class ContentGuide {
             li('Balasan:', '2 atau 3 perkara yang boleh dikatakan pelajar. Satu betul. Setiap balasan ada reaksi watak.'),
             li('Balasan salah:', 'tulis kesannya dalam cerita ("Kalau Borneo rasa diambil alih, mereka akan menolak."), bukan "Salah!". Pendekar Bayang berbisik petunjuk, skrin diputar semula dan watak bertanya semula. Hanya perbualan itu yang diulang, bukan seluruh babak.'),
             li('Bisikan:', 'petunjuk yang boleh dijumpai pelajar dalam dialog sebelumnya. Jangan tulis jawapannya.')),
-          h('p', { class: 'cm-muted', text: 'Cara menambah: buka babak. Panel "Isi Babak" ada 3 baris: (1) kad garis masa dan latar, (2) dialog dan Giliran Anda, (3) misi. Dalam baris 2, di bawah setiap baris dialog ada butang bertitik "+ Giliran Anda selepas baris ini". Tekan untuk menambah. Untuk mengubah, tekan kotak biru Giliran Anda yang sedia ada. Tetingkap yang terbuka ada 3 langkah bernombor: siapa bertanya, apa yang boleh dibalas, bisikan jika tersilap. Cadangan 1 hingga 3 setiap babak. Giliran Anda disimpan bersama quest babak itu, jadi babak mesti ada quest. Tulis reaksi balasan salah sebagai kemungkinan yang watak bimbangkan, bukan sebagai fakta tentang apa yang pasti berlaku.' })
+          h('p', { class: 'cm-muted', text: 'Cara menambah: buka babak. Panel "Isi Babak" ada 3 baris: (1) kad garis masa dan latar, (2) dialog dan Giliran Anda, (3) misi. Dalam baris 2, di bawah setiap baris dialog ada butang bertitik "+ Giliran Anda selepas baris ini". Tekan untuk menambah. Untuk mengubah, tekan kotak biru Giliran Anda yang sedia ada. Tetingkap yang terbuka ada 3 langkah bernombor: siapa bertanya, apa yang boleh dibalas, bisikan jika tersilap. Cadangan 1 hingga 3 setiap babak. Giliran Anda disimpan bersama misi babak itu, jadi babak mesti ada misi. Tulis reaksi balasan salah sebagai kemungkinan yang watak bimbangkan, bukan sebagai fakta tentang apa yang pasti berlaku.' })
         ]
       },
       {
-        title: 'Kad garis masa dan quest garis masa: dua perkara berbeza',
+        title: 'Kad garis masa dan misi garis masa: dua perkara berbeza',
         body: [
           h('ul', { class: 'guide-list' },
             li('Kad garis masa', 'ialah teks pengenalan sebuah babak (tarikh, tempat, satu ayat). Ia bukan permainan.'),
-            li('Quest', 'ialah permainan dalam babak. "Susun Garis Masa" hanyalah salah satu daripada lima jenis quest:')),
+            li('Misi', 'ialah permainan dalam babak. "Susun Garis Masa" hanyalah salah satu daripada lima jenis misi:')),
           h('ul', { class: 'guide-types' }, types.map((t) => h('li', {}, h('strong', { text: `${t.label}: ` }), t.help))),
           h('p', { class: 'cm-muted', text: 'Susun Garis Masa menyembunyikan tarikh. Pelajar menyusun peristiwa satu pautan demi satu pautan, dan tarikh dicap pada kad apabila ia betul. Setiap kad (selepas yang pertama) memerlukan baris "mengapa" yang menerangkan sebab ia berlaku selepas kad sebelumnya. Pelajar boleh "Intai tarikh" dengan membayar satu titisan dakwat.' }),
-          h('p', { class: 'cm-muted', text: 'Pratonton di sebelah borang quest ialah permainan sebenar yang dimainkan pelajar. Ia muncul apabila borang lengkap.' })
+          h('p', { class: 'cm-muted', text: 'Pratonton di sebelah borang misi ialah permainan sebenar yang dimainkan pelajar. Ia muncul apabila borang lengkap.' })
         ]
       },
       {
         title: 'Akibat jika salah: tunjukkan apa yang berlaku',
         body: [
-          h('p', { text: 'Apabila pelajar gagal dalam quest, mereka tidak dimarahi. Mereka melihat sebuah adegan pendek: gambar menjadi kelabu, benang sejarah terputus, dan akibatnya ditaip di skrin. Selepas itu Pendekar Bayang menerangkan sebabnya dengan tenang dan babak diputar semula.' }),
+          h('p', { text: 'Apabila pelajar gagal dalam misi, mereka tidak dimarahi. Mereka melihat sebuah adegan pendek: gambar menjadi kelabu, benang sejarah terputus, dan akibatnya ditaip di skrin. Selepas itu Pendekar Bayang menerangkan sebabnya dengan tenang dan babak diputar semula.' }),
           h('ul', { class: 'guide-list' },
-            li('Akibat jika salah:', 'satu medan pada setiap quest. Tulis apa yang BERLAKU dalam cerita, dalam satu atau dua ayat. Contoh: "Tanpa kerjasama, kota Melaka jatuh ke tangan Portugis dalam sehari."'),
-            li('Bagi quest pilihan (Bantu Tokoh, Nyahkod Clue):', 'setiap pilihan salah boleh ada akibat sendiri. Tulis di bawah pilihan itu. Jika kosong, akibat umum quest digunakan.'),
+            li('Akibat jika salah:', 'satu medan pada setiap misi. Tulis apa yang BERLAKU dalam cerita, dalam satu atau dua ayat. Contoh: "Tanpa kerjasama, kota Melaka jatuh ke tangan Portugis dalam sehari."'),
+            li('Bagi misi pilihan (Bantu Tokoh, Nyahkod Clue):', 'setiap pilihan salah boleh ada akibat sendiri. Tulis di bawah pilihan itu. Jika kosong, akibat umum misi digunakan.'),
             li('Jika dibiarkan kosong:', 'permainan memaparkan ayat umum, tetapi akibat yang ditulis sendiri jauh lebih berkesan.')),
           h('p', { class: 'cm-muted', text: 'Elakkan "Salah!" atau nada menghukum. Tunjukkan sebab dan akibat sejarah supaya pelajar faham mengapa pilihan itu tidak membawa kepada peristiwa sebenar.' })
         ]
@@ -100,7 +100,7 @@ class ContentGuide {
         title: 'Menyusun semula babak',
         body: [
           h('p', { text: 'Babak dimainkan dari atas ke bawah. Untuk menukar urutan, seret ikon di sebelah kiri baris babak ke atas atau ke bawah. Garis menunjukkan tempat ia akan diletakkan.' }),
-          h('p', { text: 'Anda juga boleh menekan butang anak panah atas atau bawah dalam panel "Isi Babak". Quest dan dialog bergerak bersama babaknya, jadi tiada apa yang perlu disusun semula secara berasingan.' }),
+          h('p', { text: 'Anda juga boleh menekan butang anak panah atas atau bawah dalam panel "Isi Babak". Misi dan dialog bergerak bersama babaknya, jadi tiada apa yang perlu disusun semula secara berasingan.' }),
           h('p', { class: 'cm-muted', text: 'Sebab itu satu peristiwa sejarah = satu babak. Susunan babak ialah susunan sejarah.' })
         ]
       },
@@ -108,9 +108,9 @@ class ContentGuide {
         title: 'Cuba dahulu, dan peraturan penting',
         body: [
           h('ul', { class: 'guide-list' },
-            li('Main:', '"Main Naratif" dan "Main Babak Ini" menjalankan permainan sebenar yang dimainkan pelajar: kad garis masa, cerita dengan Giliran Anda, taklimat Pendekar Bayang, quest dan catatan diari. Klik pada permainan, tekan Enter untuk mula. Tiada apa disimpan. Quest yang belum lengkap dilangkau dan diberi amaran.'),
-            li('Sekurang-kurangnya 3 babak berquest:', 'sistem tidak membenarkan memadam quest atau babak jika baki babak berquest kurang daripada 3.'),
-            li('Padam:', 'memadam babak turut memadam dialog, quest dan Giliran Anda di dalamnya. Sistem akan bertanya dahulu.'),
+            li('Main:', '"Main Naratif" dan "Main Babak Ini" menjalankan permainan sebenar yang dimainkan pelajar: kad garis masa, cerita dengan Giliran Anda, taklimat Pendekar Bayang, misi dan catatan diari. Klik pada permainan, tekan Enter untuk mula. Tiada apa disimpan. Misi yang belum lengkap dilangkau dan diberi amaran.'),
+            li('Sekurang-kurangnya 3 babak bermisi:', 'sistem tidak membenarkan memadam misi atau babak jika baki babak bermisi kurang daripada 3.'),
+            li('Padam:', 'memadam babak turut memadam dialog, misi dan Giliran Anda di dalamnya. Sistem akan bertanya dahulu.'),
             li('Rekod perubahan:', 'semua guru berkongsi kandungan yang sama, dan setiap perubahan direkodkan dengan nama guru.'))
         ]
       },

@@ -322,3 +322,8 @@
     animation: none;
   }
 }
+
+/* ---- kad Akaun (butang Logout): tiada jarak bawah tajuk kerana hanya ada satu baris ---- */
+.tpf-account .tpf-card-head {
+  margin-bottom: 0;
+}

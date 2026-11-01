@@ -145,7 +145,7 @@ const FIELD_LABELS = {
   correctAnswer: 'Jawapan betul', hint: 'Petunjuk', explanation: 'Penerangan jawapan',
   narrativeTitle: 'Tajuk naratif', summary: 'Ringkasan naratif',
   sceneStoryline: 'Kad garis masa babak', asset: 'Gambar latar',
-  questName: 'Nama quest', instruction: 'Arahan quest', description: 'Objektif quest', questType: 'Jenis quest',
+  questName: 'Nama misi', instruction: 'Arahan misi', description: 'Objektif misi', questType: 'Jenis misi',
   name: 'Nama', biography: 'Biografi', contribution: 'Sumbangan', displayName: 'Nama gambar',
   npcID: 'Watak', lines: 'Dialog', text: 'Teks', password: 'Kata laluan', username: 'Nama pengguna'
 };
@@ -201,7 +201,7 @@ function describeError(err, labels = {}) {
   const status = (err && typeof err.status === 'number') ? err.status : 0;
   const help = HTTP_HELP[status] || HTTP_HELP[status >= 500 ? 500 : 400] || ['Ralat tidak dikenali.', 'Cuba lagi.'];
   const items = errorItems(data.errors, labels);
-  (data.contentErrors || []).forEach((m) => items.push({ label: 'Kandungan quest', message: String(m) }));
+  (data.contentErrors || []).forEach((m) => items.push({ label: 'Kandungan misi', message: String(m) }));
   if (data.field && !items.length) items.push({ label: labels[data.field] || FIELD_LABELS[data.field] || data.field, message: data.message || 'Tidak sah.' });
   return {
     headline: data.message || (err && err.message) || help[0],

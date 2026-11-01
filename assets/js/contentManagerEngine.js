@@ -33,7 +33,7 @@ const LIMITS = { text: 2000, option: 255, hint: 255, explanation: 2000 };
 const MARKUP = /[<>]/;
 
 const CONTENT_TYPES = [
-  { type: 'narrative', label: 'Naratif, Dialog & Quest', icon: 'fa-book-open', ready: true },
+  { type: 'narrative', label: 'Naratif, Dialog & Misi', icon: 'fa-book-open', ready: true },
   { type: 'questions', label: 'Bank Soalan', icon: 'fa-circle-question', ready: true },
   { type: 'entity', label: 'Suara Pendekar Bayang', icon: 'fa-ghost', ready: true },
   { type: 'changes', label: 'Rekod Perubahan', icon: 'fa-clock-rotate-left', ready: true }

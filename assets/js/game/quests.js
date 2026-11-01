@@ -21,6 +21,7 @@
  * ============================================================================
  */
 import { el, esc, shuffle, sleep, tpl } from './core.js';
+import { sound } from './sound.js';
 
 export class QuestMechanic {
   #quest;
@@ -51,7 +52,7 @@ export class QuestMechanic {
       case 3: return new HelpCharacterQuest(quest, opts);
       case 4: return new MatchingQuest(quest, opts);
       case 5: return new DecodeClueQuest(quest, opts);
-      default: throw new Error(`Jenis quest ${quest.questType} tidak disokong.`);
+      default: throw new Error(`Jenis misi ${quest.questType} tidak disokong.`);
     }
   }
 
@@ -86,8 +87,15 @@ export class QuestMechanic {
     this.inkEl.innerHTML = html;
   }
 
-  /** @returns {boolean} true when this mistake ruins the story */
-  registerMistake() {
+  /** bunyi tindakan betul (dipanggil oleh setiap mekanik) */
+  markRight() { sound.sfx('betul'); }
+
+  /**
+   * @param {boolean} [silent] true = tiada bunyi salah (cth. "Intai tarikh" yang bukan kesilapan)
+   * @returns {boolean} true when this mistake ruins the story
+   */
+  registerMistake(silent = false) {
+    if (!silent) sound.sfx('salah');
     this.#mistakes += 1;
     this.renderInk();
     this.root.classList.add('shake');
@@ -120,7 +128,8 @@ export class QuestMechanic {
 /*   The dates are HIDDEN. The student must know WHAT happens next, one link  */
 /*   at a time. A right card locks in, its date is stamped on, and the        */
 /*   teacher's "why" line explains the link. A wrong card breaks the chain    */
-/*   (a drop of ink). "Intai tarikh" shows all dates but costs one drop.      */
+/*   (a drop of water). "Intai tarikh" shows the YEARS ON THE SLOTS (never on  */
+/*   the cards), so the student must read each card to match it to a year.    */
 /* ========================================================================== */
 export class TimelineQuest extends QuestMechanic {
   constructor(quest, opts) {
@@ -149,7 +158,7 @@ export class TimelineQuest extends QuestMechanic {
       </div>
       <div class="tl-tray"></div>
       <div class="tl-link px" aria-live="polite"></div>`;
-    this.peekBtn = el('button', 'btn-px small tl-peek', '\u{1F50D} Intai tarikh (\u22121 titisan)');
+    this.peekBtn = el('button', 'btn-px small tl-peek', '\u{1F50D} Tunjuk tarikh pada petak (\u22121 titisan)');
     this.peekBtn.type = 'button';
     const top = this.root.querySelector('.quest-top');
     top.insertBefore(this.peekBtn, this.inkEl);
@@ -161,7 +170,7 @@ export class TimelineQuest extends QuestMechanic {
   }
 
   card(item, where, locked) {
-    const showDate = locked || this.peeked;
+    const showDate = locked;                         // kad tidak pernah menunjukkan tarikh sebelum dikunci (elak menyusun nombor sahaja)
     const c = el('div', `seal-card${this.selected === item.id ? ' sel' : ''}${this.clueId === item.id ? ' clue' : ''}${locked ? ' locked' : ''}`);
     c.draggable = !locked;
     c.dataset.id = item.id;
@@ -189,6 +198,7 @@ export class TimelineQuest extends QuestMechanic {
     if (Number(item.id) === Number(this.correct[slotIdx].id)) {
       this.tray = this.tray.filter((t) => t.id !== item.id);
       this.slots[slotIdx] = item;
+      this.markRight();
       this.selected = null;
       this.justLocked = item.id;
       this.link = String(item.why || '').trim();
@@ -212,10 +222,10 @@ export class TimelineQuest extends QuestMechanic {
     if (ruined) this.fail();
   }
 
-  /** costs one drop of ink; the remaining chance is never spent by peeking */
+  /** costs one drop of water; the remaining chance is never spent by peeking */
   peek() {
     if (this.isSettled || this.peeked || this.mistakes + 1 >= this.maxMistakes) return;
-    this.registerMistake();
+    this.registerMistake(true);                       // intai: kos titisan sahaja, bukan bunyi salah
     this.peeked = true;
     this.paint();
   }
@@ -227,6 +237,9 @@ export class TimelineQuest extends QuestMechanic {
       const s = el('div', `tl-slot${it ? ' filled' : ''}${i === n ? ' next' : ''}`);
       s.dataset.slot = i;
       s.innerHTML = `<span class="tl-no">${i + 1}</span>`;
+      // Selepas "Intai tarikh": tahun dipaparkan pada PETAK kosong, bukan pada kad
+      const year = this.correct[i] && String(this.correct[i].year || '').trim();
+      if (!it && this.peeked && year) s.innerHTML += `<span class="tl-slot-year">${esc(year)}</span>`;
       if (it) s.appendChild(this.card(it, 'slot', true));
       s.addEventListener('click', () => this.place(i));
       s.addEventListener('dragover', (e) => e.preventDefault());
@@ -252,7 +265,7 @@ export class TimelineQuest extends QuestMechanic {
 
   applyAssist(level) {
     super.applyAssist(level);
-    if (level >= 2 && this.correct.length) {          // a clearer clue: dates shown free + a star on the NEXT event
+    if (level >= 2 && this.correct.length) {          // a clearer clue: slot years shown free + a star on the NEXT event
       this.peeked = true;
       const n = this.next;
       if (n >= 0) this.clueId = this.correct[n].id;
@@ -312,6 +325,7 @@ export class HotspotQuest extends QuestMechanic {
     this.ripple(px, py, !!near);
     if (near) {
       near.found = true;
+      this.markRight();
       const mark = el('div', 'hs-found');
       mark.style.left = `${near.x}%`;
       mark.style.top = `${near.y}%`;
@@ -400,7 +414,7 @@ export class ChoiceQuest extends QuestMechanic {
     if (this.isSettled || this.struck.has(i)) return;
     const o = this.options[i];
     const btn = this.listEl.children[i];
-    if (o.isCorrect) { btn.classList.add('right'); this.succeed(); }
+    if (o.isCorrect) { btn.classList.add('right'); this.markRight(); this.succeed(); }
     else { btn.classList.add('wrong'); this.registerMistake(); this.fail(o.consequence); }
   }
 
@@ -444,7 +458,11 @@ export class MatchingQuest extends QuestMechanic {
 
   build() {
     this.root.classList.add('q-matching');
-    this.field.innerHTML = '<div class="mt-table px"><div class="mt-grid"></div></div>';
+    // Arahan di atas meja: mana-mana dua kad boleh dipadankan, bukan hanya yang berdekatan
+    this.field.innerHTML = `<div class="mt-table px">
+      <p class="mt-help">Pilih <b>mana-mana dua kad</b> yang berpasangan. Kad boleh dipadankan dengan kad lain di mana-mana kedudukan (atas, bawah, kiri atau kanan), bukan hanya yang bersebelahan.</p>
+      <div class="mt-grid"></div>
+    </div>`;
     this.grid = this.field.querySelector('.mt-grid');
     this.cards.forEach((c) => {
       const d = el('button', 'mt-card px parchment', `<span class="mt-text">${esc(c.text)}</span>`);
@@ -463,6 +481,7 @@ export class MatchingQuest extends QuestMechanic {
     const [a, b] = this.picked;
     if (a.pair === b.pair) {
       a.matched = b.matched = true;
+      this.markRight();
       a.el.classList.add('ok'); b.el.classList.add('ok');
       this.picked = [];
       if (this.cards.every((c) => c.matched)) this.succeed();

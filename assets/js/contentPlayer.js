@@ -39,13 +39,13 @@ class StoryPlayer {
     this.frame = h('iframe', { class: 'qp-frame', src: 'story_preview.html', title: 'Pratonton cerita seperti yang dilihat pelajar', allow: 'fullscreen' });
     const wrap = h('div', { class: 'qp-frame-wrap' }, this.frame);
     const warn = skipped.length
-      ? h('div', { class: 'qp-missing' }, h('strong', { text: 'Quest yang belum lengkap dilangkau dalam pratonton ini:' }),
+      ? h('div', { class: 'qp-missing' }, h('strong', { text: 'Misi yang belum lengkap dilangkau dalam pratonton ini:' }),
         h('ul', {}, skipped.slice(0, 5).map((m) => h('li', { text: m }))))
       : null;
     const noRole = role ? null : h('div', { class: 'qp-missing' }, h('strong', { text: 'Naratif ini belum ada peranan pelajar.' }),
       h('p', { text: 'Dalam permainan, pelajar tidak akan tahu siapa dirinya dan baris "Pemain" disebut oleh avatar. Pilih watak di tab Suara Pendekar Bayang, Peranan pelajar.' }));
     const extra = scenes.some((s) => s.quests.length > 1)
-      ? h('p', { class: 'cm-hint', text: 'Babak yang mempunyai beberapa quest: pelajar mendapat satu secara rawak. Pratonton ini memaparkan quest pertama.' })
+      ? h('p', { class: 'cm-hint', text: 'Babak yang mempunyai beberapa misi: pelajar mendapat satu secara rawak. Pratonton ini memaparkan misi pertama.' })
       : null;
 
     const onMessage = (e) => {

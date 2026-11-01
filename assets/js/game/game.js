@@ -18,6 +18,7 @@ import { MapScene } from './mapScene.js';
 import { MissionScene } from './missionScene.js';
 import { TrainingScene, SiegeScene } from './battleScenes.js';
 import { AvatarScene, ProfileScene, ProgressScene } from './studentScenes.js';
+import { sound } from './sound.js';
 
 const SCENES = { HubScene, PrologueScene, DoorsScene, TrophyScene, EpilogueScene, CreditsScene, MapScene, MissionScene, TrainingScene, SiegeScene, AvatarScene, ProfileScene, ProgressScene };
 
@@ -51,6 +52,8 @@ export class Game {
     this.eras = [];
     this.lastEraID = null;
     this.input.global.f = () => this.stage.toggleFullscreen();
+    this.input.global.m = () => sound.toggleMute();      // M: senyapkan / hidupkan bunyi
+    sound.attachButton(this.stage.frame);
   }
 
   /* ----------------------------------------------------------------- boot */
@@ -118,6 +121,7 @@ export class Game {
     this.dialog.hide();
     this.scene = new Cls(this);
     this.scene.name = name;
+    sound.forScene(name);                                 // muzik latar mengikut babak (soundConfig.js)
     try {
       await this.scene.mount(params);
     } catch (err) {

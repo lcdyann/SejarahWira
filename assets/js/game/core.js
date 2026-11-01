@@ -9,6 +9,7 @@
  * Plain JavaScript, no libraries.
  * ============================================================================
  */
+import { sound } from './sound.js';
 
 export const W = 960;
 export const H = 540;
@@ -239,9 +240,11 @@ export class DialogueBox {
       const finishTyping = () => {
         clearInterval(timer);
         typing = false;
+        sound.talkStop();                                  // teks sudah habis ditaip: bunyi bercakap berhenti
         this.text.textContent = full;
         this.more.style.visibility = 'visible';
       };
+      if (full) sound.talkStart();                         // dialog dibuka: bunyi bercakap bermula
       timer = setInterval(() => {
         i += 1;
         this.text.textContent = full.slice(0, i);
@@ -266,6 +269,7 @@ export class DialogueBox {
       });
       const cleanup = () => {
         clearInterval(timer);
+        sound.talkStop();
         this.panel.removeEventListener('click', onClick);
         pop();
         this._current = null;
@@ -290,7 +294,8 @@ export class DialogueBox {
       this.text.textContent = text;
       this.more.style.visibility = 'hidden';
       this.choices.innerHTML = '';
-      const choose = (idx) => { pop(); this.choices.innerHTML = ''; resolve(idx); };
+      sound.talkStop();                                    // menunggu pilihan murid: TIADA bunyi bercakap
+      const choose = (idx) => { pop(); this.choices.innerHTML = ''; resolve(idx); };   // bunyi bercakap bermula hanya bila jawapan dipilih dan say() menaip teksnya
       options.forEach((label, idx) => {
         const b = el('button', 'btn-px small', `<span class="key">${idx + 1}</span> ${esc(label)}`);
         b.addEventListener('click', () => choose(idx));
@@ -307,6 +312,7 @@ export class DialogueBox {
   }
 
   hide() {
+    sound.talkStop();
     if (this._current) this._current.skip();
     this.root.classList.add('hidden');
     delete this.root.dataset.turn;
@@ -372,6 +378,7 @@ export class Transition {
    * Pictures: assets/gameAsset/transition/open_hand.png and fist.png
    */
   async soulPull({ line = '', ms = 2600, middle = null, speaker = null } = {}) {
+    sound.sfx('tarikJiwa');
     const wrap = el('div', 'soulpull');
     wrap.innerHTML = '<div class="sp-vortex"></div><div class="sp-vortex v2"></div><div class="sp-glow"></div>';
 
@@ -446,6 +453,7 @@ export class Transition {
    * Pictures: assets/gameAsset/transition/open_hand.png and fist.png
    */
   async bookGrab({ book, suck = [], ms = 3600, middle = null, handWidth = 230 } = {}) {
+    sound.sfx('tarikJiwa');
     const box = this.layer.getBoundingClientRect();
     const spot = (node) => {
       const r = node.getBoundingClientRect();
@@ -514,6 +522,7 @@ export class Transition {
    * Picture: assets/gameAsset/transition/time_machine.png
    */
   async timeMachine({ from = '', to = '', line = '', ms = 4200, middle = null } = {}) {
+    sound.sfx('pindahMasa');
     const wrap = el('div', 'timemachine');
     wrap.innerHTML = `
       <div class="tm-spiral"></div>

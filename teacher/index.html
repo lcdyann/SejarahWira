@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,65 +13,67 @@
 
 <body class="game-body">
 
-  <!-- Bar atas + tab halaman (sama seperti semua halaman guru) -->
+  <!-- Bar atas (dilukis oleh topNav.js) -->
   <div id="top-nav-placeholder"></div>
 
-  <main class="th-wrapper">
+  <!-- ======= Pengepala dengan logo ======= -->
+  <header class="hero">
+    <div class="hero-content">
+      <img src="../assets/gameAsset/logo.jpg" alt="Logo SejarahWira" class="logo">
+      <h1 class="game-title">SejarahWira</h1>
+      <p class="game-subtitle">Menjadi lilin yang menerangi wira bangsa</p>
+    </div>
+  </header>
 
-    <!-- Pengepala: sama susunan dengan halaman Kandungan -->
-    <header class="th-header">
-      <h1><i class="fas fa-house"></i> Selamat Datang, Arkitek Bangsa!</h1>
-      <p>Pilih apa yang ingin dilakukan hari ini.</p>
-    </header>
+  <!-- ======= Menu ======= -->
+  <main class="main-content">
 
-    <h2 class="th-section-title"><i class="fas fa-compass"></i> Menu Guru</h2>
+    <section class="menu-header">
+      <h2>Selamat Datang, Arkitek Bangsa!</h2>
+      <p>Pilih apa yang ingin dilakukan:</p>
+    </section>
 
-    <!-- Kad menu: satu kad = satu halaman guru -->
-    <nav class="th-grid">
+    <!-- Menu 2 x 2: satu kad = satu halaman. Profil dan Logout ada di bar atas / halaman Profil. -->
+    <nav class="menu-grid">
 
-      <a href="content_manager.html" class="th-card">
-        <div class="th-card-top">
-          <span class="th-icon"><i class="fas fa-pen-ruler"></i></span>
-          <span class="th-name">Urus Kandungan</span>
+      <a href="content_manager.html" class="game-card card-battle">
+        <div class="icon-wrapper">
+          <i class="fas fa-pen-ruler"></i>
         </div>
-        <p class="th-desc">Soalan, naratif, dialog dan quest bagi setiap era.</p>
-        <span class="th-open">Buka <i class="fas fa-arrow-right"></i></span>
+        <div class="card-details">
+          <h3>Urus Kandungan</h3>
+          <span>Soalan, naratif, dialog dan misi</span>
+        </div>
       </a>
 
-      <a href="class_manager.html" class="th-card">
-        <div class="th-card-top">
-          <span class="th-icon"><i class="fas fa-users-gear"></i></span>
-          <span class="th-name">Kelas dan Pelajar</span>
+      <a href="class_manager.html" class="game-card card-profile">
+        <div class="icon-wrapper">
+          <i class="fas fa-users-gear"></i>
         </div>
-        <p class="th-desc">Cipta kelas, tambah pelajar dan urus akaun log masuk mereka.</p>
-        <span class="th-open">Buka <i class="fas fa-arrow-right"></i></span>
+        <div class="card-details">
+          <h3>Kelas dan Pelajar</h3>
+          <span>Cipta kelas, tambah pelajar</span>
+        </div>
       </a>
 
-      <a href="learning_progress_teacher.html" class="th-card">
-        <div class="th-card-top">
-          <span class="th-icon"><i class="fas fa-chart-line"></i></span>
-          <span class="th-name">Kemajuan Pelajar</span>
+      <a href="learning_progress_teacher.html" class="game-card card-story">
+        <div class="icon-wrapper">
+          <i class="fas fa-chart-line"></i>
         </div>
-        <p class="th-desc">Pantau era, quest, lencana dan artifak yang telah dicapai.</p>
-        <span class="th-open">Buka <i class="fas fa-arrow-right"></i></span>
+        <div class="card-details">
+          <h3>Kemajuan Pelajar</h3>
+          <span>Era, misi, lencana dan artifak</span>
+        </div>
       </a>
 
-      <a href="monitor_analytics.html" class="th-card">
-        <div class="th-card-top">
-          <span class="th-icon"><i class="fas fa-chart-column"></i></span>
-          <span class="th-name">Analitik Prestasi</span>
+      <a href="monitor_analytics.html" class="game-card card-rewards">
+        <div class="icon-wrapper">
+          <i class="fas fa-gauge-high"></i>
         </div>
-        <p class="th-desc">Skor sumatif, topik lemah dan tetapan skor lulus.</p>
-        <span class="th-open">Buka <i class="fas fa-arrow-right"></i></span>
-      </a>
-
-      <a href="profile_teacher.html" class="th-card">
-        <div class="th-card-top">
-          <span class="th-icon"><i class="fas fa-chalkboard-teacher"></i></span>
-          <span class="th-name">Profil Guru</span>
+        <div class="card-details">
+          <h3>Analitik Prestasi</h3>
+          <span>Skor sumatif dan topik lemah</span>
         </div>
-        <p class="th-desc">Maklumat akaun dan kelas anda.</p>
-        <span class="th-open">Buka <i class="fas fa-arrow-right"></i></span>
       </a>
 
     </nav>
@@ -81,7 +83,7 @@
   <script src="../assets/js/topNav.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      renderTopNav({ homeUrl: 'index.html', logoutUrl: '../index.html' });
+      renderTopNav({ homeUrl: 'index.html' });
     });
   </script>
 </body>

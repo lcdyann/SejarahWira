@@ -22,11 +22,11 @@
       <p>Maklumat akaun dan kelas anda.</p>
     </header>
 
-    <!-- AKSES DITOLAK (security from breached) --> 
-    <section id="cm-denied" class="cm-state is-hidden" role="alert">
+    <!-- AKSES DITOLAK--> 
+    <section id="tpf-denied" class="tpf-state is-hidden" role="alert">
       <i class="fas fa-lock"></i>
-      <p id="cm-denied-text">Halaman ini hanya untuk guru.</p>
-      <a class="cm-btn cm-btn-primary" href="../index.html"><i class="fas fa-right-to-bracket"></i> Log Masuk</a>
+      <p id="tpf-denied-text">Halaman ini hanya untuk guru.</p>
+      <a class="tpf-btn tpf-btn-primary" href="../index.html"><i class="fas fa-right-to-bracket"></i> Log Masuk</a>
     </section>
     
     <section id="tpf-loading" class="tpf-state">
@@ -61,23 +61,25 @@
         </div>
         <div id="tpf-classes"></div>
       </section>
-
-      <section aria-labelledby="tpf-links-title">
-        <h2 class="tpf-section-title" id="tpf-links-title"><i class="fas fa-compass"></i> Menu Guru</h2>
-        <div class="tpf-links">
-          <a class="tpf-link" href="content_manager.html"><i class="fas fa-pen-ruler"></i><strong>Urus Kandungan</strong><span>Soalan, naratif, dialog dan quest</span></a>
-          <a class="tpf-link" href="monitor_analytics.html"><i class="fas fa-chart-column"></i><strong>Analitik Prestasi</strong><span>Skor sumatif dan topik lemah</span></a>
-          <a class="tpf-link" href="learning_progress_teacher.html"><i class="fas fa-chart-line"></i><strong>Kemajuan Pelajar</strong><span>Era, quest, lencana dan artifak</span></a>
-          <a class="tpf-link" href="class_manager.html"><i class="fas fa-users-gear"></i><strong>Kelas &amp; Pelajar</strong><span>Cipta kelas, tambah pelajar</span></a>
-        </div>
-      </section>
     </div>
+
+    <!-- AKAUN: butang Logout (dahulu di bar atas). Di luar kotak di atas supaya sentiasa ada,
+         walaupun profil gagal dimuatkan. -->
+    <section class="tpf-card tpf-account" aria-labelledby="tpf-account-title">
+      <div class="tpf-card-head">
+        <h2 id="tpf-account-title"><i class="fas fa-user-lock"></i> Akaun</h2>
+        <button type="button" id="btn-logout" class="pixel-btn pixel-btn-logout">
+          <i class="fas fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </section>
   </main>
 
   <script src="../assets/js/topNav.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      renderTopNav({ homeUrl: 'index.html', logoutUrl: '../index.html' });
+      renderTopNav({ homeUrl: 'index.html' });
+      document.getElementById('btn-logout').addEventListener('click', () => teacherLogout('../index.html'));
     });
   </script>
   <script src="../assets/js/teacherProfileEngine.js"></script>

@@ -190,10 +190,10 @@ class StoryBoard {
         h('p', { class: 'story-info-summary', text: narrative.summary }),
         h('div', { class: 'story-chips' },
           chip(`${this.scenes.length} babak`),
-          chip(`${questScenes} babak berquest`,
+          chip(`${questScenes} babak bermisi`,
             questScenes >= 3 ? 'ok' : (questScenes === 0 ? 'bad' : 'warn'),
             questScenes >= 3 ? 'fa-circle-check' : 'fa-triangle-exclamation')),
-        h('p', { class: 'cm-hint', text: 'Naratif mesti ada sekurang-kurangnya 3 babak berquest. Babak tanpa quest ialah babak cerita biasa.' })),
+        h('p', { class: 'cm-hint', text: 'Naratif mesti ada sekurang-kurangnya 3 babak bermisi. Babak tanpa misi ialah babak cerita biasa.' })),
       h('div', { class: 'story-info-actions' },
         uiButton('Main Naratif', 'cm-btn-play cm-btn-sm', () => this.playNarrative(), 'fa-play'),
         uiButton('Edit', 'cm-btn-ghost cm-btn-sm', () => this.editNarrative(narrative), 'fa-pen'),
@@ -309,7 +309,7 @@ class StoryBoard {
     return h('section', { class: 'story-pane story-pane-scenes', 'aria-label': 'Babak' },
       this.paneHead(2, 'Babak (urutan cerita)',
         uiButton('Tambah Babak', 'cm-btn-ghost cm-btn-sm', () => this.editScene(null), 'fa-plus')),
-      h('p', { class: 'cm-hint story-sort-hint', text: 'Babak dimainkan dari atas ke bawah, satu peristiwa sejarah bagi setiap babak. Seret ikon \u2630 di kiri baris untuk menukar urutan; quest dan dialog bergerak bersama babaknya. Klik satu baris untuk melihat isinya.' }),
+      h('p', { class: 'cm-hint story-sort-hint', text: 'Babak dimainkan dari atas ke bawah, satu peristiwa sejarah bagi setiap babak. Seret ikon \u2630 di kiri baris untuk menukar urutan; misi dan dialog bergerak bersama babaknya. Klik satu baris untuk melihat isinya.' }),
       this.sceneListEl);
   }
 
@@ -338,7 +338,7 @@ class StoryBoard {
       h('small', { class: 'story-snippet', text: snippet(scene.storyline, 52) })),
     h('span', { class: 'story-minis' },
       countChip('fa-comment', scene.dialogues.length, 'baris dialog'),
-      countChip('fa-puzzle-piece', scene.quests.length, 'quest')),
+      countChip('fa-puzzle-piece', scene.quests.length, 'misi')),
     h('i', { class: 'fas fa-chevron-right story-row-arrow', 'aria-hidden': 'true' }));
 
     this.attachDrag(row, scene);
@@ -497,21 +497,21 @@ class StoryBoard {
       lines.length
         ? h('ol', { class: 'sd-script' }, lines.map(scriptLine))
         : h('p', { class: 'cm-muted', text: 'Belum ada dialog. Tekan "Tulis Dialog" untuk menambah baris pertama.' }),
-      lines.length && !scene.quests.length ? h('p', { class: 'cm-hint', text: 'Giliran Anda disimpan bersama quest. Tambah satu quest di baris 3 dahulu.' }) : null,
+      lines.length && !scene.quests.length ? h('p', { class: 'cm-hint', text: 'Giliran Anda disimpan bersama misi. Tambah satu misi di baris 3 dahulu.' }) : null,
       lines.length && scene.quests.length && turnTotal >= turnMax ? h('p', { class: 'cm-hint', text: `Maksimum ${turnMax} Giliran Anda setiap babak.` }) : null);
 
     /* ====================================================================== */
     /* BARIS 3: misi (quest)                                                  */
     /* ====================================================================== */
-    const quests = stepCard(3, 'Misi: quest (permainan)', 'Pelajar melakukan apa yang sebenarnya berlaku dalam sejarah. Jika salah, adegan Akibat dimainkan dan babak diulang. Jika babak ada lebih daripada satu quest, satu dipilih secara rawak setiap kali bermain.', 'fa-puzzle-piece', scene.quests.length,
-      uiButton('Tambah Quest', 'cm-btn-primary cm-btn-sm', () => this.editQuest(scene, null), 'fa-plus'),
+    const quests = stepCard(3, 'Misi (permainan)', 'Pelajar melakukan apa yang sebenarnya berlaku dalam sejarah. Jika salah, adegan Akibat dimainkan dan babak diulang. Jika babak ada lebih daripada satu misi, satu dipilih secara rawak setiap kali bermain.', 'fa-puzzle-piece', scene.quests.length,
+      uiButton('Tambah Misi', 'cm-btn-primary cm-btn-sm', () => this.editQuest(scene, null), 'fa-plus'),
       scene.quests.length
         ? scene.quests.map((q) => h('div', { class: 'story-quest' },
-          h('button', { type: 'button', class: 'story-quest-main', onclick: () => this.editQuest(scene, q), title: 'Edit quest' },
+          h('button', { type: 'button', class: 'story-quest-main', onclick: () => this.editQuest(scene, q), title: 'Edit misi' },
             h('i', { class: `fas ${QuestRules.TYPES[q.questType].icon}` }),
             h('span', {}, h('strong', { text: q.questName }), h('small', { text: QuestRules.TYPES[q.questType].label }))),
-          iconBtn('fa-play', 'Cuba quest ini', false, () => this.quests.preview(q), 'story-quest-play')))
-        : h('p', { class: 'cm-muted', text: 'Tiada quest. Babak ini ialah cerita biasa: kad garis masa, kemudian dialog (jika ada).' }));
+          iconBtn('fa-play', 'Cuba misi ini', false, () => this.quests.preview(q), 'story-quest-play')))
+        : h('p', { class: 'cm-muted', text: 'Tiada misi. Babak ini ialah cerita biasa: kad garis masa, kemudian dialog (jika ada).' }));
 
     return h('section', { class: 'story-pane story-pane-detail', 'aria-label': `Isi Babak ${number}` },
       this.paneHead(3, `Isi Babak ${number}`,
@@ -674,7 +674,7 @@ class StoryBoard {
     const n = this.sceneNumber(scene);
     const ok = await this.app.askConfirm({
       title: `Padam Babak ${n}?`,
-      text: `Babak ini beserta ${scene.dialogues.length} baris dialog dan ${scene.quests.length} quest akan dipadam. Babak seterusnya akan dinomborkan semula. Tindakan ini tidak boleh dibatalkan.`,
+      text: `Babak ini beserta ${scene.dialogues.length} baris dialog dan ${scene.quests.length} misi akan dipadam. Babak seterusnya akan dinomborkan semula. Tindakan ini tidak boleh dibatalkan.`,
       confirmText: 'Padam', danger: true
     });
     if (!ok) return;
@@ -900,7 +900,7 @@ class StoryBoard {
 
     const ok = await this.app.askConfirm({
       title: `Padam naratif "${narrative.narrativeTitle}"?`,
-      text: `Ini akan memadam ${impact.scenes} babak, ${impact.dialogues} baris dialog, ${impact.quests} quest dan ${impact.completions} rekod quest pelajar yang telah selesai. Tindakan ini tidak boleh dibatalkan.`,
+      text: `Ini akan memadam ${impact.scenes} babak, ${impact.dialogues} baris dialog, ${impact.quests} misi dan ${impact.completions} rekod misi pelajar yang telah selesai. Tindakan ini tidak boleh dibatalkan.`,
       confirmText: 'Padam Naratif', danger: true
     });
     if (!ok) return;

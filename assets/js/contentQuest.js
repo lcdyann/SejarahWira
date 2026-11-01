@@ -27,7 +27,7 @@ function pctOf(value) {
 
 function hotspotArea(bgImage, hotspots, { onClick = null, activeIndex = -1, big = false } = {}) {
   const area = h('div', { class: `qp-hotspot-area${onClick ? ' is-clickable' : ''}${big ? ' is-big' : ''}` },
-    thumb(bgImage || DEFAULT_QUEST_BG, 'Gambar latar quest', 'qp-hotspot-img'),
+    thumb(bgImage || DEFAULT_QUEST_BG, 'Gambar latar misi', 'qp-hotspot-img'),
     hotspots.map((p, i) => h('span', {
       class: `qp-dot${i === activeIndex ? ' is-active' : ''}`,
       style: `top:${pctOf(p.top)}%;left:${pctOf(p.left)}%`,
@@ -48,7 +48,7 @@ class QuestPreview {
     this.pending = null;
     this.lastSent = '';
     this.timer = null;
-    this.frame = h('iframe', { class: 'qp-frame', src: 'quest_preview.html', title: 'Pratonton quest seperti yang dilihat pelajar' });
+    this.frame = h('iframe', { class: 'qp-frame', src: 'quest_preview.html', title: 'Pratonton misi seperti yang dilihat pelajar' });
     this.missing = h('div', { class: 'qp-missing is-hidden', role: 'status' });
     this.wrap = h('div', { class: 'qp-frame-wrap' }, this.frame);
     this.el = h('div', { class: 'qp-live' }, this.missing, this.wrap,
@@ -73,7 +73,7 @@ class QuestPreview {
       this.missing.classList.remove('is-hidden');
       this.wrap.classList.add('is-waiting');
     };
-    if (!QuestRules.TYPES[type]) { note('Pilih jenis quest untuk melihat pratonton.'); return; }
+    if (!QuestRules.TYPES[type]) { note('Pilih jenis misi untuk melihat pratonton.'); return; }
     const form = data.form || {};
     const errors = QuestRules.validateContent(type, form).filter((m) => !/^Giliran Anda/.test(m) && !/: mengapa peristiwa/.test(m));   // turns and the "mengapa" lines do not stop the game from running
     if (errors.length) { note('Pratonton muncul apabila borang lengkap. Masih perlu:', errors); return; }
@@ -81,7 +81,7 @@ class QuestPreview {
     this.missing.classList.add('is-hidden');
     this.wrap.classList.remove('is-waiting');
     const content = QuestRules.toStored(type, { ...form, turns: [] });
-    this.pending = { type: 'quest-preview', quest: { questName: String(data.questName || '').trim() || 'Quest', questType: type, content }, background: data.background || null };
+    this.pending = { type: 'quest-preview', quest: { questName: String(data.questName || '').trim() || 'Misi', questType: type, content }, background: data.background || null };
     clearTimeout(this.timer);
     this.timer = setTimeout(() => this.flush(), 400);
   }
@@ -108,7 +108,7 @@ class QuestEditor {
 
   /** Read-only look at an existing quest. */
   preview(quest) {
-    const dlg = new Dialog({ title: 'Pratonton Quest', size: 'wide', app: this.app });
+    const dlg = new Dialog({ title: 'Pratonton Misi', size: 'wide', app: this.app });
     const preview = new QuestPreview();
     dlg.onClose = () => preview.destroy();
     dlg.setBody(preview.el);
@@ -141,7 +141,7 @@ class QuestEditor {
       let moveIndex = null;                       // hotspot waiting to be moved by the next click on the image
 
       const dlg = new Dialog({
-        title: quest ? 'Edit Quest' : `Tambah Quest (Babak ${scene.order})`,
+        title: quest ? 'Edit Misi' : `Tambah Misi (Babak ${scene.order})`,
         size: 'wide',
         isDirty: () => snap() !== snapshot,
         app: this.app
@@ -261,7 +261,7 @@ class QuestEditor {
           h('p', { class: 'cm-hint', text: 'Pilih gambar, kemudian KLIK pada gambar di tempat bahan bukti tersembunyi. Pelajar perlu menemui semua titik.' }),
           h('div', { class: 'qe-bg-row' }, bgLabel,
             uiButton('Pilih / Muat Naik Gambar', 'cm-btn-ghost cm-btn-sm', async () => {
-              const picked = await this.library.pickAsset({ type: 'background', title: 'Pilih Gambar Latar Quest', currentFile: f.bgImage ? f.bgImage.split('/').pop() : null });
+              const picked = await this.library.pickAsset({ type: 'background', title: 'Pilih Gambar Latar Misi', currentFile: f.bgImage ? f.bgImage.split('/').pop() : null });
               if (picked) { f.bgImage = `${QUEST_BG_DIR}${picked.file}`; renderAll(); touch(); }
             }, 'fa-image'),
             f.bgImage ? uiButton('Guna gambar lalai', 'cm-btn-ghost cm-btn-sm', () => { f.bgImage = ''; renderAll(); touch(); }) : null),
@@ -322,7 +322,7 @@ class QuestEditor {
         const t = state.questType;
         moveIndex = null;
         if (!QuestRules.TYPES[t]) {
-          setChildren(typePanel, h('p', { class: 'qp-placeholder', text: 'Pilih jenis quest di atas untuk mula mengisi.' }));
+          setChildren(typePanel, h('p', { class: 'qp-placeholder', text: 'Pilih jenis misi di atas untuk mula mengisi.' }));
         } else {
           const nodes = t === 1 ? panelTimeline()
             : t === 2 ? panelHotspot()
@@ -337,7 +337,7 @@ class QuestEditor {
       };
 
       /* ----- type chooser ----- */
-      const typeCards = h('div', { class: 'qe-types', role: 'radiogroup', 'aria-label': 'Jenis quest' });
+      const typeCards = h('div', { class: 'qe-types', role: 'radiogroup', 'aria-label': 'Jenis misi' });
       const renderTypes = () => setChildren(typeCards, [1, 2, 3, 4, 5].map((t) => h('button', {
         type: 'button', role: 'radio', 'aria-checked': state.questType === t ? 'true' : 'false',
         class: `qe-type${state.questType === t ? ' is-selected' : ''}`,
@@ -348,7 +348,7 @@ class QuestEditor {
       const showErrors = ({ errors = {}, contentErrors = [] }) => {
         Object.keys(fieldErr).forEach((k) => setErr(fieldErr[k], errors[k]));
         if (contentErrors.length) {
-          setChildren(errorBox, h('strong', { text: `Quest belum boleh disimpan (${contentErrors.length} perkara):` }), h('ul', {}, contentErrors.map((m) => h('li', { text: m }))));
+          setChildren(errorBox, h('strong', { text: `Misi belum boleh disimpan (${contentErrors.length} perkara):` }), h('ul', {}, contentErrors.map((m) => h('li', { text: m }))));
           errorBox.classList.remove('is-hidden');
           if (errorBox.scrollIntoView) errorBox.scrollIntoView({ block: 'nearest' });
         } else {
@@ -356,7 +356,7 @@ class QuestEditor {
         }
       };
 
-      const saveBtn = uiButton(quest ? 'Simpan Perubahan' : 'Simpan Quest', 'cm-btn-primary', async () => {
+      const saveBtn = uiButton(quest ? 'Simpan Perubahan' : 'Simpan Misi', 'cm-btn-primary', async () => {
         const payload = { ...state, sceneID: scene.sceneID, form: { ...forms[state.questType], aftermath: carriedAftermath, turns: carriedTurns } };
         const local = QuestRules.validate(payload);                // same rules as the server (E1)
         showErrors(local);
@@ -370,31 +370,31 @@ class QuestEditor {
           snapshot = snap();
           dlg.setBusy(false);
           dlg.close();
-          this.app.toast(quest ? 'Quest berjaya dikemas kini.' : 'Quest berjaya ditambah.');
+          this.app.toast(quest ? 'Misi berjaya dikemas kini.' : 'Misi berjaya ditambah.');
         } catch (err) {
           dlg.setBusy(false);
           if (err.status === 401) return;
           if (err.status === 422) showErrors(err.data);
           else {
-            this.app.reportError(quest ? 'Mengemas kini quest' : 'Menambah quest', err,
-              { where: `${this.app.where()} > Babak ${scene.sceneID} > Quest${quest ? ` "${quest.questName}"` : ' baharu'}` });   // E2
+            this.app.reportError(quest ? 'Mengemas kini misi' : 'Menambah misi', err,
+              { where: `${this.app.where()} > Babak ${scene.sceneID} > Misi${quest ? ` "${quest.questName}"` : ' baharu'}` });   // E2
           }
-          saveBtn.disabled = false; saveBtn.textContent = quest ? 'Simpan Perubahan' : 'Simpan Quest';
+          saveBtn.disabled = false; saveBtn.textContent = quest ? 'Simpan Perubahan' : 'Simpan Misi';
         }
       }, 'fa-floppy-disk');
 
-      const deleteBtn = quest ? uiButton('Padam Quest', 'cm-btn-danger', async () => {
+      const deleteBtn = quest ? uiButton('Padam Misi', 'cm-btn-danger', async () => {
         const ok = await this.app.askConfirm({
-          title: 'Padam quest?', text: `Quest "${quest.questName}" dan rekod penyelesaian pelajar bagi quest ini akan dipadam. Tindakan ini tidak boleh dibatalkan.`,
+          title: 'Padam misi?', text: `Misi "${quest.questName}" dan rekod penyelesaian pelajar bagi misi ini akan dipadam. Tindakan ini tidak boleh dibatalkan.`,
           confirmText: 'Padam', danger: true
         });
         if (!ok) return;
         try {
           await this.app.api(`/quests/${quest.questID}`, { method: 'DELETE' });
           changed = true; snapshot = snap(); dlg.close();
-          this.app.toast('Quest berjaya dipadam.');
+          this.app.toast('Misi berjaya dipadam.');
         } catch (err) {
-          if (err.status !== 401) this.app.reportError('Memadam quest', err, { where: `${this.app.where()} > Babak ${scene.sceneID} > Quest "${quest.questName}"` });
+          if (err.status !== 401) this.app.reportError('Memadam misi', err, { where: `${this.app.where()} > Babak ${scene.sceneID} > Misi "${quest.questName}"` });
         }
       }, 'fa-trash') : null;
 
@@ -403,10 +403,10 @@ class QuestEditor {
       dlg.setBody(h('div', { class: 'qe-grid' },
         h('div', { class: 'qe-form' },
           errorBox,
-          formField('Nama quest', bind('questName', textInput(() => state.questName, (v) => { state.questName = v; }, { max: 255, placeholder: 'Contoh: Susun Peristiwa Pembentukan Malaysia' })), { required: true, error: fieldErr.questName }),
+          formField('Nama misi', bind('questName', textInput(() => state.questName, (v) => { state.questName = v; }, { max: 255, placeholder: 'Contoh: Susun Peristiwa Pembentukan Malaysia' })), { required: true, error: fieldErr.questName }),
           formField('Taklimat misi', areaInput(() => state.instruction, (v) => { state.instruction = v; }, { rows: 2, placeholder: 'Contoh: Susun peristiwa berikut mengikut urutan yang betul.' }), { required: true, hint: 'Pendekar Bayang menyebutnya sebelum objektif misi dipaparkan.', error: fieldErr.instruction }),
-          formField('Objektif pembelajaran', areaInput(() => state.description, (v) => { state.description = v; }, { rows: 2, placeholder: 'Apa yang pelajar akan faham selepas quest ini' }), { optional: true, error: fieldErr.description }),
-          h('div', { class: 'cm-field' }, h('label', { text: 'Jenis quest' }), typeCards, fieldErr.questType),
+          formField('Objektif pembelajaran', areaInput(() => state.description, (v) => { state.description = v; }, { rows: 2, placeholder: 'Apa yang pelajar akan faham selepas misi ini' }), { optional: true, error: fieldErr.description }),
+          h('div', { class: 'cm-field' }, h('label', { text: 'Jenis misi' }), typeCards, fieldErr.questType),
           typePanel,
           h('details', { class: 'qe-extras' },
             h('summary', { text: 'Bantuan & mesej (pilihan)' }),

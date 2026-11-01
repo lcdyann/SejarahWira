@@ -11,6 +11,7 @@
  * Pendekar Bayang is the announcer: explanations come as pembetulan / pujian, the hint as bisikan.
  * ============================================================================
  */
+import { sound } from './sound.js';
 import { el, esc, sleep } from './core.js';
 import { GameScene, SceneGone } from './scenes.js';
 import { entityPortrait } from './entity.js';
@@ -212,6 +213,7 @@ export class BattleScene extends GameScene {
   }
 
   banner(win, title, sub, buttons, extraHtml = '') {
+    sound.sfx(win ? 'menang' : 'kalah');                             // keputusan pentaksiran
     return this.game.openModal({
       title,
       body: `<div class="result-banner"><img src="${BATTLE_UI}/${win ? 'victory' : 'defeat'}.png" alt="" onerror="this.style.display='none'"><p>${esc(sub)}</p>${extraHtml}</div>`,
@@ -309,16 +311,19 @@ export class TrainingScene extends BattleScene {
 
       this.setPose(player, this.playerID, attack);
       player.classList.add('is-lunging-right');
+      sound.sfx('serang');
       await sleep(200);
 
       this.setPose(enemy, this.enemyID, defend);
       enemy.classList.add('is-hit');
+      sound.sfx('kena');
       arena.classList.add('is-shaking');
       this.setHP('enemy', this.enemyHP);
     } else {
       // wrong answer: the enemy attacks, the student is hit
       this.setPose(enemy, this.enemyID, attack);
       enemy.classList.add('is-lunging-left');
+      sound.sfx('serang');
 
       this.assessment.takeDamage(20);                                     // FormativeAssessment
       this.playerHP = this.assessment.playerHealth;
@@ -326,6 +331,7 @@ export class TrainingScene extends BattleScene {
 
       this.setPose(player, this.playerID, defend);
       player.classList.add('is-hit');
+      sound.sfx('kenaPemain');
       arena.classList.add('is-shaking');
 
       const flash = this.root.querySelector('.damage-flash');
@@ -382,6 +388,9 @@ const FORTRESS = [
   { max: 0.70, img: 'fortress_state3.jpg' }, { max: 0.95, img: 'fortress_state4.jpg' }, { max: 1.0, img: 'fortress_state5.jpg' }
 ];
 
+/** bilangan bisikan dibenarkan dalam satu Kepungan (sumatif) */
+const MAKS_BISIKAN = 3;
+
 export class SiegeScene extends BattleScene {
   async loadAssessment() {
     const data = await this.api.summative(this.eraID, 10);                // Assessment.startAssessment()
@@ -397,6 +406,8 @@ export class SiegeScene extends BattleScene {
 
   build() {
     this.root.classList.add('battle-siege');
+    this.hintsLeft = MAKS_BISIKAN;                 // ini ujian: bisikan terhad
+    this.hintsOpened = new Set();                  // soalan yang bisikannya sudah dibuka
 
     this.root.innerHTML = `
       <div class="siege-backdrop"></div>
@@ -436,10 +447,63 @@ export class SiegeScene extends BattleScene {
 
     // right: the question panel
     this.buildPanel();
+    this.paintHintButton();
 
-    this.assessment.startTimer((t) => this.tick(t), () => this.finish());
+    // Jam bermula SELEPAS taklimat (lihat begin()), supaya murid tidak kehilangan masa mendengar
     this.own(() => this.assessment.stopTimer());
     this.updateFortress(0);
+  }
+
+  /* ---------- Bisikan: hanya MAKS_BISIKAN kali bagi seluruh Kepungan ---------- */
+
+  /** tulis baki pada butang sebagai hati: ♥ penuh = ada lagi, ♥ pudar = sudah guna */
+  paintHintButton() {
+    const btn = this.panel && this.panel.querySelector('[data-action="hint"]');
+    if (!btn) return;
+    let hati = '';
+    for (let i = 0; i < MAKS_BISIKAN; i += 1) {
+      hati += `<span class="heart${i < this.hintsLeft ? '' : ' spent'}">\u2665</span>`;
+    }
+    btn.innerHTML = `Bisikan (H) <span class="hearts">${hati}</span>`;
+    btn.title = `Baki ${this.hintsLeft} daripada ${MAKS_BISIKAN} bisikan`;
+    btn.classList.toggle('is-empty', this.hintsLeft <= 0);       // tidak dimatikan: menekannya membuat Pendekar Bayang menerangkan
+  }
+
+  /** Sebelum perang: Pendekar Bayang memberitahu tentang bisikan, barulah jam dan soalan bermula */
+  async begin() {
+    this._briefing = true;
+    this.locked = true;
+    await this.gate(this.entity.speak('taklimat', {
+      taklimat: `Ini ujian sebenar. Aku hanya boleh berbisik ${MAKS_BISIKAN} kali sepanjang kepungan ini, jadi gunakan dengan bijak. Hati di butang Bisikan menunjukkan baki. Jam bermula sebaik sahaja kita mulakan!`
+    }, { eraID: this.eraID }));
+    this._briefing = false;
+    this.assessment.startTimer((t) => this.tick(t), () => this.finish());
+    return super.begin();
+  }
+
+  showQuestion() {
+    super.showQuestion();
+    this.paintHintButton();
+  }
+
+  async hint() {
+    if (this._hinting || this._briefing || !this.question) return;
+    const id = this.question.questionID;
+    let habisSekarang = false;
+    if (!this.hintsOpened.has(id)) {                       // bisikan baharu: ambil satu daripada baki
+      if (this.hintsLeft <= 0) {                           // sudah habis: Pendekar Bayang memberitahu
+        await this.gate(this.dialog.say({ name: 'Pendekar Bayang', text: 'Bisikanku sudah habis. Ini ujian, percayalah pada ilmumu!', side: 'left' })).catch(() => {});
+        return;
+      }
+      this.hintsLeft -= 1;
+      this.hintsOpened.add(id);
+      habisSekarang = this.hintsLeft === 0;
+      this.paintHintButton();
+    }
+    await super.hint();                                    // membuka semula soalan yang sama tidak menolak baki
+    if (habisSekarang) {                                   // itu bisikan terakhir
+      await this.gate(this.dialog.say({ name: 'Pendekar Bayang', text: 'Itu bisikanku yang terakhir. Selebihnya, bergantung pada ilmumu!', side: 'left' })).catch(() => {});
+    }
   }
 
   /** the countdown clock, mm:ss */
@@ -477,6 +541,7 @@ export class SiegeScene extends BattleScene {
     // fire: the barrel kicks back, the ball flies up toward the fortress, the student reacts
     this.setPose(this.studentFigure, this.playerID, ok ? 'punch' : 'block');
     barrel.classList.add('is-recoiling');
+    sound.sfx('meriam');
     ball.classList.remove('hidden');
     ball.classList.add('is-flying');
     await sleep(520);
@@ -489,6 +554,7 @@ export class SiegeScene extends BattleScene {
       // hit: explosion on the fortress and the stage shakes
       impact.classList.remove('hidden');
       impact.classList.add('is-popping');
+      sound.sfx('letupan');
       this.root.classList.add('is-shaking');
 
       this.updateFortress(this.assessment.score / total);
@@ -498,6 +564,7 @@ export class SiegeScene extends BattleScene {
       impact.classList.remove('is-popping');
       this.root.classList.remove('is-shaking');
     } else {
+      sound.sfx('tangkis');
       this.updateFortress(this.assessment.score / total);
       await sleep(250);
     }

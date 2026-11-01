@@ -193,9 +193,9 @@ const buildEraSummaries = async () => {
         return;
       }
       if (n.scenesWithQuest === 0) {
-        ralat(`${name} tiada quest. Pelajar tidak akan dapat menamatkan era ini.`);
+        ralat(`${name} tiada misi. Pelajar tidak akan dapat menamatkan era ini.`);
       } else if (n.scenesWithQuest < 3) {
-        amaran(`${name} hanya ada ${n.scenesWithQuest} babak berquest (disyorkan 3).`);
+        amaran(`${name} hanya ada ${n.scenesWithQuest} babak bermisi (disyorkan 3).`);
       }
       if (!n.hasRole) {
         amaran(`${name} belum ada peranan pelajar. Pilih watak yang dimainkan pelajar (kad KAU KINI IALAH dalam kotak Naratif). Tanpa peranan, pelajar tidak tahu siapa dirinya dalam cerita.`);

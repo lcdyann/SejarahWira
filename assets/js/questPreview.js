@@ -43,7 +43,7 @@ async function play(data) {
   let mech;
   try {
     mech = QuestMechanic.create(
-      { questName: data.quest.questName || 'Quest', questType: Number(data.quest.questType), content: data.quest.content },
+      { questName: data.quest.questName || 'Misi', questType: Number(data.quest.questType), content: data.quest.content },
       { background: data.background || null }
     );
   } catch (err) {

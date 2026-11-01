@@ -1,0 +1,32 @@
+FOLDER BUNYI SEJARAHWIRA
+========================
+Letakkan fail bunyi di sini. Senarai nama kod -> nama fail ada dalam
+assets/js/game/soundConfig.js (ubah di situ jika anda menukar nama fail).
+Jika sesuatu fail tiada, permainan tetap berjalan (senyap).
+
+sfx/   (sekarang)
+   speaking.mp3     dialog dibuka: watak bercakap (diulang sehingga teks habis)
+   correct.mp3      tindakan betul dalam KUEST sahaja (pentaksiran guna bunyi perang)
+   wrong.mp3        tindakan salah dalam KUEST sahaja
+   win.mp3          keputusan pentaksiran: menang atau lulus
+   lose.mp3         keputusan pentaksiran: kalah atau gagal
+   punch.mp3        pukulan dihayun (Latihan)
+   pukul.mp3        musuh kena pukul (Latihan)
+   dipukul.mp3      murid kena pukul (Latihan)
+   tang.mp3         menangkis (Kepungan, jawapan salah)
+   meriam.mp3       meriam ditembak (Kepungan)
+   letupan.mp3      bola meriam meletup (Kepungan)
+   tarik_jiwa.mp3   peralihan antara babak
+   pindah_masa.mp3  peralihan antara era
+
+muzik/ (sekarang; nama fail dipetakan dalam soundConfig.js, bahagian MUSIC)
+   TARI TUALANG TIGA - INSTRUMENTAL.mp3                         hub, prolog
+   Instrumental Melayu Asli - Selendang Mak Inang.mp3           peta, misi (perlahan)
+   AYAM DIDIK - INSTRUMENTAL.mp3                                latihan, trofi
+   Serunai - Gendang Silat (Studio Quality).mp3                 kepungan
+ * Dua babak yang guna fail sama = lagu bersambung (tidak mula semula).
+ * Fail lain = silih-ganti 1.5 saat. Lagu berulang tanpa jeda untuk kelancaran.
+ * Tukar nama fail? Ubah di MUSIC dalam soundConfig.js sahaja.
+ * Petua: tukar .mp3 kepada .ogg (lebih kecil, ulangan lebih rapi).
+
+Tekan M dalam permainan untuk senyapkan.

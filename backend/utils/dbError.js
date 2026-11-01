@@ -25,7 +25,7 @@ export function explainError(err) {
     case 'ER_ROW_IS_REFERENCED_2':
     case 'ER_ROW_IS_REFERENCED':
     case 1451:
-      return { status: 409, code: 'DB_IN_USE', detail: 'Rekod ini masih digunakan oleh data lain (contoh: dialog, quest atau kemajuan pelajar), jadi tidak boleh dipadam atau diubah begitu.' };
+      return { status: 409, code: 'DB_IN_USE', detail: 'Rekod ini masih digunakan oleh data lain (contoh: dialog, misi atau kemajuan pelajar), jadi tidak boleh dipadam atau diubah begitu.' };
     case 'ER_NO_REFERENCED_ROW_2':
     case 'ER_NO_REFERENCED_ROW':
     case 1452:
