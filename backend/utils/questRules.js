@@ -11,7 +11,8 @@
  *   1 Susun Garis Masa   questContent.timelineItems [{id, year, text, why}]   (id order = correct order)
  *                        dates are hidden from the student; `why` = the link from the previous event to this one
  *   2 Cari Bukti         questContent.bgImage, hotspots [{name, top, left}]  (top/left as "25%")
- *   3 Bantu Tokoh        questContent.prompt, options [{text, isCorrect}]
+ *   3 Bantu NPC          questContent.npcName (pilihan), prompt, options [{text, item, isCorrect}]
+ *                        item (pilihan) = jenis benda yang dihulurkan: kaset, surat, peta, telegram, dokumen, gambar, buku
  *   4 Padanan            questContent.pairs [{text, pair}]               (each pair number twice)
  *   5 Nyahkod Clue       questContent.clueText, options [{text, isCorrect}]
  *
@@ -31,17 +32,20 @@ const QuestRules = (() => {
   const TYPES = {
     1: { label: 'Susun Garis Masa', icon: 'fa-timeline', help: 'Tarikh disembunyikan. Pelajar menyusun peristiwa mengikut sebab dan akibat, satu pautan demi satu.', done: 'Selesai apabila semua pautan dirantai dengan betul.' },
     2: { label: 'Cari Bukti', icon: 'fa-magnifying-glass-location', help: 'Pelajar mencari semua bahan bukti yang tersembunyi pada sebuah gambar.', done: 'Selesai apabila semua titik ditemui.' },
-    3: { label: 'Bantu Tokoh', icon: 'fa-comment-dots', help: 'Pelajar memilih tindakan yang paling tepat untuk membantu seorang tokoh.', done: 'Selesai apabila jawapan yang betul dipilih.' },
+    3: { label: 'Bantu NPC', icon: 'fa-hand-holding-heart', help: 'Seorang watak lain (NPC) ada masalah. Pelajar menghulurkan benda yang betul kepadanya (surat, peta, kaset lagu...).', done: 'Selesai apabila benda yang betul diberikan.' },
     4: { label: 'Padanan', icon: 'fa-clone', help: 'Pelajar memadankan setiap kad dengan pasangannya. Mana-mana dua kad boleh dipadankan, tidak kira kedudukannya (bukan hanya atas dan bawah).', done: 'Selesai apabila semua pasangan dipadankan.' },
     5: { label: 'Nyahkod Clue', icon: 'fa-key', help: 'Pelajar membaca satu petunjuk dan memilih jawapan yang betul.', done: 'Selesai apabila jawapan yang betul dipilih.' }
   };
 
   const LIMITS = {
     questName: 255, description: 2000, instruction: 2000, hint: 255, explanation: 2000, feedback: 2000,
-    year: 40, eventText: 200, why: 200, hotspotName: 80, prompt: 400, clueText: 500, option: 200, card: 80,
+    npcName: 40, year: 40, eventText: 200, why: 200, hotspotName: 80, prompt: 400, clueText: 500, option: 200, card: 80,
     timeline: [2, 8], hotspots: [1, 8], options: [2, 5], pairs: [2, 6],
     aftermath: 200, turns: [0, 3], turnOptions: [2, 3], turnReply: 150, turnReaction: 200, turnClue: 200, turnAfter: [1, 40]
   };
+
+  // Jenis benda untuk misi Bantu NPC (kunci disimpan dalam pangkalan data, nilai = nama paparan)
+  const ITEMS = { kaset: 'Kaset lagu', surat: 'Surat', peta: 'Peta', telegram: 'Telegram', dokumen: 'Dokumen', gambar: 'Gambar', buku: 'Buku' };
 
   const MARKUP = /[<>]/;                      // basic fields (shown as plain text)
   const UNSAFE = /[<>"`\\]/;                  // quest content (inserted as HTML by quest_game.html)
@@ -56,7 +60,7 @@ const QuestRules = (() => {
     switch (Number(type)) {
       case 1: return { items: [{ year: '', text: '', why: '' }, { year: '', text: '', why: '' }] };
       case 2: return { bgImage: '', hotspots: [] };
-      case 3: return { prompt: '', options: [{ text: '', isCorrect: true }, { text: '', isCorrect: false }] };
+      case 3: return { npcName: '', prompt: '', options: [{ text: '', item: '', isCorrect: true }, { text: '', item: '', isCorrect: false }] };
       case 4: return { pairs: [{ a: '', b: '' }, { a: '', b: '' }] };
       case 5: return { clueText: '', options: [{ text: '', isCorrect: true }, { text: '', isCorrect: false }] };
       default: return {};
@@ -85,10 +89,12 @@ const QuestRules = (() => {
       case 3:
       case 5: {
         const options = Array.isArray(c.options)
-          ? c.options.map((o) => ({ text: String(o.text ?? ''), isCorrect: Boolean(o.isCorrect), consequence: String(o.consequence ?? '') }))
+          ? c.options.map((o) => ({ text: String(o.text ?? ''), item: String(o.item ?? ''), isCorrect: Boolean(o.isCorrect), consequence: String(o.consequence ?? '') }))
           : [];
         const key = Number(type) === 3 ? 'prompt' : 'clueText';
-        return { [key]: typeof c[key] === 'string' ? c[key] : '', options: options.length ? options : base.options };
+        const out = { [key]: typeof c[key] === 'string' ? c[key] : '', options: options.length ? options : base.options };
+        if (Number(type) === 3) out.npcName = typeof c.npcName === 'string' ? c.npcName : '';   // nama NPC yang dibantu
+        return out;
       }
       case 4: {
         const groups = new Map();
@@ -108,6 +114,7 @@ const QuestRules = (() => {
   /** a choice: a wrong one may carry what happens in the story when it is picked */
   const optStored = (o) => ({
     text: str(o.text), isCorrect: Boolean(o.isCorrect),
+    ...(ITEMS[o.item] ? { item: o.item } : {}),          // jenis benda (Bantu NPC sahaja)
     ...(!o.isCorrect && str(o.consequence) ? { consequence: str(o.consequence) } : {})
   });
 
@@ -122,7 +129,7 @@ const QuestRules = (() => {
         return out;
       }
       case 3:
-        return { prompt: str(f.prompt), options: f.options.map(optStored) };
+        return { ...(str(f.npcName) ? { npcName: str(f.npcName) } : {}), prompt: str(f.prompt), options: f.options.map(optStored) };
       case 4: {
         const pairs = [];
         f.pairs.forEach((p, idx) => {
@@ -205,8 +212,11 @@ const QuestRules = (() => {
         break;
       }
       case 3: {
-        const p = textErr(f.prompt, 'Situasi / soalan tokoh', LIMITS.prompt); if (p) errors.push(p);
+        // nama NPC dan jenis benda adalah pilihan; jika diisi mesti sah
+        if (str(f.npcName)) { const n = textErr(f.npcName, 'Nama NPC', LIMITS.npcName); if (n) errors.push(n); }
+        const p = textErr(f.prompt, 'Masalah NPC (gelembung fikiran)', LIMITS.prompt); if (p) errors.push(p);
         choiceErrors(f.options, errors);
+        if (Array.isArray(f.options)) f.options.forEach((o, i) => { if (str(o.item) && !ITEMS[str(o.item)]) errors.push(`Pilihan ${i + 1}: jenis benda tidak sah.`); });
         break;
       }
       case 4: {
@@ -364,7 +374,7 @@ const QuestRules = (() => {
     return { valid, errors, contentErrors, value: v };
   };
 
-  return { TYPES, LIMITS, BG_PATH, defaultForm, defaultTurn, toForm, toStored, validateContent, validate };
+  return { TYPES, LIMITS, ITEMS, BG_PATH, defaultForm, defaultTurn, toForm, toStored, validateContent, validate };
 })();
 
 if (typeof globalThis !== 'undefined') globalThis.QuestRules = QuestRules;

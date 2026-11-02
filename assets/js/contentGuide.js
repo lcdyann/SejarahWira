@@ -91,7 +91,7 @@ class ContentGuide {
           h('p', { text: 'Apabila pelajar gagal dalam misi, mereka tidak dimarahi. Mereka melihat sebuah adegan pendek: gambar menjadi kelabu, benang sejarah terputus, dan akibatnya ditaip di skrin. Selepas itu Pendekar Bayang menerangkan sebabnya dengan tenang dan babak diputar semula.' }),
           h('ul', { class: 'guide-list' },
             li('Akibat jika salah:', 'satu medan pada setiap misi. Tulis apa yang BERLAKU dalam cerita, dalam satu atau dua ayat. Contoh: "Tanpa kerjasama, kota Melaka jatuh ke tangan Portugis dalam sehari."'),
-            li('Bagi misi pilihan (Bantu Tokoh, Nyahkod Clue):', 'setiap pilihan salah boleh ada akibat sendiri. Tulis di bawah pilihan itu. Jika kosong, akibat umum misi digunakan.'),
+            li('Bagi misi pilihan (Bantu NPC, Nyahkod Clue):', 'setiap pilihan salah boleh ada akibat sendiri. Tulis di bawah pilihan itu. Jika kosong, akibat umum misi digunakan.'),
             li('Jika dibiarkan kosong:', 'permainan memaparkan ayat umum, tetapi akibat yang ditulis sendiri jauh lebih berkesan.')),
           h('p', { class: 'cm-muted', text: 'Elakkan "Salah!" atau nada menghukum. Tunjukkan sebab dan akibat sejarah supaya pelajar faham mengapa pilihan itu tidak membawa kepada peristiwa sebenar.' })
         ]

@@ -2460,29 +2460,380 @@ button {
   opacity: 0.55;
 }
 
-.decode-visual {
-  align-items: center;
-  justify-content: center;
-  background-image: radial-gradient(circle, #2a1740, #0a0612);
+/* ---------- bantu NPC ---------- */
+/* tema biru kehijauan + kad benda, supaya berbeza daripada Giliran Anda (emas) */
+.q-help {
+  background: #0c1f2a;
 }
 
-.scroll {
-  width: 92%;
-  padding: 22px 26px;
+.help-visual {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+/* gelembung fikiran NPC */
+.help-bubble {
+  width: 90%;
+  padding: 18px 22px;
+  background: #f1fbff;
+  color: #0b2b38;
+  border: 4px solid #2aa5c9;
+  border-radius: 28px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.help-bubble-title {
+  margin-bottom: 8px;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: #1b7a96;
+}
+
+.help-bubble-text {
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+/* ekor gelembung menghala ke NPC */
+.help-bubble-tail {
+  width: 0;
+  height: 0;
+  margin-top: -2px;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 22px solid #2aa5c9;
+}
+
+.help-give {
+  margin-top: 14px;
+  padding: 6px 12px;
+  background: #0008;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  line-height: 1.5;
+  color: #8fe3ff;
+}
+
+.help-menu {
+  background: #12394a;
+  border-color: #07202b;
+  box-shadow: inset 0 0 0 2px #2aa5c9, 0 4px 0 rgba(0, 0, 0, 0.55);
+}
+
+.help-menu .cq-menu-title {
+  color: #8fe3ff;
+  border-bottom-color: #2aa5c9;
+}
+
+/* kad benda: seperti tiket kertas */
+.help-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #f4ead2;
+  color: #2b1402;
+  border: 3px dashed #8a6a3a;
+  border-radius: 6px;
+  font-family: var(--font-text);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: left;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+  transition: transform 0.12s;
+}
+
+.help-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: #2aa5c9;
+}
+
+.help-card .key {
+  flex: none;
+  padding: 4px 5px;
+  background: #1b7a96;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: #fff;
+}
+
+.help-card .help-icon {
+  flex: none;
+  min-width: 46px;
+  font-size: 30px;
   text-align: center;
 }
 
-.scroll-head {
-  margin-bottom: 14px;
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  color: #8a3a1c;
+.help-card .opt-text {
+  flex: 1;
 }
 
-.scroll-body {
-  font-size: 26px;
-  line-height: 1.35;
-  letter-spacing: 0.5px;
+/* kaset lagu dilukis dengan CSS */
+.kaset {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 30px;
+  background: #2b2b2b;
+  border: 2px solid #111;
+  border-radius: 3px;
+}
+
+.kaset::before {                      /* pelekat label putih */
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 3px;
+  height: 11px;
+  background: #f4ead2;
+}
+
+.kaset i {                            /* dua gelendong pita */
+  position: absolute;
+  bottom: 4px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #555;
+}
+
+.kaset i:first-child { left: 8px; }
+.kaset i:last-child  { right: 8px; }
+
+/* kad dihulurkan kepada NPC */
+.help-card.diberi {
+  animation: beri-benda 0.4s ease-out;
+}
+
+@keyframes beri-benda {
+  from { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(-60px, -40px) scale(1.08); }
+  to   { transform: translate(0, 0) scale(1); }
+}
+
+.help-card.right {
+  border: 3px solid #1c8a4a;
+  background: #d9f5df;
+}
+
+.help-card.wrong {
+  border: 3px solid #b91c1c;
+  background: #f6d0d0;
+}
+
+.help-card.struck {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.help-card:disabled:not(.right):not(.wrong):not(.struck) {
+  opacity: 0.6;
+}
+
+/* ---------- nyahkod petunjuk ---------- */
+/* kertas lama bertulisan kod yang dinyahkod, jawapan = nota lekat yang ditempel */
+.decode-visual {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-image: radial-gradient(circle, #4a2e18, #0e0804);
+}
+
+.clue-paper {
+  position: relative;
+  width: 94%;
+  max-height: 100%;
+  overflow: auto;
+  padding: 30px 30px 22px;
+  transform: rotate(-0.8deg);
+}
+
+/* cop merah di penjuru kertas */
+.clue-stamp {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  padding: 5px 9px;
+  border: 3px solid var(--crimson);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--crimson);
+  transform: rotate(6deg);
+  opacity: 0.85;
+}
+
+/* teks petunjuk dalam tulisan tangan */
+.clue-text {
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #3a1d08;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* perkataan yang masih berkod: simbol pudar */
+.clue-text .w.kod {
+  font-family: monospace;
+  font-size: 24px;
+  letter-spacing: 2px;
+  color: #8a6a3a;
+}
+
+/* perkataan yang baru dinyahkod: menyala sekejap */
+.clue-text .w.kini {
+  background: #ffe08a;
+  box-shadow: 0 0 10px #ffd04a;
+}
+
+.clue-text .w.terbuka {
+  animation: nyahkod-masuk 0.35s ease-out;
+}
+
+@keyframes nyahkod-masuk {
+  from { transform: scale(1.3); color: var(--crimson); }
+  to   { transform: scale(1);   color: inherit; }
+}
+
+/* baris "menunjuk kepada" + ruang tempel jawapan */
+.clue-point {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 3px dashed #8a6a3a;
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--crimson);
+}
+
+.clue-slot {
+  min-width: 70px;
+  padding: 6px 14px;
+  border: 3px dashed var(--crimson);
+  text-align: center;
+  transform: rotate(-1deg);
+}
+
+/* selepas nota ditempel */
+.clue-slot.filled {
+  border-style: solid;
+  border-color: transparent;
+  color: var(--ink);
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.4);
+  animation: nota-tempel 0.3s ease-out;
+}
+
+@keyframes nota-tempel {
+  from { transform: translateY(-30px) rotate(8deg) scale(1.3); opacity: 0.2; }
+  to   { transform: translateY(0) rotate(-1deg) scale(1);      opacity: 1; }
+}
+
+.clue-hint {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #c9a063;
+  opacity: 0.8;
+}
+
+/* papan gabus tempat nota lekat */
+.cq-menu.cork {
+  background:
+    radial-gradient(circle at 20% 30%, #c08a52 0 2px, transparent 3px) 0 0 / 22px 22px,
+    radial-gradient(circle at 70% 70%, #8a5a2c 0 2px, transparent 3px) 0 0 / 18px 18px,
+    #a87440;
+  color: var(--ink);
+}
+
+.cork .cq-menu-title {
+  color: #fff;
+  border-bottom-color: #5c3510;
+}
+
+/* nota lekat: lima warna, sedikit senget */
+.note-opt {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 14px 14px 14px 12px;
+  border: none;
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+  text-align: left;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.4);
+  transform: rotate(var(--r, 0deg));
+  transition: transform 0.12s;
+}
+
+.note-opt:nth-child(odd)  { --r: -1.2deg; }
+.note-opt:nth-child(even) { --r: 1deg; }
+
+.note-0 { background: #ffb6d2; }   /* merah jambu */
+.note-1 { background: #9fd3ff; }   /* biru */
+.note-2 { background: #d0b4ff; }   /* ungu */
+.note-3 { background: #b6f0a8; }   /* hijau */
+.note-4 { background: #8eeaf0; }   /* sian */
+
+.note-opt:hover:not(:disabled) {
+  transform: rotate(0deg) translateY(-2px);
+}
+
+.note-opt .key {
+  flex: none;
+  padding: 4px 5px;
+  background: var(--ink);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: #fff;
+}
+
+.note-opt .opt-text {
+  flex: 1;
+}
+
+/* pin merah di atas nota */
+.note-opt::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d62828;
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.note-opt.right {
+  outline: 4px solid #1c8a4a;
+}
+
+.note-opt.wrong {
+  outline: 4px solid #b91c1c;
+  filter: saturate(0.5);
+}
+
+.note-opt.struck {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.note-opt:disabled:not(.right):not(.wrong):not(.struck) {
+  opacity: 0.6;
 }
 
 /* ---------- matching quest ---------- */
@@ -3828,6 +4179,7 @@ button {
 .diary-page .sticky {
   margin: 0; padding: 16px 16px 18px; background: var(--sticky-bg); color: var(--paper-ink);
   transform: rotate(-1.2deg); box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.25); line-height: 1.35;
+  white-space: pre-line; /* 3 baris penanda buku dipaparkan baris demi baris */
 }
 
 

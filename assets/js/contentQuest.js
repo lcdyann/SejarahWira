@@ -277,10 +277,19 @@ class QuestEditor {
       const panelChoices = (keyName, label, placeholder, rows) => {
         const f = forms[state.questType];
         const list = h('div', { class: 'qe-rows' });
+
+        // senarai jenis benda: kosong = dokumen (lalai). Hanya untuk misi Bantu NPC.
+        const itemSelect = (o) => {
+          const pilih = h('select', { class: 'cm-input qe-item', 'aria-label': 'Jenis benda yang dihulurkan', onchange: (e) => { o.item = e.target.value; touch(); } },
+            [['', 'Dokumen (lalai)'], ...Object.entries(QuestRules.ITEMS)].map(([nilai, nama]) => h('option', { value: nilai, text: nama })));
+          pilih.value = o.item || '';
+          return pilih;
+        };
         const render = () => {
           setChildren(list, f.options.map((o, i) => h('div', { class: 'qe-opt' }, h('div', { class: 'qe-row' },
             h('input', { type: 'radio', name: 'qe-correct', class: 'qe-radio', 'aria-label': `Pilihan ${i + 1} ialah jawapan betul`, onchange: () => { f.options.forEach((x, j) => { x.isCorrect = j === i; }); render(); touch(); } }),
-            textInput(() => o.text, (v) => { o.text = v; }, { max: 200, placeholder: `Pilihan ${i + 1}` }),
+            textInput(() => o.text, (v) => { o.text = v; }, { max: 200, placeholder: keyName === 'prompt' ? `Benda ${i + 1}, cth: Kaset lagu Perak` : `Pilihan ${i + 1}` }),
+            keyName === 'prompt' ? itemSelect(o) : null,        // jenis benda (Bantu NPC sahaja)
             h('button', { type: 'button', class: 'cm-icon-btn is-danger', 'aria-label': 'Buang pilihan', disabled: f.options.length <= QuestRules.LIMITS.options[0] ? '' : null, onclick: () => { const wasCorrect = o.isCorrect; f.options.splice(i, 1); if (wasCorrect && f.options[0]) f.options[0].isCorrect = true; render(); touch(); } }, h('i', { class: 'fas fa-trash' }))),
             // a wrong choice shows what happens in the story when it is picked
             o.isCorrect ? null : h('div', { class: 'qe-consequence' },
@@ -294,10 +303,13 @@ class QuestEditor {
         };
         render();
         return [
+          // nama NPC yang dibantu (Bantu NPC sahaja)
+          keyName === 'prompt' ? formField('Nama NPC yang dibantu', textInput(() => f.npcName || '', (v) => { f.npcName = v; }, { max: 40, placeholder: 'Cth: Wong Pow Nee' }),
+            { optional: true, hint: 'NPC ialah watak LAIN, bukan peranan yang dimainkan pelajar. Namanya dipaparkan pada gelembung fikiran.' }) : null,
           formField(label, areaInput(() => f[keyName], (v) => { f[keyName] = v; }, { max: keyName === 'prompt' ? 400 : 500, rows, placeholder }), { required: true }),
-          h('p', { class: 'cm-hint', text: 'Pilihan jawapan. Tandakan bulatan di sebelah jawapan yang betul (hanya satu).' }),
+          h('p', { class: 'cm-hint', text: keyName === 'prompt' ? 'Benda yang boleh dihulurkan. Pilih jenis benda, dan tandakan bulatan di sebelah benda yang betul (hanya satu).' : 'Pilihan jawapan. Tandakan bulatan di sebelah jawapan yang betul (hanya satu).' }),
           list,
-          uiButton('Tambah Pilihan', 'cm-btn-ghost cm-btn-sm', () => { if (f.options.length < QuestRules.LIMITS.options[1]) { f.options.push({ text: '', isCorrect: false }); render(); touch(); } }, 'fa-plus')
+          uiButton('Tambah Pilihan', 'cm-btn-ghost cm-btn-sm', () => { if (f.options.length < QuestRules.LIMITS.options[1]) { f.options.push({ text: '', item: '', isCorrect: false }); render(); touch(); } }, 'fa-plus')
         ];
       };
 
@@ -326,7 +338,7 @@ class QuestEditor {
         } else {
           const nodes = t === 1 ? panelTimeline()
             : t === 2 ? panelHotspot()
-              : t === 3 ? panelChoices('prompt', 'Situasi / soalan tokoh', 'Contoh: Apakah tindakan terbaik untuk membantu tokoh ini?', 3)
+              : t === 3 ? panelChoices('prompt', 'Masalah NPC (gelembung fikiran)', 'Contoh: Aku perlu lagu negeri yang betul untuk majlis ini. Benda mana patut aku guna?', 3)
                 : t === 4 ? panelMatching()
                   : panelChoices('clueText', 'Teks clue', 'Contoh: Dokumen ini ditulis dalam tulisan Jawi pada 1963.', 4);
           const aftermath = formField('Akibat jika salah', areaInput(() => carriedAftermath, (v) => { carriedAftermath = v; }, { max: 200, rows: 2, placeholder: 'Apa yang berlaku dalam cerita jika pelajar gagal? Cth: Tanpa kerjasama, kota Melaka jatuh ke tangan Portugis.' }),

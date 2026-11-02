@@ -1528,6 +1528,9 @@ Loaded after contentManager.css (same palette: #181512 / #211c17 / #f59e0b)
 /* "Akibat jika salah": what happens in the story when a wrong choice is picked */
 .qe-opt { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
 .qe-consequence { display: flex; align-items: center; gap: 8px; margin-left: 28px; }
+
+/* senarai jenis benda pada misi Bantu NPC */
+.qe-item { flex: none; width: 150px; font-size: 0.85rem; }
 .qe-consequence > i { color: #f87171; font-size: 0.8rem; }
 .qe-consequence input { flex: 1; font-size: 0.85rem; }
 
