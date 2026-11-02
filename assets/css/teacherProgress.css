@@ -269,7 +269,7 @@ td strong + .tp-pill {
   gap: 24px;
   align-items: center;
   flex-wrap: wrap;
-  background: var(--card-bg,var(--t-surface, #26211c));
+  background: var(--card-bg,var(--t-surface, #1e1a16));
   border: 1px solid var(--card-border,var(--t-line, #443425));
   border-radius: var(--radius-md,10px);
   padding: 20px;
@@ -380,4 +380,22 @@ td strong + .tp-pill {
   .tp-state .fa-spin {
     animation: none;
   }
+}
+
+/* MOD TERANG: .tp-body menetapkan warna gelap pada halaman ini, jadi ia menimpa nilai terang dalam theme.css
+   (pembolehubah pada <body> menang ke atas :root). Di sini nilai terang ditetapkan semula pada .tp-body.
+   Ini menerangkan kotak Kelas / Cari pelajar / Susun mengikut, butang tab, kotak statistik dan gelang kemajuan. */
+:root[data-theme="light"] .tp-body {
+  --tp-ok: #137a3a;
+  --tp-warn: #a85a06;
+  --tp-info: #1d5fb8;
+  --tp-mute: #6b5f52;
+  --tp-surface: #faf5ea;
+  --tp-line: #d8c9a8;
+}
+
+/* tab yang dipilih di mod terang: latar jingga lembut, tulisan gelap supaya jelas */
+:root[data-theme="light"] .tp-tab.is-active {
+  background: #fde7b8;
+  color: #6b3a05;
 }
