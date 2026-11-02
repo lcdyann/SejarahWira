@@ -15,10 +15,14 @@
 import { SOUND_FOLDER, VOLUME, CROSSFADE_MS, SFX, MUSIC, SCENE_MUSIC } from './soundConfig.js';
 
 const MUTE_KEY = 'sw_sound_muted';
+const MUSIC_KEY = 'sw_music_level';      // kuat muzik pilihan pemain (0 - 1)
+const SFX_KEY = 'sw_sfx_level';          // kuat kesan bunyi pilihan pemain (0 - 1)
 
 class Sound {
   constructor() {
     this.muted = this.#readMuted();
+    this.musicLevel = this.#readLevel(MUSIC_KEY);   // pengali muzik dari gelangsar
+    this.sfxLevel = this.#readLevel(SFX_KEY);       // pengali kesan bunyi dari gelangsar
     this.track = null;          // nama muzik yang sedang dimainkan
     this.voices = [];           // suara muzik yang sedang hidup (lagu semasa + lagu yang sedang senyap)
     this.current = null;        // suara lagu semasa
@@ -33,12 +37,34 @@ class Sound {
     try { return localStorage.getItem(MUTE_KEY) === '1'; } catch { return false; }
   }
 
+  /** baca kuat bunyi yang disimpan (tiada = penuh) */
+  #readLevel(key) {
+    try {
+      const n = parseFloat(localStorage.getItem(key));
+      return Number.isFinite(n) ? Math.max(0, Math.min(1, n)) : 1;
+    } catch { return 1; }
+  }
+
+  /** gelangsar muzik: 0 - 1 (dikuatkuasakan serta-merta pada lagu yang sedang main) */
+  setMusicLevel(n) {
+    this.musicLevel = Math.max(0, Math.min(1, n));
+    try { localStorage.setItem(MUSIC_KEY, String(this.musicLevel)); } catch { /* storan tidak tersedia */ }
+    this.#applyVolumes();
+  }
+
+  /** gelangsar kesan bunyi: 0 - 1 (terpakai pada bunyi seterusnya) */
+  setSfxLevel(n) {
+    this.sfxLevel = Math.max(0, Math.min(1, n));
+    try { localStorage.setItem(SFX_KEY, String(this.sfxLevel)); } catch { /* storan tidak tersedia */ }
+  }
+
   toggleMute() {
     this.muted = !this.muted;
     try { localStorage.setItem(MUTE_KEY, this.muted ? '1' : '0'); } catch { /* storan tidak tersedia */ }
     this.#applyVolumes();
     if (this.muted) this.talkStop();
     this.#paintButton();
+    document.dispatchEvent(new Event('sw-mute'));   // beritahu kawalan bunyi lain (cth. di pintu)
   }
 
   /** butang kecil di penjuru pentas */
@@ -64,7 +90,7 @@ class Sound {
   #make(file, volume) {
     if (!file || this.missing.has(file)) return null;
     const a = new Audio(SOUND_FOLDER + this.#url(file));
-    a.volume = this.muted ? 0 : volume;
+    a.volume = this.muted ? 0 : Math.min(1, volume * this.sfxLevel);
     a.addEventListener('error', () => this.missing.add(file), { once: true });
     return a;
   }
@@ -184,7 +210,7 @@ class Sound {
   /** kuat sebenar = lengkung kuasa sama (untuk silih-ganti yang licin) x kuat lagu x pengali x senyap */
   #apply(v) {
     const kuasaSama = Math.sin(Math.max(0, Math.min(1, v.level)) * Math.PI / 2);
-    v.el.volume = this.muted ? 0 : Math.max(0, Math.min(1, kuasaSama * v.vol * VOLUME.music));
+    v.el.volume = this.muted ? 0 : Math.max(0, Math.min(1, kuasaSama * v.vol * VOLUME.music * this.musicLevel));
   }
 
   #applyVolumes() { this.voices.forEach(v => this.#apply(v)); }

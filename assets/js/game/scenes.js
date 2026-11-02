@@ -12,9 +12,10 @@
  *    BattleScene -> TrainingScene / SiegeScene -> battleScenes.js)
  * ============================================================================
  */
-import { el, esc, sleep } from './core.js';
+import { el, esc, sleep, tpl } from './core.js';
 import { entityPortrait, spriteEl } from './entity.js';
 import { ShelfComponent } from './shelf.js';
+import { sound } from './sound.js';
 import {
   HUB_BG,
   HUB_BG_DAY,
@@ -577,17 +578,32 @@ export class HubScene extends GameScene {
     });
   }
 
-  /** the door in the hub: game settings */
+  /** the door in the hub: game settings (susun atur bunyi: <template id="tpl-sound"> dalam templates.html) */
   async doorMenu() {
+    // kawalan bunyi: isi nilai semasa, kemudian ikut gerakan gelangsar
+    const panel = tpl('sound', {});
+    const paintMute = () => { panel.refs.mute.textContent = sound.muted ? '🔇 Bunyi mati' : '🔊 Bunyi hidup'; };
+    paintMute();
+    panel.refs.mute.addEventListener('click', () => sound.toggleMute());
+    const onMute = () => { if (panel.refs.mute.isConnected) paintMute(); };      // juga bila tekan M
+    document.addEventListener('sw-mute', onMute);
+
+    panel.refs.music.value = Math.round(sound.musicLevel * 100);
+    panel.refs.sfx.value = Math.round(sound.sfxLevel * 100);
+    panel.refs.music.addEventListener('input', () => sound.setMusicLevel(panel.refs.music.value / 100));
+    panel.refs.sfx.addEventListener('input', () => sound.setSfxLevel(panel.refs.sfx.value / 100));
+    panel.refs.sfx.addEventListener('change', () => sound.sfx('betul'));         // bunyi contoh
+
     await this.game.openModal({
       title: 'Pintu',
-      body: '<p>Tetapan permainan.</p><p class="muted">Bunyi: belum tersedia.</p>',
+      body: panel,
       buttons: [
         { label: 'Skrin penuh (F)', onClick: () => this.stage.toggleFullscreen(), keep: true },
         { label: 'Log keluar', onClick: () => this.student.logout() },
         { label: 'Tutup', primary: true }
       ]
     });
+    document.removeEventListener('sw-mute', onMute);
   }
 }
 

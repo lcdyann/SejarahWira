@@ -1369,6 +1369,29 @@ button {
   bottom: 14px;
 }
 
+/* tetapan bunyi dalam kotak Pintu (hab): <template id="tpl-sound"> */
+.set-sound {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 17px;
+}
+
+/* gelangsar: tombol emas */
+.set-row input[type="range"] {
+  width: 180px;
+  accent-color: #c9891a;
+  cursor: pointer;
+}
+
 
 /* ============================================================================
    9. TROPHY ROOM (SHELF)

@@ -27,6 +27,7 @@
     6. tpl-pieces      kertas koyak: kepingan LENCANA bertambah selepas setiap misi
     7. tpl-artifak     hadiah Kepungan: artifak yang digelapkan (sebelum perang bermula)
     8. tpl-bookend     akhir era: halaman diari / kepingan terkumpul ke dalam buku
+    9. tpl-sound       tetapan bunyi di Pintu (hab): senyap + gelangsar muzik / kesan
   ============================================================================
 -->
 
@@ -152,6 +153,17 @@
       <div class="be-book" data-ref="book"></div>                <!-- buku.png -->
       <div class="be-title" data-text="title"></div>             <!-- contoh: Kisah Era 2 lengkap -->
       <div class="be-count" data-text="count"></div>             <!-- contoh: 5 halaman -->
+    </div>
+  </template>
+
+  <!-- 9. TETAPAN BUNYI -----------------------------------------------------
+       Dipaparkan dalam kotak "Pintu" di hab. Gelangsar 0 - 100, disimpan dalam pelayar.
+       JavaScript (scenes.js: doorMenu) mengisi nilai dan mendengar perubahan. -->
+  <template id="tpl-sound">
+    <div class="set-sound">
+      <button class="btn-px small set-mute" data-ref="mute"></button>   <!-- senyap / hidupkan -->
+      <label class="set-row">Muzik <input type="range" min="0" max="100" data-ref="music"></label>
+      <label class="set-row">Kesan bunyi <input type="range" min="0" max="100" data-ref="sfx"></label>
     </div>
   </template>
 </body>
