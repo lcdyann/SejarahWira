@@ -1019,7 +1019,7 @@ so the dark / light switch reaches every colour here.
   font: inherit;
   padding: 8px 10px;
   border-radius: 6px;
-  background: var(--surface-2, #1c1713);
+  background: var(--surface-2, #fef3c7);
   color: inherit;
   border: 1px solid var(--card-border, var(--t-line, #443425));
 }
