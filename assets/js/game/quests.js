@@ -157,7 +157,10 @@ export class TimelineQuest extends QuestMechanic {
         <div class="tl-slots"></div>
       </div>
       <div class="tl-tray"></div>
-      <div class="tl-link px" aria-live="polite"></div>`;
+      <div class="tl-link px" aria-live="polite">
+        <button type="button" class="tl-link-toggle" title="Sembunyikan / tunjuk petunjuk">▼ Sembunyi</button>
+        <span class="tl-link-text"></span>
+      </div>`;
     this.peekBtn = el('button', 'btn-px small tl-peek', '\u{1F50D} Tunjuk tarikh pada petak (\u22121 titisan)');
     this.peekBtn.type = 'button';
     const top = this.root.querySelector('.quest-top');
@@ -165,6 +168,14 @@ export class TimelineQuest extends QuestMechanic {
     this.slotsEl = this.field.querySelector('.tl-slots');
     this.trayEl = this.field.querySelector('.tl-tray');
     this.linkEl = this.field.querySelector('.tl-link');
+    this.linkText = this.field.querySelector('.tl-link-text');      // teks petunjuk sahaja (butang kekal)
+    this.linkToggle = this.field.querySelector('.tl-link-toggle');
+    // butang sembunyi / tunjuk: kotak petunjuk menutup kad jika terlalu banyak, jadi murid boleh sembunyikannya
+    this.linkToggle.addEventListener('click', () => {
+      const closed = this.linkEl.classList.toggle('closed');
+      this.linkEl.classList.remove('has-new');
+      this.linkToggle.textContent = closed ? '\u{1F4AC} Petunjuk' : '\u25BC Sembunyi';
+    });
     this.peekBtn.addEventListener('click', () => this.peek());
     this.paint();
   }
@@ -248,16 +259,20 @@ export class TimelineQuest extends QuestMechanic {
     });
     this.trayEl.innerHTML = '';
     this.tray.forEach((it) => this.trayEl.appendChild(this.card(it, 'tray', false)));
-    this.linkEl.textContent = '';
+    const before = this.linkText.textContent;
     this.linkEl.classList.toggle('empty', !this.link);
     if (this.link) {
       const broken = this.link.startsWith('Pautan putus');
       this.linkEl.classList.toggle('broken', broken);
-      this.linkEl.textContent = broken ? this.link : `\u21B3 ${this.link}`;
+      this.linkText.textContent = broken ? this.link : `\u21B3 ${this.link}`;
     } else {
       this.linkEl.classList.remove('broken');
-      this.linkEl.textContent = n === 0 ? 'Mana satu bermula dahulu? Pilih kad, kemudian letakkannya pada petak yang bersinar.' : '';
-      this.linkEl.classList.toggle('empty', !this.linkEl.textContent);
+      this.linkText.textContent = n === 0 ? 'Mana satu bermula dahulu? Pilih kad, kemudian letakkannya pada petak yang bersinar.' : '';
+      this.linkEl.classList.toggle('empty', !this.linkText.textContent);
+    }
+    // petunjuk baharu semasa kotak disembunyikan: butang berdenyut supaya murid tahu
+    if (this.linkText.textContent && this.linkText.textContent !== before && this.linkEl.classList.contains('closed')) {
+      this.linkEl.classList.add('has-new');
     }
     this.peekBtn.disabled = this.peeked || this.isSettled || this.mistakes + 1 >= this.maxMistakes;
     this.peekBtn.classList.toggle('hidden', this.peeked);

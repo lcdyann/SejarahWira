@@ -111,17 +111,25 @@ export class ShelfComponent {
   }
 
   /* ---- mode 2: reveal one item ---- */
-  reveal(container, { kind, item, title = '' }) {
+  reveal(container, { kind, item, title = '', next = '' }) {
     return new Promise((resolve) => {
       const wrap = el('div', `shelf-reveal ${kind}`);
       wrap.innerHTML = `<div class="rv-rays"></div><div class="rv-title">${esc(title || (kind === 'badge' ? 'LENCANA DIPEROLEHI' : 'ARTIFAK DIBUKA'))}</div>
-        <div class="rv-stage"></div><div class="rv-name">${esc(item.name || '')}</div><div class="rv-hint">Tekan Enter</div>`;
+        <div class="rv-stage"></div><div class="rv-name">${esc(item.name || '')}</div>${next ? '' : '<div class="rv-hint">Tekan Enter</div>'}`;
       container.appendChild(wrap);
       const stage = wrap.querySelector('.rv-stage');
       stage.appendChild(this.card(kind, { ...item, isUnlocked: true }, { big: true }));
       requestAnimationFrame(() => wrap.classList.add('in'));
       const done = () => { off(); wrap.classList.remove('in'); setTimeout(() => { wrap.remove(); resolve(); }, 350); };
-      wrap.addEventListener('click', done);
+      if (next) {
+        // butang (atau Enter) untuk ke halaman seterusnya
+        const btn = el('button', 'btn-px gold rv-next');
+        btn.textContent = next;
+        btn.addEventListener('click', (ev) => { ev.stopPropagation(); done(); });
+        wrap.appendChild(btn);
+      } else {
+        wrap.addEventListener('click', done);
+      }
       const off = this.game.input.push({ onKeyDown: (k) => { if (k === 'Enter' || k === ' ') { done(); return true; } return false; } });
     });
   }

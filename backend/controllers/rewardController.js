@@ -79,6 +79,8 @@ export const viewBadges = async (req, res) => {
         eraID: r.eraID,
         eraName: r.eraName,
         asset: isUnlocked ? resolveAsset(r.asset, 'badge', '../assets/gameAsset/badge/era_historian.png') : null,
+        // gambar untuk BAYANG (kepingan lencana semasa cerita); nama masih disembunyikan sehingga dimiliki
+        previewAsset: resolveAsset(r.asset, 'badge', '../assets/gameAsset/badge/era_historian.png'),
         isUnlocked,
         acquiredAt: r.earnedAt
       };
@@ -126,6 +128,8 @@ export const viewArtifacts = async (req, res) => {
         name: isUnlocked ? r.artifactName : '???',
         moralLesson: isUnlocked ? r.moralLesson : null,
         asset: isUnlocked ? resolveAsset(r.asset, 'artifact', '../assets/gameAsset/artifact/artifact_default.png') : null,
+        // gambar untuk BAYANG (artifak digelapkan sebelum Kepungan); nama masih disembunyikan sehingga dimiliki
+        previewAsset: resolveAsset(r.asset, 'artifact', '../assets/gameAsset/artifact/artifact_default.png'),
         isUnlocked,
         acquiredAt: r.unlockedAt,
         eraID: era ? era.eraID : null,

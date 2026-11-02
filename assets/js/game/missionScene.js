@@ -39,6 +39,7 @@ import { ShelfComponent } from './shelf.js';
 import { fillMarkers, ROLE_LINES, ENTITY_NAME } from './entityLines.js';
 import { buildAftermath } from './aftermath.js';
 import { sound } from './sound.js';
+import { koyakPaths } from './koyak.js';
 
 export class MissionScene extends GameScene {
   async enter({ eraID }) {
@@ -58,6 +59,7 @@ export class MissionScene extends GameScene {
     this.ribbon = this.root.querySelector('.m-ribbon');
     this.root.querySelector('[data-a="hint"]').addEventListener('click', () => this.hintNow());
     this.root.querySelector('[data-a="pause"]').addEventListener('click', () => this.pause());
+    this.syncHud();                                    // mula-mula Bisikan kelabu (belum ada misi)
 
     await this.entity.load(this.eraID);
     try {
@@ -120,6 +122,18 @@ export class MissionScene extends GameScene {
     this.quests = quests;                         // [{questID, sceneID, isCompleted, ...}]
     runStore.set(sid, this.eraID, run);
     this.paintChips();
+    await this.loadBadgePreview();
+  }
+
+  /** Gambar lencana era ini (sebagai bayang untuk kepingan). Gagal = tiada kepingan, permainan tetap berjalan. */
+  async loadBadgePreview() {
+    this.badgePreview = null;
+    try {
+      const res = await this.api.badges(this.student.studentID);
+      const b = (res.badges || []).find((x) => Number(x.eraID) === this.eraID);
+      const asset = b && (b.previewAsset || b.asset);
+      if (asset) this.badgePreview = { asset };
+    } catch { /* tiada kepingan; tidak mengapa */ }
   }
 
   get doneCount() { return this.quests.filter((q) => q.isCompleted).length; }
@@ -199,6 +213,7 @@ export class MissionScene extends GameScene {
           const page = tpl('diary', { tab: `Diari ${this.me().name}`, note: quest.explanation });
           await this.gate(this.game.openModal({ title: 'Catatan Diari', body: page, buttons: [{ label: 'Teruskan', primary: true }] }));
         }
+        await this.showPieces();                       // halaman buku: satu kepingan lencana bertambah
         return;
       }
       fails += 1;
@@ -279,6 +294,57 @@ export class MissionScene extends GameScene {
     wrap.classList.remove('in');
     await sleep(250);
     wrap.remove();
+  }
+
+  /**
+   * KEPINGAN LENCANA: kertas koyak dengan lencana era sebagai bayang.
+   * Setiap misi yang selesai mewarnakan satu kepingan. Misi terakhir tidak dipaparkan di sini
+   * kerana lencana penuh terus diberikan (finishChapter). Susun atur: <template id="tpl-pieces">.
+   */
+  async showPieces() {
+    const total = this.quests.length;
+    const done = this.doneCount;
+    if (!this.badgePreview || done <= 0 || done >= total) return;
+
+    // kertas koyak: tepat satu kepingan bagi setiap misi (koyak.js), berapa pun bilangan misi
+    const bentuk = koyakPaths(total, 300, this.eraID);
+
+    // susunan kepingan diwarnakan: tetap bagi setiap era (bukan rawak setiap kali)
+    const order = [...Array(total).keys()].sort((a, b) => ((a * 7 + this.eraID) % 11) - ((b * 7 + this.eraID) % 11) || a - b);
+    const gambar = esc(this.badgePreview.asset);
+
+    // lapisan: bayang lencana, kemudian setiap kepingan (gambar berwarna dipotong ikut bentuk koyak)
+    // topeng: garisan koyak hanya kelihatan di dalam bentuk lencana
+    let isi = `<mask id="pc-topeng" maskUnits="userSpaceOnUse" x="0" y="0" width="300" height="300">
+        <image class="pc-topeng-img" href="${gambar}" width="300" height="300"/>
+      </mask>
+      <image class="pc-shadow" href="${gambar}" width="300" height="300"/>
+      <g mask="url(#pc-topeng)">`;
+    bentuk.forEach(({ d }, i) => {
+      const rank = order.indexOf(i);                                   // kepingan ke berapa diwarnakan
+      const keadaan = rank < done - 1 ? 'on' : rank === done - 1 ? 'baru' : 'kosong';
+      isi += `<clipPath id="pc-klip-${i}"><path d="${d}"/></clipPath>
+        <g class="pc-piece ${keadaan}">
+          <image class="pc-img" href="${gambar}" width="300" height="300" clip-path="url(#pc-klip-${i})"/>
+          <path class="pc-edge" d="${d}"/>
+        </g>`;
+    });
+    isi += '</g>';
+
+    const page = tpl('pieces', { era: this.era.eraName, count: `${done} / ${total}` });
+    page.refs.svg.innerHTML = isi;
+    this.layer.appendChild(page);
+    requestAnimationFrame(() => page.classList.add('in'));
+
+    // masa untuk melihat: kepingan lama dahulu, kemudian kepingan baharu jatuh (~3.2 saat), barulah Enter diterima.
+    // (Enter dari diari tadi tidak terlangkau secara tidak sengaja.)
+    await this.gate(sleep(3200));
+    const done2 = this.waitEnter();
+    page.refs.go.addEventListener('click', () => this._cancelWait && this._cancelWait());
+    await this.gate(done2);
+    page.classList.remove('in');
+    await sleep(400);
+    page.remove();
   }
 
   showNpc(npc) {
@@ -364,6 +430,7 @@ export class MissionScene extends GameScene {
     const mech = QuestMechanic.create(quest, { background: scene.asset });
     this.current = mech;
     this.currentQuest = quest;
+    this.syncHud();
     const playing = mech.play(this.layer);
     if (fails >= 3) mech.applyAssist(2);               // a clearer clue (never the answer)
     try {
@@ -372,12 +439,15 @@ export class MissionScene extends GameScene {
       mech.destroy();
       this.current = null;
       this.currentQuest = null;
+      this.syncHud();
     }
   }
 
   /** AKIBAT: show what happens in the story for this mistake (a cutscene, not a telling-off). */
   async showAftermath(text, scene) {
     const a = buildAftermath(text, { background: scene.asset });
+    this._cutscene = true;                             // adegan Akibat menutupi HUD: Jeda kelabu
+    this.syncHud();
     this.layer.appendChild(a.el);
     sound.sfx('benangPutus', { maxMs: 3500 });         // benang terputus: bunyi kalah, dipotong supaya tidak menutup bacaan
     const typed = () => a.el.classList.contains('typed');
@@ -394,7 +464,7 @@ export class MissionScene extends GameScene {
         }
       });
     });
-    try { await this.gate(done); } finally { off(); }
+    try { await this.gate(done); } finally { off(); this._cutscene = false; this.syncHud(); }
     a.el.remove();
   }
 
@@ -416,18 +486,32 @@ export class MissionScene extends GameScene {
   }
 
   /* ---------------------------------------------------------- hints / pause */
+  /**
+   * Butang Bisikan / Jeda di penjuru: bertukar KELABU bila tidak boleh digunakan.
+   *  - Bisikan: hanya boleh semasa misi berjalan dan Pendekar Bayang tidak sedang bercakap
+   *  - Jeda   : tidak boleh semasa tetingkap Jeda terbuka atau adegan Akibat
+   */
+  syncHud() {
+    const hint = this.root.querySelector('[data-a="hint"]');
+    const pause = this.root.querySelector('[data-a="pause"]');
+    if (hint) hint.disabled = Boolean(this._busy || !this.currentQuest);
+    if (pause) pause.disabled = Boolean(this._paused || this._cutscene);
+  }
+
   async hintNow() {
     if (this._busy || !this.currentQuest) return;
     this._busy = true;
+    this.syncHud();
     try {
       const support = new LearningSupport(this.currentQuest);
       await this.entity.speak('bisikan', { petunjuk: support.provideHint() }, { eraID: this.eraID });
-    } finally { this._busy = false; }
+    } finally { this._busy = false; this.syncHud(); }
   }
 
   async pause() {
-    if (this._paused) return;
+    if (this._paused || this._cutscene) return;
     this._paused = true;
+    this.syncHud();
     let action = null;
     await this.game.openModal({
       title: 'Jeda',
@@ -439,6 +523,7 @@ export class MissionScene extends GameScene {
       ]
     });
     this._paused = false;
+    this.syncHud();
     if (action === 'hint') this.hintNow();
     if (action === 'leave') this.game.go('MapScene', { focusEra: this.eraID });
   }
@@ -446,6 +531,37 @@ export class MissionScene extends GameScene {
   /* --------------------------------------------------------- chapter clear */
   roleSay(n, extra = '') {
     return this.game.roleSpeak(this.narrative.role, n, extra);
+  }
+
+  /**
+   * KISAH ERA LENGKAP: satu halaman kertas bagi setiap misi terbang masuk ke dalam buku.
+   * Bilangan halaman = bilangan misi era ini (mengikut pangkalan data). Susun atur: <template id="tpl-bookend">.
+   */
+  async showBookEnd() {
+    const n = this.quests.length;
+    const page = tpl('bookend', { title: `Kisah ${this.era.eraName} lengkap`, count: `${n} halaman` });
+    for (let i = 0; i < n; i += 1) {
+      const sheet = el('div', 'be-page');
+      sheet.style.setProperty('--i', i);
+      sheet.style.setProperty('--n', n);
+      page.refs.pages.appendChild(sheet);
+    }
+    this.layer.appendChild(page);
+    requestAnimationFrame(() => page.classList.add('in'));
+    await this.gate(sleep(600 + n * 450 + 900));       // semua halaman masuk
+    page.classList.add('siap');                        // buku bercahaya
+    await this.gate(sleep(1800));
+    page.classList.remove('in');
+    await sleep(400);
+    page.remove();
+  }
+
+  /** PUSING HALAMAN: sehelai kertas menyapu skrin (peralihan ke dua pintu). */
+  async pageTurn() {
+    const wrap = el('div', 'pageturn');
+    wrap.appendChild(el('div', 'pageturn-sheet'));
+    this.layer.appendChild(wrap);
+    await this.gate(sleep(950));
   }
 
   async finishChapter() {
@@ -475,9 +591,11 @@ export class MissionScene extends GameScene {
       : null);
 
     const b = res.badge;
+    await this.showBookEnd();                          // halaman setiap misi terkumpul ke dalam buku
     const shelf = new ShelfComponent(this.game);
-    await this.gate(shelf.reveal(this.layer, { kind: 'badge', item: { name: b.badgeTitle, asset: b.badgeAsset, isUnlocked: true }, title: b.isNew ? 'LENCANA BARU' : 'LENCANA ANDA' }));
+    await this.gate(shelf.reveal(this.layer, { kind: 'badge', item: { name: b.badgeTitle, asset: b.badgeAsset, isUnlocked: true }, title: b.isNew ? 'LENCANA BARU' : 'LENCANA ANDA', next: 'Halaman seterusnya ▶' }));
     await this.gate(this.roleSay(1));
+    await this.pageTurn();                             // kertas menyapu skrin, kemudian dua pintu
     await this.game.refreshEras();
     await this.game.go('DoorsScene', { eraID: this.eraID, first: true });
   }

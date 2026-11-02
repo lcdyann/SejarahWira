@@ -12,7 +12,7 @@
  * ============================================================================
  */
 import { sound } from './sound.js';
-import { el, esc, sleep } from './core.js';
+import { el, esc, sleep, tpl } from './core.js';
 import { GameScene, SceneGone } from './scenes.js';
 import { entityPortrait } from './entity.js';
 import { FormativeAssessment, SummativeAssessment, resolveAsset } from './domain.js';
@@ -473,12 +473,33 @@ export class SiegeScene extends BattleScene {
   async begin() {
     this._briefing = true;
     this.locked = true;
+    const hadiah = await this.showArtifactHint();      // artifak bayang + markah yang perlu dicapai
     await this.gate(this.entity.speak('taklimat', {
       taklimat: `Ini ujian sebenar. Aku hanya boleh berbisik ${MAKS_BISIKAN} kali sepanjang kepungan ini, jadi gunakan dengan bijak. Hati di butang Bisikan menunjukkan baki. Jam bermula sebaik sahaja kita mulakan!`
     }, { eraID: this.eraID }));
+    if (hadiah) { hadiah.classList.remove('in'); setTimeout(() => hadiah.remove(), 400); }
     this._briefing = false;
     this.assessment.startTimer((t) => this.tick(t), () => this.finish());
     return super.begin();
+  }
+
+  /**
+   * Sebelum perang: tunjuk artifak era ini sebagai bayang gelap + markah untuk membukanya (motivasi).
+   * Susun atur: <template id="tpl-artifak">. Gagal dimuatkan = dilangkau tanpa ralat.
+   */
+  async showArtifactHint() {
+    try {
+      const res = await this.api.artifacts(this.student.studentID);
+      const a = (res.artifacts || []).find((x) => Number(x.eraID) === this.eraID);
+      const asset = a && (a.previewAsset || a.asset);
+      if (!asset) return null;
+      const card = tpl('artifak', { need: `Capai ${this.artifactScore}% ke atas untuk membukanya` });
+      card.refs.sprite.src = asset;
+      if (a.isUnlocked) card.classList.add('sudah');   // sudah dimiliki: bukan bayang lagi
+      this.root.appendChild(card);
+      requestAnimationFrame(() => card.classList.add('in'));
+      return card;
+    } catch { return null; }
   }
 
   showQuestion() {
