@@ -115,6 +115,33 @@ export class GameScene {
     return off;
   }
 
+  /**
+   * BUTANG HUD TERTUTUP: butang (cth. Jeda, Bisikan) bertukar KELABU bila ada sesuatu menutupinya
+   * (tetingkap, halaman kepingan, dialog, peralihan) kerana ketika itu ia tidak boleh diklik.
+   * Cara: tanya pelayar elemen apa yang berada di tengah butang; jika bukan butang itu, ia tertutup.
+   * `selectors` = senarai pemilih butang di dalam adegan ini.
+   */
+  watchCovered(selectors) {
+    const frame = this.game.stage.frame;
+    let queued = false;
+    const check = () => {
+      queued = false;
+      selectors.forEach((sel) => {
+        const btn = this.root.querySelector(sel);
+        if (!btn) return;
+        const r = btn.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        btn.classList.toggle('is-covered', !!top && top !== btn && !btn.contains(top));
+      });
+    };
+    const soon = () => { if (!queued) { queued = true; requestAnimationFrame(check); } };
+    const watcher = new MutationObserver(soon);
+    watcher.observe(frame, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
+    this.own(() => watcher.disconnect());
+    soon();
+  }
+
   /** run something every `ms` milliseconds until the scene is left */
   every(fn, ms) {
     const id = setInterval(fn, ms);

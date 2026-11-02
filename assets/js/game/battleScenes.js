@@ -107,6 +107,7 @@ export class BattleScene extends GameScene {
 
     this.panel = panel;
     this.root.appendChild(panel);
+    this.watchCovered(['[data-action="hint"]', '[data-action="leave"]']);   // kelabu bila tertutup tetingkap / dialog
   }
 
   /** a silat fighter picture; a drawn figure takes over if the pose picture is missing */
@@ -473,11 +474,10 @@ export class SiegeScene extends BattleScene {
   async begin() {
     this._briefing = true;
     this.locked = true;
-    const hadiah = await this.showArtifactHint();      // artifak bayang + markah yang perlu dicapai
+    await this.showArtifactHint();                     // halaman teaser: artifak bayang + markah (satu perkara pada satu masa)
     await this.gate(this.entity.speak('taklimat', {
       taklimat: `Ini ujian sebenar. Aku hanya boleh berbisik ${MAKS_BISIKAN} kali sepanjang kepungan ini, jadi gunakan dengan bijak. Hati di butang Bisikan menunjukkan baki. Jam bermula sebaik sahaja kita mulakan!`
     }, { eraID: this.eraID }));
-    if (hadiah) { hadiah.classList.remove('in'); setTimeout(() => hadiah.remove(), 400); }
     this._briefing = false;
     this.assessment.startTimer((t) => this.tick(t), () => this.finish());
     return super.begin();
@@ -492,14 +492,23 @@ export class SiegeScene extends BattleScene {
       const res = await this.api.artifacts(this.student.studentID);
       const a = (res.artifacts || []).find((x) => Number(x.eraID) === this.eraID);
       const asset = a && (a.previewAsset || a.asset);
-      if (!asset) return null;
+      if (!asset || a.isUnlocked) return null;         // sudah memiliki artifak era ini: tiada teaser lagi
       const card = tpl('artifak', { need: `Capai ${this.artifactScore}% ke atas untuk membukanya` });
       card.refs.sprite.src = asset;
-      if (a.isUnlocked) card.classList.add('sudah');   // sudah dimiliki: bukan bayang lagi
       this.root.appendChild(card);
       requestAnimationFrame(() => card.classList.add('in'));
-      return card;
-    } catch { return null; }
+      // tunggu Enter / klik, barulah halaman ditutup dan taklimat bermula
+      await this.gate(new Promise((resolve) => {
+        const tutup = () => { off(); resolve(); };
+        const off = this.input.push({ onKeyDown: (k) => { if (k === 'Enter' || k === ' ') { tutup(); return true; } return false; } });
+        card.refs.go.addEventListener('click', tutup);
+      }));
+      card.classList.remove('in');
+      await sleep(400);
+      card.remove();
+    } catch (err) {
+      if (err instanceof SceneGone) throw err;      // keluar dari babak: hentikan, bukan abaikan
+    }
   }
 
   showQuestion() {

@@ -49,6 +49,14 @@ export class ShelfComponent {
       s.src = item.asset;
       s.onerror = () => { s.replaceWith(el('span', 'sprite-fallback', kind === 'badge' ? '★' : '❖')); };
       c.appendChild(s);
+    } else if (!unlocked && item.previewAsset) {
+      // belum dibuka: tunjuk SILUET gelap sebagai teaser (sama seperti artifak sebelum Kepungan). Gambar gagal = tanda "?".
+      const s = new Image();
+      s.className = `${kind === 'badge' ? 'badge-sprite' : 'artifact-sprite'} silhuet`;
+      s.alt = '';
+      s.src = item.previewAsset;
+      s.onerror = () => { s.replaceWith(el('span', 'locked-mark', '?')); };
+      c.appendChild(s);
     } else if (!unlocked) {
       c.appendChild(el('span', 'locked-mark', '?'));
     }

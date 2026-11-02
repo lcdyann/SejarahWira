@@ -189,7 +189,9 @@ button {
 /* BUTANG TIDAK BOLEH DIKLIK: bertukar kelabu (warna, bukan hanya pudar) supaya jelas ia mati.
    Berlaku untuk SEMUA butang .btn-px (Jeda, Bisikan, Tunjuk tarikh, dll). */
 .btn-px:disabled,
-.btn-px.gold:disabled {
+.btn-px.gold:disabled,
+.btn-px.is-covered,
+.btn-px.gold.is-covered {
   background: linear-gradient(180deg, #6b6662, #45423f);
   border-color: #8f8a84;
   color: #c9c3bb;
@@ -1377,6 +1379,8 @@ button {
   align-items: stretch;
 }
 
+.set-mute { align-self: center; }
+
 .set-row {
   display: flex;
   align-items: center;
@@ -1539,6 +1543,12 @@ button {
   height: 38px;
   object-fit: contain;
   animation: badge-float 2.8s infinite ease-in-out;
+}
+
+.badge-sprite.silhuet,
+.artifact-sprite.silhuet {
+  filter: brightness(0) opacity(0.5);     /* siluet gelap: teaser lencana / artifak yang belum dibuka */
+  animation: none;                         /* tanpa kilauan: kilauan menimpa siluet dan menampakkan warna asal */
 }
 
 .locked-mark {
@@ -4001,10 +4011,6 @@ button {
 }
 
 .pc-go {
-  font-family: var(--font-pixel);
-  font-size: 10px;
-  color: var(--gold-light);
-  cursor: pointer;
   animation: pc-ink 1s ease 3.4s both;        /* muncul selepas kepingan baharu siap diletakkan */
 }
 
@@ -4025,11 +4031,14 @@ button {
    ========================================================================== */
 .af-wrap {
   position: absolute;
-  left: 50%;
-  top: 78px;
-  transform: translateX(-50%);
+  inset: 0;
   z-index: 35;
-  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #07050fe6;
   opacity: 0;
   transition: opacity 0.4s;
 }
@@ -4037,7 +4046,7 @@ button {
 .af-wrap.in { opacity: 1; }
 
 .af-card {
-  width: 250px;
+  width: 300px;
   padding: 10px 14px 12px;
   text-align: center;
 }
@@ -4080,6 +4089,13 @@ button {
 .af-wrap.sudah .af-sprite {
   filter: drop-shadow(0 0 6px #ffd35a88);
   animation: none;
+}
+
+.af-go {
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--gold-light);
+  cursor: pointer;
 }
 
 .af-need {
@@ -4166,7 +4182,7 @@ button {
 }
 
 /* ==========================================================================
-   PUSING HALAMAN (peralihan selepas lencana) - missionScene.js: pageTurn()
+   PUSING HALAMAN (peralihan selepas halaman kepingan, ke babak seterusnya) - missionScene.js: pageTurn()
    Sehelai kertas besar menyapu dari kanan ke kiri menutup skrin.
    ========================================================================== */
 .pageturn {

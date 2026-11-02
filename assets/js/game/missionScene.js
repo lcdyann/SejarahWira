@@ -60,6 +60,7 @@ export class MissionScene extends GameScene {
     this.root.querySelector('[data-a="hint"]').addEventListener('click', () => this.hintNow());
     this.root.querySelector('[data-a="pause"]').addEventListener('click', () => this.pause());
     this.syncHud();                                    // mula-mula Bisikan kelabu (belum ada misi)
+    this.watchCovered(['[data-a="hint"]', '[data-a="pause"]']);   // kelabu juga bila tertutup tetingkap / halaman
 
     await this.entity.load(this.eraID);
     try {
@@ -132,7 +133,7 @@ export class MissionScene extends GameScene {
       const res = await this.api.badges(this.student.studentID);
       const b = (res.badges || []).find((x) => Number(x.eraID) === this.eraID);
       const asset = b && (b.previewAsset || b.asset);
-      if (asset) this.badgePreview = { asset };
+      if (asset) this.badgePreview = { asset };     // juga bagi era yang sudah dimiliki: halaman ini ialah rehat belajar
     } catch { /* tiada kepingan; tidak mengapa */ }
   }
 
@@ -342,9 +343,12 @@ export class MissionScene extends GameScene {
     const done2 = this.waitEnter();
     page.refs.go.addEventListener('click', () => this._cancelWait && this._cancelWait());
     await this.gate(done2);
-    page.classList.remove('in');
-    await sleep(400);
+    const sapu = await this.pageTurn();                // kertas menyapu skrin: halaman diselak ke babak seterusnya
     page.remove();
+    sapu.style.transition = 'opacity 0.4s';
+    sapu.style.opacity = '0';
+    await sleep(400);
+    sapu.remove();
   }
 
   showNpc(npc) {
@@ -556,12 +560,13 @@ export class MissionScene extends GameScene {
     page.remove();
   }
 
-  /** PUSING HALAMAN: sehelai kertas menyapu skrin (peralihan ke dua pintu). */
+  /** PUSING HALAMAN: sehelai kertas menyapu skrin. Mengembalikan lapisan kertas (pemanggil membuangnya). */
   async pageTurn() {
     const wrap = el('div', 'pageturn');
     wrap.appendChild(el('div', 'pageturn-sheet'));
     this.layer.appendChild(wrap);
     await this.gate(sleep(950));
+    return wrap;
   }
 
   async finishChapter() {
@@ -593,9 +598,8 @@ export class MissionScene extends GameScene {
     const b = res.badge;
     await this.showBookEnd();                          // halaman setiap misi terkumpul ke dalam buku
     const shelf = new ShelfComponent(this.game);
-    await this.gate(shelf.reveal(this.layer, { kind: 'badge', item: { name: b.badgeTitle, asset: b.badgeAsset, isUnlocked: true }, title: b.isNew ? 'LENCANA BARU' : 'LENCANA ANDA', next: 'Halaman seterusnya ▶' }));
+    await this.gate(shelf.reveal(this.layer, { kind: 'badge', item: { name: b.badgeTitle, asset: b.badgeAsset, isUnlocked: true }, title: b.isNew ? 'LENCANA BARU' : 'LENCANA ANDA' }));
     await this.gate(this.roleSay(1));
-    await this.pageTurn();                             // kertas menyapu skrin, kemudian dua pintu
     await this.game.refreshEras();
     await this.game.go('DoorsScene', { eraID: this.eraID, first: true });
   }

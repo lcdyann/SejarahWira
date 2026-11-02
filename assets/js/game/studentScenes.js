@@ -270,8 +270,9 @@ export class ProfileScene extends GameScene {
 /* ProgressScene  -  UC-09                                                    */
 /* ========================================================================== */
 const STATUS_LABEL = { locked: 'Terkunci', unlocked: 'Dibuka', 'in progress': 'Sedang berjalan', completed: 'Selesai' };
+// Lencana dan artifak dipaparkan di Bilik Piala (rak), jadi tidak diulang di sini; hanya jumlahnya dalam ringkasan.
 const TABS = [
-  ['eras', 'Era'], ['assessments', 'Pentaksiran'], ['badges', 'Lencana'], ['artifacts', 'Artifak']
+  ['eras', 'Era'], ['assessments', 'Pentaksiran']
 ];
 
 export class ProgressScene extends GameScene {
@@ -358,24 +359,5 @@ export class ProgressScene extends GameScene {
       <td><b>${esc(x.score)}%</b> <small>(lulus ${esc(x.requiredScore)}%)</small></td>
       <td>${x.passed ? '<span class="tag completed">Lulus</span>' : '<span class="tag locked">Belum</span>'}</td></tr>`).join('');
     return `<table class="pg-table"><thead><tr><th>Tarikh</th><th>Era</th><th>Jenis</th><th>Skor</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
-  }
-
-  render_badges() {
-    const list = this.data.badges || [];
-    if (!list.length) return '<p class="pg-empty">Tiada lencana.</p>';
-    return `<div class="pg-grid">${list.map((b) => `<div class="pg-item ${b.earned ? 'on' : ''}">
-      <img src="${esc(b.asset)}" alt="" onerror="this.style.visibility='hidden'">
-      <b>${esc(b.badgeName)}</b><small>${esc(b.eraName)}</small>
-      <small>${b.earned ? `Diperoleh ${esc(fmtDate(b.earnedAt))}` : 'Terkunci'}</small></div>`).join('')}</div>`;
-  }
-
-  render_artifacts() {
-    const list = this.data.artifacts || [];
-    if (!list.length) return '<p class="pg-empty">Tiada artifak.</p>';
-    return `<div class="pg-grid">${list.map((a) => `<div class="pg-item ${a.earned ? 'on' : ''}">
-      <img src="${esc(a.asset)}" alt="" onerror="this.style.visibility='hidden'">
-      <b>${esc(a.artifactName)}</b>
-      <small>${a.earned ? `Dibuka ${esc(fmtDate(a.unlockedAt))}` : 'Capai markah artifak dalam Kepungan Agung untuk membuka'}</small>
-      ${a.earned && a.moralLesson ? `<small class="pg-moral">${esc(a.moralLesson)}</small>` : ''}</div>`).join('')}</div>`;
   }
 }
