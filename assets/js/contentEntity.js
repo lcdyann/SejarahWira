@@ -16,7 +16,7 @@
  */
 
 const SAMPLE = {
-  nama: 'Aiman', taklimat: 'Bantu Tun Perak memilih strategi.', petunjuk: 'Fikir tentang perpaduan.',
+  nama: 'Aidan', taklimat: 'Bantu Tun Perak memilih strategi.', petunjuk: 'Fikir tentang perpaduan.',
   penerangan: 'Perpaduan rakyat memperkukuh pertahanan.', maklumbalas: 'Tepat sekali!', skor: '85%'
 };
 

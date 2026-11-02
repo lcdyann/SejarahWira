@@ -17,7 +17,7 @@
   --t-line-bg: #e4d8c0;
   /* text */
   --t-heading: #724f1d;
-  --t-text: #fff1e6;
+  --t-text: #5b2802;
   --t-text-2: #4b3f33;
   --t-muted: #6b5f52;
   --t-muted2: #857869;
@@ -50,6 +50,7 @@
   --tp-mute: #6b5f52;
   --tp-surface: #ffffff;
   --tp-line: #d8c9a8;
+  --ev-area: #fef3c7;
 }
 
 :root[data-theme="light"] body,
