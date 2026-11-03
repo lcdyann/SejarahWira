@@ -463,7 +463,7 @@ class StoryBoard {
         h('span', { class: 'sd-reply', text: o.text }),
         h('span', { class: 'sd-badge', text: o.isCorrect ? 'BETUL' : 'SALAH' }),
         o.reaction ? h('small', { class: 'sd-react', text: `Watak menjawab: ${o.reaction}` }) : null))),
-      found.turn.clue ? h('p', { class: 'sd-clue' }, h('i', { class: 'fas fa-ghost' }), ` Bisikan Pendekar Bayang jika salah: ${found.turn.clue}`) : null);
+      found.turn.clue ? h('p', { class: 'sd-clue' }, h('i', { class: 'fas fa-ghost' }), ` Petunjuk Pendekar Bayang jika salah: ${found.turn.clue}`) : null);
 
     // Butang kecil di bawah baris watak: tambah Giliran Anda di sini
     const addTurnSlot = (n) => h('button', {
@@ -607,7 +607,7 @@ class StoryBoard {
 
     const story = h('textarea', { rows: '5', maxlength: '2000', placeholder: 'Terangkan apa yang berlaku dalam babak ini.', oninput: (e) => { state.sceneStoryline = e.target.value; setErr(err.sceneStoryline, ''); } });
     story.value = state.sceneStoryline;
-    const hint = h('input', { type: 'text', maxlength: '255', value: state.hint, placeholder: 'Bantuan ringkas apabila pelajar menekan butang ?', oninput: (e) => { state.hint = e.target.value; setErr(err.hint, ''); } });
+    const hint = h('input', { type: 'text', maxlength: '255', value: state.hint, placeholder: 'Petunjuk ringkas untuk babak ini (pilihan). Petunjuk misi ditulis pada borang misi.', oninput: (e) => { state.hint = e.target.value; setErr(err.hint, ''); } });
 
     const bgHost = h('div', { class: 'cm-bg-pick' });
     const renderBg = () => setChildren(bgHost,
@@ -651,7 +651,7 @@ class StoryBoard {
     }, 'fa-floppy-disk');
 
     dlg.setBody(h('div', { class: 'sc-form' },
-      formField('Kad garis masa', story, { required: true, hint: 'Tarikh dan tempat, dengan satu ayat peristiwa. Contoh: "24 Ogos 1511, Melaka: Portugis menyerang kota." Kad ini dipaparkan sebelum misi babak.', error: err.sceneStoryline }),
+      formField('Kad garis masa', story, { required: true, hint: 'Tarikh dan tempat, dengan satu ayat peristiwa. Contoh: "24 Ogos 1511, Melaka: Portugis menyerang kota." Kad ini dipaparkan sebelum misi babak, dan dibaca semula sebagai "Apa yang berlaku?" dalam butang Bantuan murid. Pastikan ia berkait dengan misi babak.', error: err.sceneStoryline }),
       h('div', { class: 'cm-field' }, h('label', {}, 'Gambar latar', h('span', { class: 'cm-req', text: ' *' })), bgHost, err.asset),
       formField('Petunjuk babak', hint, { optional: true, error: err.hint })));
     dlg.setFooter(uiButton('Batal', 'cm-btn-ghost', () => dlg.requestClose()), save);

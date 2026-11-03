@@ -422,7 +422,7 @@ class QuestEditor {
           typePanel,
           h('details', { class: 'qe-extras' },
             h('summary', { text: 'Bantuan & mesej (pilihan)' }),
-            formField('Bisikan (petunjuk)', textInput(() => state.hint, (v) => { state.hint = v; }, { max: 255, placeholder: 'Dibisikkan selepas kegagalan kedua, jangan tulis jawapan' }), { optional: true, hint: 'Selepas kegagalan kedua. Selepas kegagalan ketiga, pelajar mendapat petunjuk yang lebih jelas (bukan jawapan).', error: fieldErr.hint }),
+            formField('Petunjuk', textInput(() => state.hint, (v) => { state.hint = v; }, { max: 255, placeholder: 'Jangan tulis jawapan; tunjukkan di mana dalam cerita jawapan itu boleh dijumpai' }), { optional: true, hint: 'Dipaparkan apabila murid menekan butang Petunjuk (mentol), dan dibisikkan automatik selepas kegagalan kedua. Selepas kegagalan ketiga murid mendapat petunjuk yang lebih jelas (bukan jawapan).', error: fieldErr.hint }),
             formField('Catatan diari dan pembetulan', areaInput(() => state.explanation, (v) => { state.explanation = v; }, { rows: 2 }), { optional: true, hint: 'Ditulis sebagai nota lekat dalam diari selepas berjaya, dan disebut oleh Pendekar Bayang apabila pelajar tersilap.', error: fieldErr.explanation }),
             formField('Pujian', areaInput(() => state.feedback, (v) => { state.feedback = v; }, { rows: 2, placeholder: 'Tepat sekali! Perpaduan menyelamatkan kota.' }), { optional: true, hint: 'Pendekar Bayang memuji selepas misi berjaya.', error: fieldErr.feedback }))),
         h('aside', { class: 'qe-preview' }, h('h4', {}, h('i', { class: 'fas fa-eye' }), ' Pratonton Pelajar'), previewHost)));

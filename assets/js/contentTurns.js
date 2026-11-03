@@ -54,7 +54,7 @@ class TurnEditor {
       const input = (get, set, max, placeholder) =>
         h('input', { type: 'text', maxlength: String(max), placeholder, value: get(), oninput: (e) => { set(e.target.value); } });
 
-      // tajuk langkah bernombor supaya guru baharu faham urutan: 1 siapa bertanya, 2 balasan, 3 bisikan
+      // tajuk langkah bernombor supaya guru baharu faham urutan: 1 siapa bertanya, 2 balasan, 3 petunjuk
       const step = (no, title, hint) => h('div', { class: 'te-step' },
         h('span', { class: 'te-step-no', text: String(no) }), h('strong', { text: title }), hint ? h('small', { text: hint }) : null);
 
@@ -92,8 +92,8 @@ class TurnEditor {
           opts,
           t.options.length < L.turnOptions[1]
             ? uiButton('Tambah balasan', 'cm-btn-ghost cm-btn-sm', () => { t.options.push({ text: '', isCorrect: false, reaction: '' }); render(); }, 'fa-plus') : null,
-          step(3, 'Bisikan jika pelajar tersilap', 'Pendekar Bayang berbisik, kemudian watak bertanya semula.'),
-          field('Bisikan Pendekar Bayang selepas balasan salah:', input(() => t.clue, (v) => { t.clue = v; }, L.turnClue, 'Rujuk apa yang watak katakan tadi. Jangan tulis jawapan.'),
+          step(3, 'Petunjuk jika pelajar tersilap', 'Pendekar Bayang berbisik, kemudian watak bertanya semula.'),
+          field('Petunjuk Pendekar Bayang selepas balasan salah:', input(() => t.clue, (v) => { t.clue = v; }, L.turnClue, 'Rujuk apa yang watak katakan tadi. Jangan tulis jawapan.'),
             'Pelajar mesti dapat mencarinya dalam dialog sebelum ini. Itulah yang menjadikan membaca penting.'));
       };
 

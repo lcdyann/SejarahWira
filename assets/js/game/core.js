@@ -246,6 +246,7 @@ export class DialogueBox {
       };
       if (full) sound.talkStart();                         // dialog dibuka: bunyi bercakap bermula
       timer = setInterval(() => {
+        if (this._frozen) return;                          // Jeda: taipan berhenti di huruf semasa
         i += 1;
         this.text.textContent = full.slice(0, i);
         if (i >= full.length) finishTyping();
@@ -253,6 +254,7 @@ export class DialogueBox {
       if (!full) finishTyping();
 
       const advance = () => {
+        if (this._frozen) return;                          // Jeda: dialog tidak boleh dimajukan
         if (typing) { finishTyping(); return; }
         cleanup();
         resolve();
@@ -274,7 +276,7 @@ export class DialogueBox {
         pop();
         this._current = null;
       };
-      this._current = { skip: () => { cleanup(); resolve(); } };
+      this._current = { skip: () => { cleanup(); resolve(); }, isTyping: () => typing };
     });
   }
 
@@ -311,7 +313,29 @@ export class DialogueBox {
     });
   }
 
+  /**
+   * JEDA: bekukan dialog tepat di tempat ia berhenti. Taipan berhenti, bunyi bercakap berhenti,
+   * klik tidak memajukan. thaw() menyambung dari huruf yang sama.
+   */
+  freeze(sembunyi = false) {
+    this._frozen = true;
+    sound.talkStop();
+    // sembunyi: seluruh kotak (termasuk anak panah \u25BC) dilenyapkan; tanda _kitaSorok mengingatkan kotak ini
+    // hanya dimunculkan semula jika KITA yang menyorokkannya (bukan jika dialog memang sudah ditutup)
+    this._kitaSorok = sembunyi && !this.root.classList.contains('hidden');
+    if (this._kitaSorok) this.root.classList.add('hidden');
+  }
+
+  /** Sambung selepas Jeda (bunyi bercakap bermula semula jika teks masih ditaip). */
+  thaw() {
+    this._frozen = false;
+    if (this._kitaSorok) { this.root.classList.remove('hidden'); this._kitaSorok = false; }
+    if (this._current && this._current.isTyping && this._current.isTyping()) sound.talkStart();
+  }
+
   hide() {
+    this._frozen = false;
+    this._kitaSorok = false;
     sound.talkStop();
     if (this._current) this._current.skip();
     this.root.classList.add('hidden');

@@ -146,7 +146,6 @@ class TeacherProgressEngine {
       k('fa-users', 'Pelajar', String(s.studentCount), `${s.startedCount} sudah bermula`),
       k('fa-flag-checkered', 'Purata kemajuan', `${fmt(s.averageCompletion)}%`),
       k('fa-trophy', 'Purata skor terbaik', `${fmt(s.averageBestScore)}%`),
-      k('fa-scroll', 'Misi selesai', String(s.questsCompletedTotal)),
       k('fa-award', 'Lencana / Artifak', `${s.badgesTotal} / ${s.artifactsTotal}`));
   }
 
@@ -162,13 +161,12 @@ class TeacherProgressEngine {
     };
     list = list.slice().sort(by[sort] || by.name);
     if (!list.length) return setChildren(this.$('tp-students'), h('p', { class: 'tp-empty', text: 'Tiada pelajar sepadan.' }));
-    const head = h('tr', {}, ['Pelajar', 'Kelas', 'Kemajuan', 'Era', 'Misi', 'Skor terbaik', 'Lencana', 'Artifak', ''].map((t) => h('th', { scope: 'col', text: t })));
+    const head = h('tr', {}, ['Pelajar', 'Kelas', 'Kemajuan', 'Era', 'Skor terbaik', 'Lencana', 'Artifak', ''].map((t) => h('th', { scope: 'col', text: t })));
     const rows = list.map((s) => h('tr', {},
       h('td', {}, h('strong', { text: s.studentName }), s.started ? null : h('span', { class: 'tp-pill mute', text: 'Belum bermula' })),
       h('td', { text: s.className }),
       h('td', {}, h('div', { class: 'tp-mini', 'aria-label': `${fmt(s.completionRate)} peratus` }, h('span', { style: `width:${Math.min(100, s.completionRate)}%` })), h('small', { text: `${fmt(s.completionRate)}%` })),
       h('td', { text: `${s.erasCompleted}/${s.totalEras}` }),
-      h('td', { text: String(s.questsCompleted) }),
       h('td', { text: s.attempts ? `${s.bestScore}%` : '-' }),
       h('td', { text: `${s.badges}/${s.totalBadges}` }),
       h('td', { text: `${s.artifacts}/${s.totalArtifacts}` }),
@@ -211,7 +209,6 @@ class TeacherProgressEngine {
       const st = (icon, v, l) => h('div', { class: 'tp-stat' }, h('i', { class: `fas ${icon}` }), h('strong', { text: v }), h('span', { text: l }));
       setChildren(this.$('tp-stats'),
         st('fa-flag-checkered', `${s.erasCompleted} / ${s.totalEras}`, 'Era Selesai'),
-        st('fa-scroll', `${s.questsCompleted} / ${s.totalQuests}`, 'Misi Selesai'),
         st('fa-trophy', `${s.bestScore}%`, 'Skor Terbaik'),
         st('fa-award', `${s.badges} / ${s.totalBadges}`, 'Lencana'),
         st('fa-gem', `${s.artifacts} / ${s.totalArtifacts}`, 'Artifak'));
@@ -236,9 +233,8 @@ class TeacherProgressEngine {
     try {
       if (this.category === 'eras') {
         if (!d.eras.length) throw new Error('empty');
-        content = table(['Era', 'Status', 'Misi'], d.eras.map((e) => h('tr', {},
-          h('td', { text: e.eraName }), h('td', {}, pill(STATUS[e.status] || STATUS.locked)),
-          h('td', { text: `${e.doneQuests} / ${e.totalQuests}` }))));
+        content = table(['Era', 'Status'], d.eras.map((e) => h('tr', {},
+          h('td', { text: e.eraName }), h('td', {}, pill(STATUS[e.status] || STATUS.locked)))));
       } else if (this.category === 'assessments') {
         content = d.assessments.length
           ? table(['Tarikh', 'Era', 'Jenis', 'Skor', 'Keputusan'], d.assessments.map((a) => h('tr', {},

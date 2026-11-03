@@ -566,7 +566,6 @@ export class HubScene extends GameScene {
       body = `
         <div class="nb-grid">
           <div><b>${sum.completedEras ?? 0}/${sum.totalEras ?? 0}</b><span>Era selesai</span></div>
-          <div><b>${sum.questsCompleted ?? 0}</b><span>Misi selesai</span></div>
           <div><b>${sum.badgesEarned ?? 0}</b><span>Lencana</span></div>
           <div><b>${sum.artifactsUnlocked ?? 0}</b><span>Artifak</span></div>
           <div><b>${sum.bestScore ?? 0}%</b><span>Skor terbaik</span></div>
@@ -626,7 +625,7 @@ export class HubScene extends GameScene {
       body: panel,
       buttons: [
         { label: 'Skrin penuh (F)', onClick: () => this.stage.toggleFullscreen(), keep: true },
-        { label: 'Log keluar', onClick: () => this.student.logout() },
+        { label: 'Log keluar', danger: true, icon: 'fas fa-right-from-bracket', onClick: () => this.student.logout() },
         { label: 'Tutup', primary: true }
       ]
     });

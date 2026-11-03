@@ -44,8 +44,31 @@ class ContentGuide {
           h('ul', { class: 'guide-list' },
             li('1 Kad garis masa:', 'apa, bila dan di mana. Pelajar membacanya dahulu.'),
             li('2 Cerita:', 'dialog antara beberapa watak. Pada baris tertentu watak berpaling kepada pelajar dan pelajar memilih apa yang hendak dikatakan (Giliran Anda). Pelajar tidak boleh menekan Enter sahaja.'),
-            li('3 Misi:', 'permainan yang mengukuhkan apa yang baru diceritakan. Jika salah, cerita rosak dan misi diulang. Pelajar mendapat petunjuk selepas gagal kali kedua dan ketiga.')),
+            li('3 Misi:', 'permainan yang mengukuhkan apa yang baru diceritakan. Jika salah, cerita rosak dan misi diulang. Butang Petunjuk (mentol) hanya ada semasa misi. Selepas gagal kali kedua butang Bantuan (?) bersinar dan petunjuk dibisikkan; selepas kali ketiga petunjuk menjadi lebih jelas (tidak pernah jawapan).')),
           h('p', { class: 'cm-muted', text: 'Babak yang tiada Giliran Anda dimainkan seperti dahulu: kad, misi, kemudian dialog selepas misi. Babak tanpa misi ialah cerita biasa. Jika sebuah babak ada lebih daripada satu misi, satu sahaja dimainkan secara rawak.' })
+        ]
+      },
+      {
+        title: 'Cerita mesti membawa kepada misi',
+        body: [
+          h('p', { text: 'Murid belajar apabila cerita dan misi bersambung. Misi bukan kuiz yang berasingan; ia kelanjutan apa yang baru diceritakan.' }),
+          h('ul', { class: 'guide-list' },
+            li('Baris dialog terakhir:', 'baris sebelum misi mesti membawa terus ke misi. Contoh: watak berkata "Sekarang tunjukkan kepada kami siapa yang menjalankan tinjauan itu", dan misi menanyakan perkara itu.'),
+            li('Jawapan ada dalam cerita:', 'jawapan misi mesti boleh dijumpai oleh murid dengan membaca kad garis masa atau dialog babak itu. Sistem memberi AMARAN dalam Kesediaan Era jika jawapan betul misi Bantu Tokoh atau Nyahkod Clue tidak ditemui dalam cerita.'),
+            li('Kad garis masa berkait dengan misi:', 'teks kad juga dibaca semula sebagai "Apa yang berlaku?" dalam butang Bantuan murid, jadi ia mesti menerangkan peristiwa yang ditanya misi.'),
+            li('Dialog ialah suara watak sahaja:', 'tulis apa yang watak katakan, bukan huraian seperti "(tersenyum)" atau "Tunku berjalan ke hadapan".'),
+            li('Petunjuk yang membantu:', 'tunjukkan di mana dalam cerita jawapan itu boleh dijumpai, tanpa menyebut jawapannya. Sistem memberi amaran jika sesebuah misi tiada petunjuk.'))
+        ]
+      },
+      {
+        title: 'Butang yang murid ada semasa bermain',
+        body: [
+          h('ul', { class: 'guide-list' },
+            li('Catatan:', 'membaca semula dialog babak semasa. Ia hanya muncul selepas ada dialog yang dibaca (jawapan Giliran Anda tidak dicatat).'),
+            li('Bantuan (?):', 'satu skrin ringkas: apa yang berlaku (kad garis masa dan baris dialog terakhir), apa yang perlu dibuat, dan demo bergerak cara bermain jenis misi itu. Ia bersinar bila murid diam 25 saat atau gagal dua kali. Demo juga dipaparkan sendiri sekali bagi setiap jenis misi.'),
+            li('Petunjuk (mentol):', 'hanya ada semasa misi. Ia memaparkan petunjuk yang anda tulis pada misi itu.'),
+            li('Jeda:', 'membekukan permainan dan membawa murid ke Lompong Masa, ruang rehat dengan tiga permainan kecil. Dialog berhenti tepat di tempatnya dan disambung semula selepas itu. Murid juga boleh keluar ke peta dari sini.'),
+            li('Antara babak:', 'halaman buku diselak dengan ayat "Kisah ini belum selesai...". Selepas setiap tahap, murid melalui Lompong Masa dengan peta kemajuan babak.'))
         ]
       },
       {
@@ -70,8 +93,8 @@ class ContentGuide {
             li('Soalan:', 'satu baris dialog daripada seorang watak, ditulis sebagai soalan kepada pelajar.'),
             li('Balasan:', '2 atau 3 perkara yang boleh dikatakan pelajar. Satu betul. Setiap balasan ada reaksi watak.'),
             li('Balasan salah:', 'tulis kesannya dalam cerita ("Kalau Borneo rasa diambil alih, mereka akan menolak."), bukan "Salah!". Pendekar Bayang berbisik petunjuk, skrin diputar semula dan watak bertanya semula. Hanya perbualan itu yang diulang, bukan seluruh babak.'),
-            li('Bisikan:', 'petunjuk yang boleh dijumpai pelajar dalam dialog sebelumnya. Jangan tulis jawapannya.')),
-          h('p', { class: 'cm-muted', text: 'Cara menambah: buka babak. Panel "Isi Babak" ada 3 baris: (1) kad garis masa dan latar, (2) dialog dan Giliran Anda, (3) misi. Dalam baris 2, di bawah setiap baris dialog ada butang bertitik "+ Giliran Anda selepas baris ini". Tekan untuk menambah. Untuk mengubah, tekan kotak biru Giliran Anda yang sedia ada. Tetingkap yang terbuka ada 3 langkah bernombor: siapa bertanya, apa yang boleh dibalas, bisikan jika tersilap. Cadangan 1 hingga 3 setiap babak. Giliran Anda disimpan bersama misi babak itu, jadi babak mesti ada misi. Tulis reaksi balasan salah sebagai kemungkinan yang watak bimbangkan, bukan sebagai fakta tentang apa yang pasti berlaku.' })
+            li('Petunjuk:', 'rujukan kepada dialog sebelumnya yang boleh dijumpai pelajar. Jangan tulis jawapannya.')),
+          h('p', { class: 'cm-muted', text: 'Cara menambah: buka babak. Panel "Isi Babak" ada 3 baris: (1) kad garis masa dan latar, (2) dialog dan Giliran Anda, (3) misi. Dalam baris 2, di bawah setiap baris dialog ada butang bertitik "+ Giliran Anda selepas baris ini". Tekan untuk menambah. Untuk mengubah, tekan kotak biru Giliran Anda yang sedia ada. Tetingkap yang terbuka ada 3 langkah bernombor: siapa bertanya, apa yang boleh dibalas, petunjuk jika tersilap. Cadangan 1 hingga 3 setiap babak. Giliran Anda disimpan bersama misi babak itu, jadi babak mesti ada misi. Tulis reaksi balasan salah sebagai kemungkinan yang watak bimbangkan, bukan sebagai fakta tentang apa yang pasti berlaku.' })
         ]
       },
       {
@@ -81,7 +104,7 @@ class ContentGuide {
             li('Kad garis masa', 'ialah teks pengenalan sebuah babak (tarikh, tempat, satu ayat). Ia bukan permainan.'),
             li('Misi', 'ialah permainan dalam babak. "Susun Garis Masa" hanyalah salah satu daripada lima jenis misi:')),
           h('ul', { class: 'guide-types' }, types.map((t) => h('li', {}, h('strong', { text: `${t.label}: ` }), t.help))),
-          h('p', { class: 'cm-muted', text: 'Susun Garis Masa menyembunyikan tarikh. Pelajar menyusun peristiwa satu pautan demi satu pautan, dan tarikh dicap pada kad apabila ia betul. Setiap kad (selepas yang pertama) memerlukan baris "mengapa" yang menerangkan sebab ia berlaku selepas kad sebelumnya. Pelajar boleh "Intai tarikh" dengan membayar satu titisan dakwat.' }),
+          h('p', { class: 'cm-muted', text: 'Susun Garis Masa menyembunyikan tarikh. Pelajar menyusun peristiwa satu pautan demi satu pautan, dan tarikh dicap pada kad apabila ia betul. Setiap kad (selepas yang pertama) memerlukan baris "mengapa" yang menerangkan sebab ia berlaku selepas kad sebelumnya. Pelajar boleh "Intai tarikh" dengan membayar satu titisan dakwat. Kad disusun dalam satu barisan yang boleh digelongsor, jadi bilangan kad dan panjang teks tidak menjadi masalah. Tulis tarikh penuh seperti "16 September 1963"; ia dipaparkan tiga baris (hari, bulan, tahun) dalam kotak.' }),
           h('p', { class: 'cm-muted', text: 'Pratonton di sebelah borang misi ialah permainan sebenar yang dimainkan pelajar. Ia muncul apabila borang lengkap.' })
         ]
       },
@@ -118,7 +141,7 @@ class ContentGuide {
         title: 'Tab lain',
         body: [
           h('ul', { class: 'guide-list' },
-            li('Bank Soalan:', 'soalan pentaksiran (Wira Training Grounds dan The Great Siege).'),
+            li('Bank Soalan:', 'soalan pentaksiran. Wira Training Grounds ialah pertarungan nyawa: pelajar menang atau kalah bergantung pada siapa kehabisan nyawa dahulu (tiada markah atau bilangan soalan dipaparkan, dan tiada apa disimpan). The Great Siege ialah ujian bermarkah dan markahnya disimpan.'),
             li('Suara Pendekar Bayang:', 'kata-kata Pendekar Bayang pada saat tertentu, seperti taklimat dan pujian.'),
             li('Rekod Perubahan:', 'siapa mengubah apa dan bila.')),
           h('p', { class: 'cm-muted', text: 'Anda boleh membuka panduan ini semula bila-bila masa melalui butang "Cara ia berfungsi" di bahagian atas halaman.' })

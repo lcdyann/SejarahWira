@@ -93,10 +93,9 @@ export class BattleScene extends GameScene {
 
     panel.innerHTML = `
       <div class="question-panel-head">
-        <span class="question-counter"></span>
         <span class="question-tools">
-          <button class="btn-px small" data-action="hint">Bisikan (H)</button>
-          <button class="btn-px small" data-action="leave">Keluar (Esc)</button>
+          <button class="hud-btn hud-hint" data-action="hint" title="Petunjuk (H)"><i class="hud-ico bulb">&#128161;</i><span>Petunjuk</span></button>   <!-- butang yang sama seperti dalam permainan cerita -->
+          <button class="hud-btn hud-leave" data-action="leave" title="Keluar (Esc)"><i class="hud-ico fas fa-right-from-bracket"></i><span>Keluar</span></button>
         </span>
       </div>
       <div class="question-text"></div>
@@ -133,9 +132,7 @@ export class BattleScene extends GameScene {
   showQuestion() {
     const q = this.question;
     const data = q.displayQuestion();                                // Question.displayQuestion()
-    const total = this.assessment.questions.length;
 
-    this.panel.querySelector('.question-counter').textContent = `Soalan ${this.assessment.currentIndex + 1} / ${total}`;
     this.panel.querySelector('.question-text').textContent = data.questionText;
 
     const list = this.panel.querySelector('.answer-list');
@@ -204,7 +201,7 @@ export class BattleScene extends GameScene {
     await this.game.openModal({
       title: 'Keluar?',
       body: '<p>Pentaksiran ini akan ditamatkan. Skor tidak disimpan.</p>',
-      buttons: [{ label: 'Terus bertarung', primary: true }, { label: 'Keluar', onClick: () => { out = true; } }]
+      buttons: [{ label: 'Terus bertarung', primary: true }, { label: 'Keluar', danger: true, icon: 'fas fa-right-from-bracket', onClick: () => { out = true; } }]
     });
     this._leaving = false;
     if (out) {
@@ -361,13 +358,13 @@ export class TrainingScene extends BattleScene {
     if (this._finished) return;
     this._finished = true;
     const win = this.playerHP > this.enemyHP;
-    const score = this.assessment.calculateBattleScore(this.correct);     // shown only, never saved
+    // Latihan = permainan HP: menang/kalah ditentukan oleh siapa kehabisan nyawa dahulu (tiada peratusan atau bilangan soalan)
     try {
       await this.gate(this.entity.speak(win ? 'latihanMenang' : 'latihanKalah', {}, { eraID: this.eraID }));
       let choice = null;
       await this.gate(this.banner(win, win ? 'Kemenangan di Gelanggang!' : 'Tewas di Gelanggang',
-        `${this.correct} daripada ${this.assessment.questions.length} betul (${score}%). Skor latihan tidak disimpan.`, [
-          { label: 'Cuba lagi', onClick: () => { choice = 'retry'; } },
+        win ? 'Nyawa lawan habis dahulu. Latihan tidak disimpan.' : 'Nyawa kamu habis dahulu. Latihan tidak disimpan.', [
+          { label: '\u21BB Cuba lagi', onClick: () => { choice = 'retry'; } },
           { label: 'Kepungan Agung', primary: win, onClick: () => { choice = 'siege'; } },
           { label: 'Kembali', onClick: () => { choice = 'back'; } }
         ]));
@@ -465,8 +462,8 @@ export class SiegeScene extends BattleScene {
     for (let i = 0; i < MAKS_BISIKAN; i += 1) {
       hati += `<span class="heart${i < this.hintsLeft ? '' : ' spent'}">\u2665</span>`;
     }
-    btn.innerHTML = `Bisikan (H) <span class="hearts">${hati}</span>`;
-    btn.title = `Baki ${this.hintsLeft} daripada ${MAKS_BISIKAN} bisikan`;
+    btn.innerHTML = `<i class="hud-ico bulb">&#128161;</i><span>Petunjuk</span><span class="hearts">${hati}</span>`;   // ikon mentol yang sama; hati = baki
+    btn.title = `Petunjuk (H): baki ${this.hintsLeft} daripada ${MAKS_BISIKAN}`;
     btn.classList.toggle('is-empty', this.hintsLeft <= 0);       // tidak dimatikan: menekannya membuat Pendekar Bayang menerangkan
   }
 
@@ -649,7 +646,7 @@ export class SiegeScene extends BattleScene {
       if (!passed) {
         let choice = 'doors';
         await this.gate(this.banner(false, 'Kubu Masih Teguh', sub, [
-          { label: 'Cuba lagi', primary: true, onClick: () => { choice = 'retry'; } },
+          { label: '\u21BB Cuba lagi', primary: true, onClick: () => { choice = 'retry'; } },
           { label: 'Latihan dahulu', onClick: () => { choice = 'train'; } },
           { label: 'Peta', onClick: () => { choice = 'map'; } }
         ]));

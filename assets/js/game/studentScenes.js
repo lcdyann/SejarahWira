@@ -15,6 +15,9 @@ import { GameScene } from './scenes.js';
 import { Avatar } from './domain.js';
 import { spriteEl } from './entity.js';
 
+/** ikon butang keluar (Font Awesome), sama di semua butang Keluar / Log keluar */
+const IKON_KELUAR = '<i class="fas fa-right-from-bracket"></i> ';
+
 const fmtDate = (d) => {
   const date = new Date(d);
   return Number.isNaN(date.getTime()) ? '-' : date.toLocaleDateString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -190,7 +193,7 @@ export class ProfileScene extends GameScene {
           <div class="pf-class-row">
             <input id="pf-code" class="pf-code" type="text" maxlength="60" autocomplete="off" placeholder="cth. 5-BESTARI">
             <button class="btn-px small gold pf-join" type="button">Sertai kelas</button>
-            <button class="btn-px small pf-leave" type="button">Keluar kelas</button>
+            <button class="btn-px small danger pf-leave" type="button"><i class="fas fa-right-from-bracket"></i> Keluar kelas</button>
           </div>
           <p class="pf-class-msg muted" role="status"></p>
         </div>
@@ -252,12 +255,12 @@ export class ProfileScene extends GameScene {
     code.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') submit(); });
     leaveBtn.addEventListener('click', () => {
       if (!leaveBtn.dataset.sure) {                       // first click asks, second click does it
-        leaveBtn.dataset.sure = '1'; leaveBtn.textContent = 'Pasti? Klik lagi';
+        leaveBtn.dataset.sure = '1'; leaveBtn.innerHTML = IKON_KELUAR + 'Pasti? Klik lagi';
         msg.textContent = 'Kemajuan anda dikekalkan jika anda keluar.';
-        setTimeout(() => { delete leaveBtn.dataset.sure; leaveBtn.textContent = 'Keluar kelas'; }, 4000);
+        setTimeout(() => { delete leaveBtn.dataset.sure; leaveBtn.innerHTML = IKON_KELUAR + 'Keluar kelas'; }, 4000);
         return;
       }
-      delete leaveBtn.dataset.sure; leaveBtn.textContent = 'Keluar kelas';
+      delete leaveBtn.dataset.sure; leaveBtn.innerHTML = IKON_KELUAR + 'Keluar kelas';
       run(leaveBtn, async () => {
         const c = await this.student.leaveClass(this.api);
         showClass(c); msg.textContent = 'Anda telah keluar daripada kelas. Kemajuan anda dikekalkan.';
@@ -305,7 +308,6 @@ export class ProgressScene extends GameScene {
         <div class="pg-ring" style="--pct:${pct}"><b>${pct}%</b></div>
         <div class="nb-grid">
           <div><b>${s.completedEras}/${s.totalEras}</b><span>Era selesai</span></div>
-          <div><b>${s.questsCompleted}</b><span>Misi selesai</span></div>
           <div><b>${s.bestScore}%</b><span>Skor terbaik</span></div>
           <div><b>${s.badgesEarned}/${s.totalBadges}</b><span>Lencana</span></div>
           <div><b>${s.artifactsUnlocked}/${s.totalArtifacts}</b><span>Artifak</span></div>
@@ -346,7 +348,7 @@ export class ProgressScene extends GameScene {
         : (e.attempts > 0 ? `Kepungan belum lulus${e.bestScore !== null ? ` (${e.bestScore}%)` : ''}` : 'Kepungan belum dicuba');
       return `<div class="pg-row"><b class="pg-num">${esc(e.eraID)}</b>
         <div class="pg-main"><div class="pg-rname">${esc(e.eraName)}</div>
-        <div class="pg-chips"><span>${e.narrativeDone ? 'Kisah selesai' : 'Kisah belum selesai'}</span><span>${esc(e.questsCompleted)} misi</span><span>${esc(siege)}</span></div></div>
+        <div class="pg-chips"><span>${e.narrativeDone ? 'Kisah selesai' : 'Kisah belum selesai'}</span><span>${esc(siege)}</span></div></div>
         <span class="tag ${esc(String(e.eraStatus).replace(/\s+/g, '-'))}">${esc(STATUS_LABEL[e.eraStatus] || e.eraStatus)}</span></div>`;
     }).join('');
   }

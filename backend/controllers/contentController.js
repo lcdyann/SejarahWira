@@ -130,6 +130,27 @@ const findQuestion = async (questionID) => {
 /* READINESS: is an era complete enough for students to play AND finish it? */
 /* ------------------------------------------------------------------------ */
 
+/* ---- semakan cerita <-> misi (amaran, bukan ralat) ---------------------------------------
+   Peraturan penulisan: jawapan misi mesti boleh ditemui dalam cerita babak itu, dan setiap misi
+   patut ada petunjuk yang membantu. Semakan ini hanya memberi AMARAN kepada guru.            */
+const normal = (t) => String(t || '').toLowerCase().replace(/[^a-z0-9\u00C0-\u024F\s]/g, ' ').replace(/\s+/g, ' ').trim();
+const katakunci = (t) => normal(t).split(' ').filter((w) => w.length >= 4);
+
+/** adakah jawapan (frasa penuh, atau sekurang-kurangnya 70% perkataan penting) ada dalam teks cerita? */
+const jawapanDalamCerita = (jawapan, ceritaNormal) => {
+  const frasa = normal(jawapan);
+  if (!frasa) return true;
+  if (ceritaNormal.includes(frasa)) return true;
+  const kata = katakunci(jawapan);
+  if (!kata.length) return true;                        // jawapan terlalu pendek untuk disemak
+  return kata.filter((k) => ceritaNormal.includes(k)).length / kata.length >= 0.7;
+};
+
+const parseJsonSafe = (v) => {
+  if (v && typeof v === 'object') return v;
+  try { return JSON.parse(v); } catch { return null; }
+};
+
 const buildEraSummaries = async () => {
   const [eras] = await db.query(`SELECT eraID, eraName, description FROM HistoricalEra ORDER BY eraID ASC`);
 
@@ -156,6 +177,14 @@ const buildEraSummaries = async () => {
     `SELECT eraID, requiredScore, summativeConfig FROM Assessment WHERE assessmentType = 'Summative'`
   );
   const [artifacts] = await db.query(`SELECT artifactID FROM Artifact`);
+
+  // bahan semakan cerita <-> misi
+  const [sceneRows] = await db.query(
+    `SELECT s.sceneID, s.narrativeID, s.sceneStoryline FROM Scene s ORDER BY s.narrativeID, s.sceneOrder ASC, s.sceneID ASC`);
+  const [lineRows] = await db.query(`SELECT sceneID, dialogueLine FROM DialogueLine WHERE sceneID IS NOT NULL`);
+  const [questRows] = await db.query(`SELECT questID, sceneID, questType, questContent FROM Quest`);
+  const [hintRows] = await db.query(`SELECT DISTINCT questID FROM LearningSupport WHERE questID IS NOT NULL AND hint IS NOT NULL AND hint <> ''`);
+  const hintedQuests = new Set(hintRows.map((r) => Number(r.questID)));
 
   const artifactIDs = new Set(artifacts.map((a) => Number(a.artifactID)));
   const questionByEra = new Map(questionCounts.map((r) => [Number(r.eraID), Number(r.total)]));
@@ -202,6 +231,28 @@ const buildEraSummaries = async () => {
       }
       if (n.scenesWithDialogue < n.sceneCount) {
         amaran(`${name}: ${n.sceneCount - n.scenesWithDialogue} babak belum mempunyai dialog.`);
+      }
+
+      // jawapan misi (Bantu Tokoh / Nyahkod) mesti ada dalam cerita babak; setiap misi patut ada petunjuk
+      const babakTiadaJawapan = [];
+      const babakTiadaPetunjuk = [];
+      sceneRows.filter((r) => Number(r.narrativeID) === Number(n.narrativeID)).forEach((sc, idx) => {
+        const cerita = normal([sc.sceneStoryline, ...lineRows.filter((l) => Number(l.sceneID) === Number(sc.sceneID)).map((l) => l.dialogueLine)].join(' '));
+        questRows.filter((q) => Number(q.sceneID) === Number(sc.sceneID)).forEach((q) => {
+          if ([3, 5].includes(Number(q.questType))) {
+            const c = parseJsonSafe(q.questContent);
+            const betul = c && Array.isArray(c.options) ? c.options.filter((o) => o && o.isCorrect) : [];
+            if (betul.some((o) => !jawapanDalamCerita(o.text, cerita))) babakTiadaJawapan.push(idx + 1);
+          }
+          if (!hintedQuests.has(Number(q.questID))) babakTiadaPetunjuk.push(idx + 1);
+        });
+      });
+      const senarai = (a) => [...new Set(a)].join(', ');
+      if (babakTiadaJawapan.length) {
+        amaran(`${name}: jawapan misi tidak ditemui dalam cerita pada babak ${senarai(babakTiadaJawapan)}. Murid sepatutnya boleh menemui jawapan dengan membaca cerita babak itu.`);
+      }
+      if (babakTiadaPetunjuk.length) {
+        amaran(`${name}: misi pada babak ${senarai(babakTiadaPetunjuk)} belum ada petunjuk (butang Petunjuk murid akan kosong).`);
       }
     });
 

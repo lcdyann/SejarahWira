@@ -214,7 +214,7 @@ export class Game {
 
   /* ----------------------------------------------------------------- modal */
   /**
-   * openModal({ title, body (html string or Element), buttons:[{label, primary, keep, onClick}] })
+   * openModal({ title, body (html string or Element), buttons:[{label, primary, danger (merah), icon (kelas Font Awesome, cth. 'fas fa-right-from-bracket'), keep, onClick}] })
    * Resolves with the label of the pressed button (null for Esc).
    */
   openModal({ title = '', body = '', buttons = [{ label: 'Tutup', primary: true }] }) {
@@ -230,7 +230,7 @@ export class Game {
       let closed = false;
       const close = (label) => { if (closed) return; closed = true; off(); wrap.remove(); resolve(label); };
       buttons.forEach((def) => {
-        const btn = el('button', `btn-px small${def.primary ? ' gold' : ''}`, esc(def.label));
+        const btn = el('button', `btn-px small${def.primary ? ' gold' : ''}${def.danger ? ' danger' : ''}`, `${def.icon ? `<i class="${def.icon}"></i> ` : ''}${esc(def.label)}`);
         btn.addEventListener('click', () => {
           if (def.onClick) def.onClick();
           if (!def.keep) close(def.label);

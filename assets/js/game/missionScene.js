@@ -40,6 +40,9 @@ import { fillMarkers, ROLE_LINES, ENTITY_NAME } from './entityLines.js';
 import { buildAftermath } from './aftermath.js';
 import { sound } from './sound.js';
 import { koyakPaths } from './koyak.js';
+import { SupportModule } from './support.js';
+import { RehatPage } from './rehat.js';
+import { selakBuku } from './halaman.js';
 
 export class MissionScene extends GameScene {
   async enter({ eraID }) {
@@ -51,16 +54,27 @@ export class MissionScene extends GameScene {
       <div class="m-layer"></div>
       <div class="m-hud">
         <div class="m-chips px"></div>
-        <div class="m-btns"><button class="btn-px small" data-a="hint">Bisikan (H)</button><button class="btn-px small" data-a="pause">Jeda (Esc)</button></div>
+        <div class="m-btns">
+          <!-- blok "?" ala Mario = Bantuan; mentol = Petunjuk (dahulu "Bisikan"); jeda -->
+          <button class="hud-btn hud-log hidden" data-a="log" title="Catatan: baca semula dialog babak ini"><i class="hud-ico">&#128220;</i><span>Catatan</span></button>
+          <button class="hud-btn hud-help" data-a="help" title="Bantuan (B)"><i class="hud-ico mario-q">?</i><span>Bantuan</span></button>
+          <button class="hud-btn hud-hint" data-a="hint" title="Petunjuk (H): bantuan untuk soalan misi"><i class="hud-ico bulb">&#128161;</i><span>Petunjuk</span></button>
+          <button class="hud-btn hud-pause" data-a="pause" title="Jeda (Esc)"><i class="hud-ico">&#9208;</i><span>Jeda</span></button>
+        </div>
       </div>
       <div class="m-ribbon hidden px"></div>`;
     this.bg = this.root.querySelector('.m-bg');
     this.layer = this.root.querySelector('.m-layer');
     this.ribbon = this.root.querySelector('.m-ribbon');
     this.root.querySelector('[data-a="hint"]').addEventListener('click', () => this.hintNow());
+    // Modul Bantuan Pembelajaran Adaptif (support.js): sentiasa boleh dibuka semasa cerita ATAU misi
+    this.support = new SupportModule(this.game, this.student.studentID);
+    this.root.querySelector('[data-a="help"]').addEventListener('click', () => this.helpNow());
+    this.root.querySelector('[data-a="log"]').addEventListener('click', () => this.logNow());
+    this.watchIdle();
     this.root.querySelector('[data-a="pause"]').addEventListener('click', () => this.pause());
     this.syncHud();                                    // mula-mula Bisikan kelabu (belum ada misi)
-    this.watchCovered(['[data-a="hint"]', '[data-a="pause"]']);   // kelabu juga bila tertutup tetingkap / halaman
+    this.watchCovered(['[data-a="log"]', '[data-a="help"]', '[data-a="hint"]', '[data-a="pause"]']);   // kelabu juga bila tertutup tetingkap / halaman
 
     await this.entity.load(this.eraID);
     try {
@@ -73,6 +87,7 @@ export class MissionScene extends GameScene {
     this.mainKeys = this.keys({
       onKeyDown: (k) => {
         if (k === 'h') { this.hintNow(); return true; }
+        if (k === 'b') { this.helpNow(); return true; }
         if (k === 'Escape') { this.pause(); return true; }
         return false;
       }
@@ -139,11 +154,19 @@ export class MissionScene extends GameScene {
 
   get doneCount() { return this.quests.filter((q) => q.isCompleted).length; }
 
+  /**
+   * Papan kemajuan di penjuru kiri atas, bentuk BUKU:
+   *   Era 1 / 10  Pembentukan Malaysia 1963  (nombor era daripada jumlah era)
+   *   Halaman 6 / 17                         (babak semasa daripada jumlah babak)
+   * Dikemas kini setiap kali babak bertukar (lihat play()).
+   */
   paintChips() {
     const chips = this.root.querySelector('.m-chips');
-    const total = this.quests.length;
-    const role = this.narrative && this.narrative.role ? `<span class="role-chip">Sebagai: <b>${esc(this.narrative.role.npc.name)}</b></span>` : '';
-    chips.innerHTML = `<b>${esc(this.era.eraName)}</b>${role}<span class="orbs">${this.quests.map((q) => `<i class="orb${q.isCompleted ? ' on' : ''}"></i>`).join('')}</span><small>Misi ${this.doneCount}/${total}</small>`;
+    const jumlah = this.narrative ? this.narrative.scenes.length : this.quests.length;
+    const halaman = Math.min(jumlah, (this.run ? this.run.sceneIdx : 0) + 1);
+    chips.innerHTML = `
+      <div class="bk-bab"><span>Era ${this.eraID} / ${this.game.eras.length}</span><b>${esc(this.era.eraName)}</b></div>
+      <div class="bk-hal">Halaman <b>${halaman}</b> / ${jumlah}</div>`;
   }
 
   setBackground(scene) {
@@ -159,12 +182,18 @@ export class MissionScene extends GameScene {
       const scene = scenes[i];
       this.run.sceneIdx = i;
       this.game.runStore.set(this.student.studentID, this.eraID, this.run);
+      this.paintChips();                                      // Halaman X / Y
+      await this.levelBreak(i, scenes.length, start);           // halaman Tahap + rehat (hanya di sempadan tahap)
       if (i === start) {
         this.setBackground(scene);
       } else {
+        // peralihan babak: tangan menarik jiwa, kemudian buku diselak (halaman.js)
         await this.gate(this.game.transition.soulPull({
-          line: this.entity.remark('pindahJiwa', {}, this.eraID), ms: 2400,
-          middle: async () => { this.setBackground(scene); this.layer.innerHTML = ''; }
+          line: '', ms: 2600,
+          middle: () => selakBuku(this.game.transition.layer, {
+            ms: 2200,
+            middle: async () => { this.setBackground(scene); this.layer.innerHTML = ''; }
+          })
         }));
       }
       await this.playScene(scene, i);
@@ -172,7 +201,52 @@ export class MissionScene extends GameScene {
     await this.finishChapter();
   }
 
+  /**
+   * TAHAP: satu era dibahagi 3 tahap (kira-kira 5-6 babak setiap satu).
+   * Di sempadan tahap, halaman Rehat dipaparkan: kemajuan tahap + mini game santai ikut tema.
+   * @param i      indeks babak yang AKAN dimainkan
+   * @param total  jumlah babak dalam naratif ini
+   * @param start  babak tempat era ini dimulakan/disambung (untuk paparan "Selamat kembali")
+   */
+  levelBreak(i, total, start) {
+    const { jumlahTahap, saiz } = this.tahapInfo(total);
+    if (i === 0) return Promise.resolve();
+    if (i % saiz !== 0) {                                         // menyambung di tengah tahap: tunjuk kemajuan sekali sahaja
+      if (i !== start) return Promise.resolve();        // hanya sebaik sahaja era disambung
+      return this.gate(this.lompongMasa({ mode: 'sambung', babakSiap: i }));
+    }
+    return this.gate(this.lompongMasa({ mode: 'tahap', babakSiap: i }));
+  }
+
+  /** Bilangan tahap (maks 3) dan saiz setiap tahap bagi naratif semasa */
+  tahapInfo(total) {
+    const jumlahTahap = Math.min(3, Math.max(1, Math.ceil(total / 5)));
+    return { jumlahTahap, saiz: Math.ceil(total / jumlahTahap) };
+  }
+
+  /**
+   * Buka Lompong Masa (tempat rehat). Dipanggil di sempadan tahap dan oleh butang Jeda.
+   * @returns 'terus' atau 'keluar'
+   */
+  lompongMasa({ mode, babakSiap }) {
+    const babak = this.narrative.scenes;
+    const { jumlahTahap, saiz } = this.tahapInfo(babak.length);
+    const rehat = new RehatPage(this.root, this.eraID);
+    return rehat.show({
+      mode,
+      eraName: this.era ? this.era.eraName : '',
+      tahapJumlah: jumlahTahap,
+      saiz,
+      babakSiap,
+      babak: babak.map((b) => b.asset)               // latar setiap babak (jubin dalam carousel)
+    });
+  }
+
   async playScene(scene) {
+    this.sceneNow = scene;                               // untuk Bantuan ("Apa berlaku?")
+    this.lastLine = '';
+    this.log = [];                                       // log dialog babak ini (butang Catatan)
+    this.syncHud();
     const qInfo = this.quests.find((q) => q.sceneID === scene.sceneID && !q.isCompleted);
     let quest = null;
     if (qInfo) quest = await this.gate(Quest.load(this.api, qInfo.questID, qInfo));
@@ -196,6 +270,7 @@ export class MissionScene extends GameScene {
       const padanNota = Number(quest.questType) === 4 ? ' Ingat: mana-mana dua kad boleh dipadankan, tidak kira di mana kedudukannya.' : '';
       await this.gate(this.entity.speak('taklimat', { taklimat: (quest.instructions || quest.description || quest.questName) + padanNota }, { eraID: this.eraID }));
 
+      await this.gate(this.support.firstTime(Number(quest.questType)));   // demo bergerak, SEKALI bagi setiap jenis misi
       const result = await this.runQuest(quest, scene, fails);
       if (result.ok) {
         await this.gate(this.entity.speak('pujian', { maklumbalas: support.provideFeedback() }, { eraID: this.eraID }));
@@ -203,10 +278,11 @@ export class MissionScene extends GameScene {
           studentID: this.student.studentID, questID: quest.questID, eraID: this.eraID,
           narrativeID: this.narrative.narrativeID, questIDs: this.run.questIDs
         }).catch(async (err) => {
-          await this.game.openModal({ title: 'Kemajuan tidak dapat disimpan', body: `<p>${esc(err.message)}</p><p>Cuba lagi.</p>`, buttons: [{ label: 'Cuba lagi', primary: true }] });
+          await this.game.openModal({ title: 'Kemajuan tidak dapat disimpan', body: `<p>${esc(err.message)}</p><p>Cuba lagi.</p>`, buttons: [{ label: '\u21BB Cuba lagi', primary: true }] });
           return QuestCompletion.verifyCompletion(this.api, { studentID: this.student.studentID, questID: quest.questID, eraID: this.eraID, narrativeID: this.narrative.narrativeID, questIDs: this.run.questIDs });
         }));
         qInfo.isCompleted = true;
+        this.clearNudge();                             // jawapan betul: cahaya butang Bantuan dipadam
         this.paintChips();
         if (!turns.length) await this.storyReveal(scene, true);
         if (quest.explanation) {
@@ -343,12 +419,7 @@ export class MissionScene extends GameScene {
     const done2 = this.waitEnter();
     page.refs.go.addEventListener('click', () => this._cancelWait && this._cancelWait());
     await this.gate(done2);
-    const sapu = await this.pageTurn();                // kertas menyapu skrin: halaman diselak ke babak seterusnya
-    page.remove();
-    sapu.style.transition = 'opacity 0.4s';
-    sapu.style.opacity = '0';
-    await sleep(400);
-    sapu.remove();
+    page.remove();                                     // (peralihan ke babak seterusnya: tangan menarik jiwa + buku diselak, lihat play())
   }
 
   showNpc(npc) {
@@ -372,6 +443,7 @@ export class MissionScene extends GameScene {
       const l = reader.nextLine();
       n += 1;
       const d = l.displayLine(this.student.studentName);
+      this.lastLine = `${d.isPlayer ? this.me().name : d.name}: ${d.text}`;   // baris terakhir untuk Bantuan
       // the student ("kau") is always on the right in their own colour; every other character is on the left
       const side = d.isPlayer ? 'right' : 'left';
       const me = this.me();
@@ -384,6 +456,9 @@ export class MissionScene extends GameScene {
       } else {
         await this.gate(this.dialog.say({ name: shownName, text: d.text, portrait: portrait(), side, tone: d.isPlayer ? 'me' : '' }));
       }
+      // catat dalam log SELEPAS baris dibaca (jawapan Giliran Anda sengaja tidak dicatat)
+      this.log.push({ name: shownName, text: d.text, src, me: d.isPlayer });
+      this.syncHud();
     }
     this.dialog.hide();
     this.ribbon.classList.add('hidden');
@@ -473,6 +548,7 @@ export class MissionScene extends GameScene {
   }
 
   async ruin(fails, support, scene, result = {}) {
+    if (fails >= 2) { const b = this.root.querySelector('[data-a="help"]'); if (b) b.classList.add('nudge'); }
     this.root.classList.add('ruin-fx');
     await this.showAftermath(result.aftermath, scene);
     await this.gate(this.entity.speak('ceritaRuntuh', {}, { eraID: this.eraID }));
@@ -498,8 +574,78 @@ export class MissionScene extends GameScene {
   syncHud() {
     const hint = this.root.querySelector('[data-a="hint"]');
     const pause = this.root.querySelector('[data-a="pause"]');
-    if (hint) hint.disabled = Boolean(this._busy || !this.currentQuest);
+    // Petunjuk hanya WUJUD semasa misi (disembunyikan sepenuhnya di luar misi supaya skrin tidak sesak)
+    if (hint) { hint.classList.toggle('hidden', !this.currentQuest); hint.disabled = Boolean(this._busy); }
     if (pause) pause.disabled = Boolean(this._paused || this._cutscene);
+    // Catatan hanya muncul bila babak ini sudah ada baris dialog untuk dibaca semula
+    const log = this.root.querySelector('[data-a="log"]');
+    if (log) log.classList.toggle('hidden', !(this.log && this.log.length));
+  }
+
+  /**
+   * Bekukan permainan sementara satu tetingkap/halaman dibuka (Jeda, Bantuan, Catatan):
+   * dialog berhenti tepat di tempatnya (freeze), kekunci ditelan, dan disambung semula (thaw) selepas itu.
+   * @param fn      fungsi async yang membuka tetingkap dan selesai bila ia ditutup
+   * @param sembunyi true = kotak dialog juga disembunyikan (untuk halaman penuh seperti Lompong Masa)
+   */
+  async bekukan(fn, sembunyi = false) {
+    this.dialog.freeze(sembunyi);                          // dialog berhenti (dan disorok jika sembunyi) -- lihat DialogueBox.freeze
+    const lepaskan = this.input.push({ onKeyDown: () => true });   // kekunci tidak sampai ke cerita di belakang
+    try {
+      return await fn();
+    } finally {
+      lepaskan();
+      this.dialog.thaw();
+    }
+  }
+
+  /** Butang Catatan: senarai dialog babak ini (tpl-log). */
+  async logNow() {
+    if (this._helpOpen || this._paused || this._cutscene || !(this.log && this.log.length)) return;
+    this._helpOpen = true;
+    this.clearNudge();
+    try {
+      await this.bekukan(async () => {
+        const panel = tpl('log');
+        this.log.forEach((b) => {
+          const row = tpl('logrow', { name: b.name, text: b.text });
+          row.classList.toggle('lg-me', b.me);
+          row.refs.face.appendChild(spriteEl(b.src, b.name, 'lg-sprite'));
+          panel.refs.list.appendChild(row);
+        });
+        const dibuka = this.game.openModal({ title: 'Catatan dialog', body: panel, buttons: [{ label: 'Tutup', primary: true }] });
+        requestAnimationFrame(() => { panel.refs.list.scrollTop = panel.refs.list.scrollHeight; });   // terus ke baris terbaharu
+        await dibuka;
+      });
+    } finally { this._helpOpen = false; }
+  }
+
+  /** Butang Bantuan (B): buka modul bantuan mengikut keadaan semasa (cerita atau misi). */
+  async helpNow() {
+    if (this._helpOpen || this._paused || this._cutscene) return;
+    this._helpOpen = true;
+    this.clearNudge();
+    try {
+      const q = this.currentQuest;
+      await this.bekukan(() => this.support.open({
+        mode: q ? 'quest' : 'story',
+        storyline: this.sceneNow ? this.sceneNow.sceneStoryline : '',
+        lastLine: this.lastLine,
+        questType: q ? Number(q.questType) : 0,
+        questText: q ? (q.instructions || q.description || '') : ''
+      }));
+    } finally { this._helpOpen = false; }
+  }
+
+  /**
+   * ADAPTIF (UC-D): jika murid diam >= 25 saat atau sudah gagal >= 2 kali, butang Bantuan bersinar.
+   * Ia tidak membuka apa-apa sendiri; murid yang memutuskan.
+   */
+  watchIdle() {
+    const btn = this.root.querySelector('[data-a="help"]');
+    this.clearNudge = () => { btn.classList.remove('nudge'); clearTimeout(this._idleT); this._idleT = setTimeout(() => { if (this.currentQuest) btn.classList.add('nudge'); }, 25000); };   // bersinar hanya semasa misi
+    ['pointerdown', 'keydown'].forEach((ev) => this.root.addEventListener(ev, () => this.clearNudge(), true));
+    this.clearNudge();
   }
 
   async hintNow() {
@@ -516,20 +662,11 @@ export class MissionScene extends GameScene {
     if (this._paused || this._cutscene) return;
     this._paused = true;
     this.syncHud();
-    let action = null;
-    await this.game.openModal({
-      title: 'Jeda',
-      body: '<p>Misi yang sudah selesai telah disimpan. Babak semasa akan bermula dari awal jika kau keluar.</p>',
-      buttons: [
-        { label: 'Sambung', primary: true },
-        { label: 'Bisikan', onClick: () => { action = 'hint'; } },
-        { label: 'Keluar ke peta', onClick: () => { action = 'leave'; } }
-      ]
-    });
+    // Jeda = masa dibekukan: dialog berhenti tepat di tempatnya dan disembunyikan di belakang Lompong Masa
+    const hasil = await this.bekukan(() => this.lompongMasa({ mode: 'jeda', babakSiap: this.run.sceneIdx }), true);
     this._paused = false;
     this.syncHud();
-    if (action === 'hint') this.hintNow();
-    if (action === 'leave') this.game.go('MapScene', { focusEra: this.eraID });
+    if (hasil === 'keluar') this.game.go('MapScene', { focusEra: this.eraID });
   }
 
   /* --------------------------------------------------------- chapter clear */
@@ -558,15 +695,6 @@ export class MissionScene extends GameScene {
     page.classList.remove('in');
     await sleep(400);
     page.remove();
-  }
-
-  /** PUSING HALAMAN: sehelai kertas menyapu skrin. Mengembalikan lapisan kertas (pemanggil membuangnya). */
-  async pageTurn() {
-    const wrap = el('div', 'pageturn');
-    wrap.appendChild(el('div', 'pageturn-sheet'));
-    this.layer.appendChild(wrap);
-    await this.gate(sleep(950));
-    return wrap;
   }
 
   async finishChapter() {

@@ -295,9 +295,11 @@ button {
 /* ============================================================================
    4. DIALOGUE BOX
    ============================================================================ */
+/* Lapisan dialog menerima klik di mana-mana (klik = teruskan) KECUALI jalur atas 66px:
+   jalur itu dikosongkan supaya butang HUD (Bantuan / Petunjuk / Jeda) tidak tertutup dan tidak menjadi kelabu. */
 .dlg {
   position: absolute;
-  inset: 0;
+  inset: 66px 0 0 0;
   pointer-events: auto;
 }
 
@@ -308,7 +310,13 @@ button {
   bottom: 22px;
   min-height: 124px;
   padding: 24px 28px 16px;
-  background: rgba(26, 15, 7, 0.96);
+  /* Kotak dialog: latar putih dan tulisan hitam supaya mudah dibaca */
+  background: #ffffff;
+  color: #111111;
+  border-color: #3a2a14;
+  box-shadow:
+    inset 0 0 0 2px #d9d2c3,
+    0 4px 0 rgba(0, 0, 0, 0.55);
 }
 
 .dlg[data-side="right"] .dlg-panel {
@@ -329,6 +337,7 @@ button {
 }
 
 .dlg-text {
+  color: #111111;
   min-height: 62px;
   font-size: 23px;
   line-height: 1.3;
@@ -339,7 +348,7 @@ button {
   position: absolute;
   right: 16px;
   bottom: 6px;
-  color: var(--gold-light);
+  color: #8a5a00;   /* anak panah 'seterusnya' dalam warna emas tua supaya nampak pada latar putih */
   animation: bounce 0.8s infinite;
 }
 
@@ -365,6 +374,19 @@ button {
   filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.5));
 }
 
+/* Potret dalam kotak dialog mengikut saiz .dlg-portrait (kelas asal .entity-portrait dan .npc-portrait
+   bersaiz tetap 120x150 sehingga menimpa saiz besar di atas) */
+.dlg-portrait .entity-portrait,
+.dlg-portrait .npc-portrait {
+  width: 100%;
+  height: 100%;
+}
+.dlg-portrait .entity-portrait img,
+.dlg-portrait .npc-portrait img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .dlg-choices {
   position: absolute;
   right: 40px;
@@ -380,32 +402,36 @@ button {
 .dlg[data-turn="1"] .dlg-panel { left: 150px; right: 170px; }
 .dlg[data-turn="1"] .dlg-choices { right: 170px; bottom: 160px; align-items: flex-end; max-width: 62%; }
 .dlg[data-turn="1"] .dlg-choices .btn-px {
-  background: #1d4f63; color: #e6fbff; border-color: #0b2a36; text-align: left;
+  /* Pilihan Giliran Anda: biru muda dan tulisan hitam */
+  background: #bfe6f7; color: #111111; border-color: #2a8fb0; text-align: left;
 }
-.dlg[data-turn="1"] .dlg-choices .btn-px:hover { background: #2a6f8a; }
+.dlg[data-turn="1"] .dlg-choices .btn-px:hover { background: #9ad6ef; }
 .dlg[data-tone="me"] .dlg-panel {
-  background: rgba(10, 36, 48, 0.97);
+  background: #eaf8ff;   /* putih kebiruan: dialog pemain */
   box-shadow: inset 0 0 0 2px #2a8fb0, 0 4px 0 rgba(0, 0, 0, 0.55);
 }
 .dlg[data-tone="me"] .dlg-name { background: #5fd0f0; color: #062330; border-color: #0b2a36; }
-.dlg[data-tone="me"] .dlg-text { color: #e6fbff; }
+.dlg[data-tone="me"] .dlg-text { color: #111111; }
 
 /* tone: how Pendekar Bayang speaks */
 .dlg[data-tone="loud"] .dlg-panel {
+  background: #fff1ee;   /* putih kemerahan: suara kuat */
   border-color: #7a1209;
   animation: shake 0.35s 1;
 }
 
 .dlg[data-tone="loud"] .dlg-text {
-  color: #ffd0c4;
+  color: #111111;
+  font-weight: bold;
 }
 
 .dlg[data-tone="whisper"] .dlg-text {
-  color: #cdbff3;
+  color: #111111;
   font-style: italic;
 }
 
 .dlg[data-tone="whisper"] .dlg-panel {
+  background: #f5f1ff;   /* putih keungunan: bisikan */
   box-shadow:
     inset 0 0 0 2px #5b3fa8,
     0 0 24px #8a5cff55,
@@ -2022,6 +2048,7 @@ button {
 .quest-field {
   position: relative;
   flex: 1;
+  min-height: 0; /* benarkan medan mengecut supaya kandungan panjang tidak melimpah keluar pentas */
   margin: 8px 12px 12px;
 }
 
@@ -2181,38 +2208,71 @@ button {
 }
 
 /* ---------- hotspot quest ---------- */
+/* Cari Bukti: bar atas (tajuk + arahan + titisan) berada DALAM aliran, di bawah butang HUD,
+   dan gambar mengambil ruang yang tinggal. Tiada apa-apa menindih gambar. */
 .q-hotspot .quest-field {
-  margin: 0;
+  margin: 6px 12px 10px;
 }
 
 .q-hotspot .quest-top {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  background: rgba(26, 15, 7, 0.8);
+  gap: 14px;
+  margin-top: 64px;   /* turun sedikit supaya tidak bertindih dengan papan buku di HUD */
 }
 
+/* Cari Bukti: lajur = kotak arahan (atas) + pentas gambar 16:9 (bawah).
+   Tiada apa-apa menindih gambar; pentas mengecut mengikut ruang yang ada. */
 .hs-root {
   position: absolute;
-  inset: -8px -12px -12px;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* kotak arahan: dipindahkan oleh JS ke dalam bar atas (antara tajuk dan titisan) */
+.hs-note {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px 10px;
+  font-size: 13px;
+  line-height: 1.3;
+  color: #fff3d6;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid #c9b88e;
+}
+
+.hs-note b { color: var(--gold-light); }
+
+/* ruang gambar: container query supaya pentas 16:9 sentiasa muat dalam ruang yang tinggal */
+.hs-area {
+  flex: 1 1 0;
+  min-height: 0;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
+.hs-stage {
+  position: relative;
+  width: min(100cqw, 177.78cqh);
+  aspect-ratio: 16 / 9;
 }
 
 .hs-scene {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #222 center / cover no-repeat;
+  background: #222 center / 100% 100% no-repeat;
   cursor: zoom-in;
 }
 
 /* panel bukti di kanan: boleh ditutup supaya tiada bukti terlindung */
 .hs-side {
   position: absolute;
-  top: 74px;
+  top: 12px;
   right: 12px;
   width: 210px;
-  max-height: calc(100% - 100px);
+  max-height: calc(100% - 24px);
   padding: 10px 12px 12px;
   z-index: 3;
   transition: transform 0.25s ease;
@@ -2399,6 +2459,7 @@ button {
 
 .cq-menu {
   flex: 1;
+  min-height: 0; /* menu tidak melebihi pentas; senarai di dalamnya yang tatal */
   align-self: stretch;
   padding: 14px;
   display: flex;
@@ -2418,7 +2479,14 @@ button {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto; /* kad panjang atau banyak: senarai boleh ditatal */
+}
+
+/* kad jawapan tidak dipenyek apabila teks panjang */
+.cq-list > * {
+  flex: none;
 }
 
 /* answer button (used by choice quests and by the battle question panel) */
@@ -2531,14 +2599,14 @@ button {
 .help-card {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 7px 10px;
   background: #f4ead2;
   color: #2b1402;
   border: 3px dashed #8a6a3a;
   border-radius: 6px;
   font-family: var(--font-text);
-  font-size: 19px;
+  font-size: 17px;
   font-weight: 600;
   line-height: 1.15;
   text-align: left;
@@ -2562,8 +2630,8 @@ button {
 
 .help-card .help-icon {
   flex: none;
-  min-width: 46px;
-  font-size: 30px;
+  min-width: 40px;
+  font-size: 26px;
   text-align: center;
 }
 
@@ -3414,7 +3482,8 @@ button {
 /* summary numbers in the notebook */
 .nb-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-auto-flow: column;            /* bilangan kotak berubah-ubah: setiap satu sama lebar */
+  grid-auto-columns: 1fr;
   gap: 6px;
   text-align: center;
 }
@@ -4557,3 +4626,522 @@ button {
 }
 
 @keyframes pt-sweep { to { left: 0; } }
+/* ==========================================================================
+   MODUL BANTUAN PEMBELAJARAN ADAPTIF  (support.js + tpl-bantuan / tpl-tutor-*)
+   ========================================================================== */
+/* butang Bantuan bersinar lembut bila murid nampak tersangkut (diam lama / banyak silap) */
+.m-btns .hud-btn.nudge {
+  animation: bt-nudge 1.1s ease-in-out infinite;
+  outline: 3px solid var(--gold-light);
+}
+@keyframes bt-nudge { 50% { transform: translateY(-3px); box-shadow: 0 0 14px 2px #ffd86b; } }
+
+/* Bantuan: SATU skrin. Modal dilebarkan (bukan skrol): kiri teks, kanan demo bergerak. */
+.modal-card:has(.bt-wrap) { width: min(860px, 94vw); max-height: none; overflow: visible; }
+.bt-wrap { display: flex; gap: 18px; align-items: stretch; color: #2b1a0a; }
+.bt-text { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.bt-block h4 { margin: 0 0 4px; font-family: var(--font-pixel); font-size: 10px; color: #8a5a00; }
+.bt-big { margin: 0; font-size: 18px; line-height: 1.4; }
+.bt-wrap.long .bt-big { font-size: 15px; }                       /* teks panjang: kecilkan sedikit, jangan potong */
+.bt-last { margin: 6px 0 0; padding: 6px 10px; font-size: 15px; line-height: 1.35; background: #fff; border: 2px solid #c9b88e; }
+.bt-demo { flex: 0 0 380px; }
+.bt-demo.hot { outline: 4px solid var(--gold-light); animation: bt-hot 1s ease-in-out infinite; }
+@keyframes bt-hot { 50% { outline-color: transparent; } }
+@media (max-width: 760px) { .bt-wrap { flex-direction: column; } .bt-demo { flex-basis: auto; } }
+
+/* ---- demo bergerak ---- */
+.bt-demo { display: flex; justify-content: center; }
+.tt-demo { width: 100%; }
+.tt-title { font-family: var(--font-pixel); font-size: 11px; color: #8a5a00; margin-bottom: 8px; }
+.bt-demo .tt-title { display: none; }
+.tt-stage {
+  position: relative; height: 170px; overflow: hidden; padding: 10px;
+  background: #1b120a; border: 3px solid #6b4a22; color: #fff3d6; font-size: 13px;
+}
+.tt-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.tt-slot, .tt-card, .tt-opt {
+  flex: 1; padding: 8px 6px; text-align: center; border: 2px solid #c9b88e; background: #3b2a16;
+}
+.tt-slot { border-style: dashed; background: transparent; }
+.tt-card, .tt-opt { background: #f3e6c4; color: #111; }
+.tt-ask { margin-bottom: 12px; line-height: 1.35; }
+.tt-opts { display: flex; flex-direction: column; gap: 6px; width: 60%; }
+.tt-steps { margin: 10px 0 0; padding-left: 22px; font-size: 15px; line-height: 1.45; }
+.tt-steps li { margin-bottom: 3px; }
+
+/* tangan: kedudukan mutlak, digerakkan oleh @keyframes (loop 6s) */
+.tt-hand { position: absolute; left: 0; top: 0; font-size: 30px; z-index: 5; pointer-events: none; }
+
+/* 1. Garis masa: tangan -> kad 3 -> petak 1 (kad 1 tak perlu, cukup tunjuk mekanik) */
+.tt-t1 .tt-hand { animation: tt1-hand 6s infinite; }
+@keyframes tt1-hand {
+  0%   { transform: translate(250px, 120px); }
+  20%  { transform: translate(250px, 82px); }
+  30%  { transform: translate(250px, 82px) scale(.85); }
+  60%  { transform: translate(40px, 28px) scale(.85); }
+  70%  { transform: translate(40px, 28px) scale(1); }
+  100% { transform: translate(250px, 120px); }
+}
+.tt-t1 .c3 { animation: tt1-card 6s infinite; }
+@keyframes tt1-card { 0%,28% { background: #f3e6c4; } 32%,100% { background: #ffd86b; } }
+.tt-t1 .s1 { animation: tt1-slot 6s infinite; }
+@keyframes tt1-slot { 0%,60% { background: transparent; } 70%,100% { background: #4caf50; } }
+
+/* 2. Hotspot: tangan -> sasaran -> riak -> senarai berubah */
+.tt-pic {
+  position: absolute; left: 10px; top: 10px; width: 62%; height: calc(100% - 20px);
+  background: linear-gradient(#7fb6d6, #c9b27a); border: 2px solid #c9b88e;
+}
+.tt-target { position: absolute; left: 62%; top: 55%; width: 16px; height: 16px; background: #6b3a1a; border-radius: 3px; }
+.tt-ripple {
+  position: absolute; left: calc(62% - 8px); top: calc(55% - 8px); width: 32px; height: 32px;
+  border: 3px solid #ffd86b; border-radius: 50%; opacity: 0; animation: tt2-ripple 6s infinite;
+}
+@keyframes tt2-ripple { 0%,38% { opacity: 0; transform: scale(.3); } 45% { opacity: 1; } 70%,100% { opacity: 0; transform: scale(1.6); } }
+.tt-list { position: absolute; right: 10px; top: 10px; width: 30%; padding: 8px; background: #2a1c0e; border: 2px solid #c9b88e; }
+.tt-list b { display: block; font-size: 11px; margin-bottom: 6px; color: #ffd86b; }
+.tt-list i { font-style: normal; animation: tt2-list 6s infinite; display: block; padding: 3px; }
+@keyframes tt2-list { 0%,45% { background: transparent; } 55%,100% { background: #4caf50; color: #111; } }
+.tt-t2 .tt-hand { animation: tt2-hand 6s infinite; }
+@keyframes tt2-hand {
+  0%   { transform: translate(40px, 120px); }
+  30%  { transform: translate(150px, 90px); }
+  38%  { transform: translate(150px, 90px) scale(.8); }
+  46%  { transform: translate(150px, 90px) scale(1); }
+  100% { transform: translate(40px, 120px); }
+}
+
+/* 3 & 5. Pilihan: tangan -> pilihan tengah (nyahkod: pilihan betul = tengah) */
+.tt-t3 .tt-hand, .tt-t5 .tt-hand { animation: tt3-hand 6s infinite; }
+@keyframes tt3-hand {
+  0%   { transform: translate(260px, 130px); }
+  35%  { transform: translate(120px, 108px); }
+  45%  { transform: translate(120px, 108px) scale(.8); }
+  55%  { transform: translate(120px, 108px) scale(1); }
+  100% { transform: translate(260px, 130px); }
+}
+.tt-t3 .o2, .tt-t5 .o2 { animation: tt3-opt 6s infinite; }
+@keyframes tt3-opt { 0%,44% { background: #f3e6c4; } 50%,100% { background: #ffd86b; } }
+
+/* 4. Padanan: klik kad 1 -> klik pasangannya -> hijau */
+.tt-t4 .tt-hand { animation: tt4-hand 7s infinite; }
+@keyframes tt4-hand {
+  0%   { transform: translate(250px, 130px); }
+  15%  { transform: translate(60px, 24px); }
+  22%  { transform: translate(60px, 24px) scale(.8); }
+  28%  { transform: translate(60px, 24px) scale(1); }
+  55%  { transform: translate(230px, 24px); }
+  62%  { transform: translate(230px, 24px) scale(.8); }
+  68%  { transform: translate(230px, 24px) scale(1); }
+  100% { transform: translate(250px, 130px); }
+}
+.tt-t4 .m1 { animation: tt4-a 7s infinite; }
+.tt-t4 .m2 { animation: tt4-b 7s infinite; }
+@keyframes tt4-a { 0%,20% { background: #f3e6c4; } 25%,60% { background: #ffd86b; } 66%,100% { background: #7ed67f; } }
+@keyframes tt4-b { 0%,64% { background: #f3e6c4; } 68%,100% { background: #7ed67f; } }
+
+/* ==========================================================================
+   PERALIHAN BABAK: BUKU DISELAK  (halaman.js + tpl-halaman). Awalan kelas: sb- (selak buku)
+   Latar = void. Buku diregang tepi ke tepi. --ms = jumlah masa peralihan.
+   ========================================================================== */
+.sb-void {
+  position: absolute; inset: 0; z-index: 60; opacity: 0; transition: opacity .45s;
+  background: radial-gradient(ellipse at 50% 50%, #120a22 0%, #000 75%);   /* kekosongan */
+  perspective: 1600px; overflow: hidden;
+}
+.sb-void.on { opacity: 1; }
+.sb-book {
+  position: absolute; left: 0; right: 0; top: 4%; bottom: 14%;             /* tepi ke tepi */
+  background: url('../gameAsset/hub/buku.png') center / 100% 100% no-repeat;
+  filter: drop-shadow(0 0 28px #7a5cff55);
+}
+/* helaian yang diselak: bermula di halaman kanan, berputar ke kiri ikut tulang buku (tengah) */
+.sb-leaf {
+  position: absolute; left: 50%; top: 11%; width: 40%; height: 76%;
+  background: url('../gameAsset/hub/halaman.png') center / cover;
+  transform-origin: left center; border-radius: 0 6px 6px 0;
+  box-shadow: 0 0 12px #0006; opacity: 0;
+}
+/* tiga helaian diselak berturut-turut (tertib kelewatan berbeza) */
+.sb-void.on .sb-leaf { animation: sb-flip calc(var(--ms) * .3) ease-in-out forwards; }
+.sb-void.on .sb-leaf:nth-child(1) { animation-delay: calc(var(--ms) * .05); }
+.sb-void.on .sb-leaf:nth-child(2) { animation-delay: calc(var(--ms) * .3); }
+.sb-void.on .sb-leaf:nth-child(3) { animation-delay: calc(var(--ms) * .55); }
+@keyframes sb-flip {
+  0%   { opacity: 1; transform: rotateY(0deg); }
+  100% { opacity: 1; transform: rotateY(-178deg); }
+}
+.sb-line {
+  position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%);
+  padding: 10px 22px; display: flex; gap: 10px; align-items: baseline;
+  color: #fff3d6; font-size: 20px; white-space: nowrap;
+}
+.sb-line b { font-family: var(--font-pixel); font-size: 11px; color: var(--gold-light); }
+
+/* ==========================================================================
+   SUSUN GARIS MASA = MENYUSUN KERTAS DI ATAS MEJA HUB
+   Latar = meja hub (dizum supaya permukaan meja memenuhi skrin). Petak = garis kapur
+   di atas meja. Kad = helaian kertas yang sedikit senget.
+   ========================================================================== */
+.q-timeline {
+  background:
+    linear-gradient(rgba(18, 8, 2, .38), rgba(18, 8, 2, .38)),
+    url('../gameAsset/hub/hub.jpg') 50% 91% / auto 300% no-repeat,
+    #1b120a;
+}
+.q-timeline .tl-board { background: none; border: none; box-shadow: none; }
+.q-timeline .tl-rope { display: none; }
+.q-timeline .tl-slot { background: rgba(255, 255, 255, .13); border: 3px dashed #f3e6c4aa; }
+.q-timeline .tl-slot.next { border-color: var(--gold-light); background: rgba(255, 216, 107, .2); }
+.q-timeline .seal-card {
+  background: url('../gameAsset/hub/halaman.png') center / cover, #f0e2c8;
+  border: 1px solid #8c5d31; box-shadow: 1px 4px 8px #000a;
+}
+/* kertas bertaburan: setiap kad sedikit senget, berbeza-beza */
+.q-timeline .tl-tray .seal-card:nth-child(4n+1) { transform: rotate(-3deg); }
+.q-timeline .tl-tray .seal-card:nth-child(4n+2) { transform: rotate(2deg); }
+.q-timeline .tl-tray .seal-card:nth-child(4n+3) { transform: rotate(-1.5deg); }
+.q-timeline .tl-tray .seal-card:nth-child(4n)   { transform: rotate(3deg); }
+.q-timeline .tl-tray .seal-card.sel { transform: translateY(-8px) rotate(0deg); }
+
+/* ==========================================================================
+   LOMPONG MASA  (rehat.js + tpl-rehat)
+   Semua muat dalam satu skrin 960x540 TANPA skrol:
+     kepala -> pedagang -> carousel tahap (atau mini game) -> butang bawah
+   ========================================================================== */
+.rh-root {
+  position: absolute; inset: 0; z-index: 40; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  padding: 46px 14px 10px;                                  /* 46px atas = ruang butang HUD */
+  background: radial-gradient(ellipse at 50% 40%, #1a0f33 0%, #05020c 80%);
+}
+.rh-card {
+  position: relative; z-index: 1; width: 100%; height: 100%;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 16px 12px; color: #fff3d6; overflow: hidden;
+  background: none; border: none; box-shadow: none;          /* lutsinar: latar kekosongan kelihatan */
+}
+.rh-card .hidden { display: none !important; }
+
+/* kekosongan: helaian & bintang melayang naik (hiasan) */
+.rh-drift { position: absolute; inset: 0; pointer-events: none; }
+.rh-star, .rh-leaf { position: absolute; bottom: -40px; animation: rh-rise linear infinite; }
+.rh-star { width: 4px; height: 4px; background: #ffe9a8; border-radius: 50%; box-shadow: 0 0 8px 2px #ffd86b88; }
+.rh-leaf { width: 22px; height: 30px; background: url('../gameAsset/hub/halaman.png') center / cover; opacity: .55; border-radius: 2px; }
+@keyframes rh-rise { to { transform: translateY(-110vh) rotate(160deg); } }
+
+/* ---- kepala ---- */
+.rh-head { flex: 0 0 auto; display: flex; align-items: baseline; gap: 14px; }
+.rh-kicker { font-family: var(--font-pixel); font-size: 9px; color: #ffd86b; }
+.rh-title { margin: 0; font-size: 22px; color: #fff; text-shadow: 0 2px 8px #000; }
+
+/* ---- pedagang (Pendekar Bayang menyamar) + ucapan ---- */
+.rh-host { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; }
+.rh-merchant { --misai-y: 62%; --misai-w: 40px; position: relative; flex: 0 0 72px; height: 76px; }
+.rh-merchant .entity-portrait { width: 100%; height: 100%; }
+.rh-merchant .entity-portrait img { max-width: 100%; max-height: 100%; }
+/* misai palsu (CSS): dua lengkung di atas mulut. Laraskan --misai-y (atas-bawah) / --misai-w (lebar) */
+.rh-merchant::before, .rh-merchant::after {
+  content: ''; position: absolute; top: var(--misai-y); z-index: 2;
+  width: calc(var(--misai-w) / 2); height: 10px; background: #8a4b1a; box-shadow: 0 0 0 1px #1b0f05;
+  border-radius: 100% 0 60% 40% / 100% 0 100% 40%;
+}
+.rh-merchant::before { left: calc(50% - var(--misai-w) / 2); transform: rotate(8deg); }
+.rh-merchant::after  { left: 50%; transform: scaleX(-1) rotate(8deg); }
+.rh-say {
+  flex: 1; margin: 0; padding: 8px 12px; font-size: 16px; line-height: 1.35;
+  background: #fff; color: #111; border: 3px solid #3a2a14; position: relative;
+}
+.rh-say::before { content: ''; position: absolute; left: -11px; top: 50%; margin-top: -8px; border: 8px solid transparent; border-right-color: #3a2a14; border-left: 0; }
+
+/* ---- CAROUSEL TAHAP ---- */
+.rh-main { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.rh-carousel { flex: 1 1 0; min-height: 0; display: flex; align-items: stretch; gap: 6px; }
+.rh-arrow {
+  flex: 0 0 38px; font-size: 18px; cursor: pointer; color: #ffd86b;
+  background: #2a1c0e; border: 3px solid #6b4a22;
+}
+.rh-arrow:disabled { opacity: .3; cursor: default; }
+.rh-viewport { flex: 1; min-width: 0; overflow: hidden; }
+.rh-track {
+  --i: 0; height: 100%; display: flex; gap: 2%;
+  transform: translateX(calc(15% - var(--i) * 72%));        /* panel di tengah, jiran separuh kelihatan */
+  transition: transform .4s ease;
+}
+.rh-panel {
+  flex: 0 0 70%; display: flex; flex-direction: column; gap: 6px; padding: 8px;
+  background: rgba(30, 18, 8, .85); border: 3px solid #6b4a22; color: #fff3d6;
+  opacity: .45; transform: scale(.94); transition: opacity .4s, transform .4s; cursor: pointer;
+}
+.rh-panel.on { opacity: 1; transform: none; border-color: #ffd86b; cursor: default; }
+.rh-panel-head { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: baseline; }
+.rh-panel-head b { font-size: 18px; }
+.rh-panel-head span { font-family: var(--font-pixel); font-size: 9px; color: #ffd86b; }
+
+/* jubin babak: tiada skrol. Lajur menyesuaikan bilangan babak; jika guru menambah babak, jubin mengecil */
+.rh-tiles {
+  flex: 1 1 0; min-height: 0; display: grid; gap: 6px;
+  grid-auto-rows: 1fr;                                          /* lajur ditetapkan oleh rehat.js */
+}
+.rh-tile {
+  position: relative; min-height: 0; overflow: hidden; border: 3px solid #3a2a14;
+  background: #222 center / cover no-repeat;
+}
+.rh-tile::after { content: ''; position: absolute; inset: 0; }              /* lapisan warna status */
+.rh-tile-no {
+  position: absolute; left: 4px; top: 3px; z-index: 2; font-style: normal; font-family: var(--font-pixel);
+  font-size: 10px; color: #fff; text-shadow: 0 1px 3px #000;
+}
+.rh-tile-mark { position: absolute; right: 5px; bottom: 3px; z-index: 2; font-style: normal; font-size: 18px; color: #fff; text-shadow: 0 1px 3px #000; }
+/* siap = hijau */
+.rh-tile.siap { border-color: #4caf50; }
+.rh-tile.siap::after { background: rgba(46, 160, 67, .55); }
+/* seterusnya = bercahaya */
+.rh-tile.semasa { border-color: #ffd86b; animation: rh-glow 1.3s ease-in-out infinite; z-index: 1; }
+.rh-tile.semasa::after { background: rgba(255, 216, 107, .12); }
+@keyframes rh-glow { 50% { box-shadow: 0 0 16px 4px #ffd86b; transform: scale(1.04); } }
+/* belum sampai = kelabu */
+.rh-tile.kunci { filter: grayscale(1) brightness(.55); }
+
+.rh-dots { flex: 0 0 auto; display: flex; justify-content: center; gap: 8px; }
+.rh-dot { width: 10px; height: 10px; border-radius: 50%; background: #6b4a22; }
+.rh-dot.on { background: #ffd86b; }
+
+/* ---- butang bawah: tiga mini game besar + teruskan ---- */
+.rh-actions { flex: 0 0 auto; display: flex; gap: 8px; align-items: stretch; }
+.rh-game {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px;
+  cursor: pointer; background: #fff7e2; color: #2b1a0a; border: 3px solid #8a5a00;
+}
+.rh-game:hover { background: #ffe9a8; border-color: #ffd86b; }
+.rh-game img { height: 44px; width: auto; object-fit: contain; }
+.rh-game b { font-size: 15px; }
+.rh-game small { font-size: 12px; color: #5a4a30; }
+
+/* ---- ARENA MINI GAME: mengambil tempat carousel (muat tanpa skrol) ---- */
+.rh-arena { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.rh-arena-bar { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-pixel); font-size: 11px; color: #ffd86b; }
+.rh-play { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 8px; background: rgba(255, 247, 226, .92); border: 3px solid #c9b88e; overflow: hidden; color: #2b1a0a; }
+.rh-note { margin: 0; font-size: 14px; text-align: center; color: #5a4a30; }
+.rh-done { margin: 0; text-align: center; font-size: 17px; font-weight: bold; color: #2f7d32; }
+
+/* Padan Kad: 6 lajur x 2 baris */
+.rh-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; max-width: 560px; width: 100%; margin: 0 auto; }
+.rh-card-flip { aspect-ratio: 1; font-size: 24px; cursor: pointer; background: #8a5a00; color: #fff3d6; border: 3px solid #4a2f00; transition: transform .2s; }
+.rh-card-flip img { width: 80%; height: 80%; object-fit: contain; }
+.rh-card-flip.open { background: #fff; color: #111; transform: scale(1.04); }
+.rh-card-flip.matched { background: #bfe8bb; color: #111; border-color: #4caf50; }
+
+/* Pecah Gelembung */
+.rh-sky { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; background: linear-gradient(#bfe6f7, #fff7e2); border: 2px solid #c9b88e; }
+.rh-bubble { position: absolute; bottom: -60px; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.75); border: 3px solid #7fc4e0; cursor: pointer; animation: rh-float 8s linear forwards; }
+.rh-bubble img { width: 70%; height: 70%; object-fit: contain; pointer-events: none; }
+.rh-bubble.pop { animation: none; transform: scale(1.6); opacity: 0; transition: .25s; }
+@keyframes rh-float { to { transform: translateY(-300px); } }
+
+/* Cari Pendekar: satu baris enam benda */
+.rh-seek-say { min-height: 24px; text-align: center; font-size: 17px; font-weight: bold; }
+.rh-seek-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-width: 620px; width: 100%; margin: 0 auto; }
+.rh-spot { position: relative; aspect-ratio: 1; padding: 4px; cursor: pointer; overflow: hidden; background: #fff; border: 3px solid #c9b88e; }
+.rh-spot img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+.rh-spot:hover { border-color: #ffd86b; }
+.rh-spot.wiggle { animation: shake .4s; }
+.rh-spot.found { border-color: #4caf50; background: #dff3d8; }
+.rh-seek-pendekar { position: absolute; inset: 0; animation: rh-pop .35s ease-out; background: rgba(223, 243, 216, .92); }
+.rh-seek-pendekar img { width: 100%; height: 100%; object-fit: contain; }
+@keyframes rh-pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ==========================================================================
+   BUTANG HUD: ikon + nama kecil di bawah (padat, mudah dikenali)
+     ?  blok kuning ala Mario = Bantuan (cara bermain / apa berlaku)
+     mentol = Petunjuk (dahulu "Bisikan"): bantuan untuk soalan misi
+   Kelabu bila tidak boleh digunakan (tiada misi / tertutup / Jeda).
+   ========================================================================== */
+.m-btns { gap: 6px; }
+.hud-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; width: 58px; padding: 4px 2px 3px;
+  font-family: var(--font-pixel); font-size: 7px; color: #fff3d6; cursor: pointer;
+  background: rgba(26, 15, 7, .88); border: 3px solid #6b4a22; box-shadow: 0 3px 0 #000a;
+}
+.hud-btn:hover:not(:disabled) { border-color: #ffd86b; transform: translateY(-2px); }
+.hud-btn:disabled, .hud-btn.is-covered { filter: grayscale(1); opacity: .45; cursor: default; }
+.hud-ico {
+  display: grid; place-items: center; width: 30px; height: 30px; font-style: normal; font-size: 20px; line-height: 1;
+}
+/* blok "?" Mario: kuning, bucu bertitik, melantun bila dihover */
+.mario-q {
+  font-family: var(--font-pixel); font-size: 18px; font-weight: bold; color: #7a3c00;
+  background: #ffc931; border: 3px solid #7a3c00; box-shadow: inset -3px -3px 0 #d98a00, inset 3px 3px 0 #ffe27a;
+}
+.hud-help:hover:not(:disabled) .mario-q { animation: bt-bump .35s; }
+@keyframes bt-bump { 40% { transform: translateY(-8px); } }
+/* mentol: bersinar bila boleh digunakan (misi sedang berjalan) */
+.hud-hint:not(:disabled) .bulb { filter: drop-shadow(0 0 6px #ffd86b); }
+.hud-hint { border-color: #b68a1c; }
+.m-btns .hud-btn.nudge { animation: bt-nudge 1.1s ease-in-out infinite; outline: 3px solid var(--gold-light); }
+
+/* demo "cara bercerita" (tpl-tutor-0) */
+.tt-dlg { position: relative; margin-bottom: 8px; padding: 8px 10px 8px 12px; background: #fff; color: #111; border: 3px solid #3a2a14; }
+.tt-dlg b { display: block; font-size: 11px; color: #8a5a00; }
+.tt-dlg.tt-me { background: #bfe6f7; border-color: #2a8fb0; margin-left: 40px; }
+.tt-more { position: absolute; right: 8px; bottom: 2px; font-style: normal; color: #8a5a00; animation: bounce .8s infinite; }
+.tt-t0 .tt-hand { animation: tt0-hand 4s infinite; }
+@keyframes tt0-hand {
+  0%   { transform: translate(280px, 130px); }
+  35%  { transform: translate(280px, 48px); }
+  45%  { transform: translate(280px, 48px) scale(.8); }
+  55%  { transform: translate(280px, 48px) scale(1); }
+  100% { transform: translate(280px, 130px); }
+}
+
+/* ==========================================================================
+   PAPAN BUKU (penjuru kiri atas): "Bab 1 Pembentukan Malaysia 1963 / Halaman 6 / 17"
+   Menggantikan titik hijau, peranan "Sebagai" dan "Misi x/y".
+   ========================================================================== */
+.m-chips { flex-direction: column; align-items: flex-start; gap: 4px; padding: 6px 12px; }
+.bk-bab { display: flex; align-items: baseline; gap: 8px; }
+.bk-bab span { font-family: var(--font-pixel); font-size: 8px; color: #ffd86b; }
+.bk-bab b { font-size: 12px; color: #fff3d6; }
+.bk-hal { font-family: var(--font-pixel); font-size: 8px; color: #d9c9a3; }
+.bk-hal b { color: #ffd86b; font-size: 10px; }
+.hud-btn.hidden { display: none; }
+
+/* bar tajuk misi: ringan (bukan bingkai tebal) supaya skrin tidak sesak */
+.quest-top.px { padding: 4px 12px; box-shadow: none; border-width: 2px; }
+
+/* Butang bunyi (.sound-btn) duduk di penjuru kanan atas pentas dan menutupi butang paling kanan HUD (Jeda),
+   lalu sistem "tertutup" menjadikan Jeda kelabu. Beri ruang 52px di kanan supaya tiada yang bertindih. */
+.m-hud { padding-right: 52px; }
+
+/* butang MAIN (segi tiga): sama saiz dan sejajar dengan tiga mini game */
+.rh-play-btn { background: #ffd86b; border-color: #8a5a00; }
+.rh-play-btn:hover { background: #ffe9a8; }
+.rh-play-ico {
+  display: block; width: 0; height: 0; margin: 8px 0 8px 10px;
+  border-style: solid; border-width: 15px 0 15px 26px; border-color: transparent transparent transparent #2b1a0a;   /* segi tiga ▶ */
+}
+.rh-head { align-items: center; }
+.rh-leave { margin-left: auto; }
+
+/* ==========================================================================
+   LOG DIALOG (buku catatan): missionScene.js -> logNow, tpl-log / tpl-logrow
+   ========================================================================== */
+.modal-card:has(.lg-wrap) { width: min(640px, 94vw); max-height: none; overflow: visible; }
+.lg-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; max-height: 340px; overflow-y: auto; }
+.lg-row { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; background: #fff; color: #111; border: 2px solid #c9b88e; }
+.lg-row.lg-me { background: #eaf8ff; border-color: #2a8fb0; flex-direction: row-reverse; }
+.lg-face { flex: 0 0 46px; height: 56px; }
+.lg-sprite { width: 100%; height: 100%; }
+.lg-sprite img { width: 100%; height: 100%; object-fit: contain; object-position: center top; }
+.lg-msg { flex: 1; min-width: 0; }
+.lg-msg b { display: block; font-size: 12px; color: #8a5a00; }
+.lg-me .lg-msg { text-align: right; }
+.lg-msg p { margin: 2px 0 0; font-size: 16px; line-height: 1.35; }
+
+/* ==========================================================================
+   SUSUN ATUR ATAS (HUD + bar misi): tiada yang bertindih
+   HUD (papan buku + butang) tamat kira-kira 52px dari atas; bar tajuk misi bermula di bawahnya.
+   ========================================================================== */
+.m-hud { padding-top: 4px; }
+.hud-ico { width: 26px; height: 26px; font-size: 18px; }
+.quest-top { margin-top: 56px; }
+.q-hotspot .quest-top { margin-top: 58px; }
+
+/* Nyahkod / pilihan: tiada skrol dalam kertas dan papan gabus */
+.clue-paper { overflow-x: hidden; }
+.clue-paper.muat-sederhana .clue-text { font-size: 26px; }
+.clue-paper.muat-sederhana .clue-point { font-size: 24px; margin-top: 12px; padding-top: 10px; }
+.clue-paper.muat-kecil .clue-text { font-size: 21px; line-height: 1.25; }
+.clue-paper.muat-kecil .clue-point { font-size: 22px; margin-top: 10px; padding-top: 8px; }
+.clue-paper.muat-kecil, .clue-paper.muat-sederhana { padding: 22px 24px 16px; }
+.cq-list { overflow-x: hidden; padding: 4px 6px; }          /* nota senget tidak lagi mencetuskan palang skrol mendatar */
+
+/* kotak "Baru dikatakan" kosong disembunyikan (cth. babak yang dialognya selepas misi) */
+.bt-last:empty { display: none; }
+
+/* ==========================================================================
+   GARIS MASA: SUSUN ATUR LENTUR (flex), DEK KAD BOLEH DIGELONGSOR
+   Lajur dalam .quest-field:  petak (atas)  ->  dek kad (tengah, ambil baki ruang)  ->  petunjuk (bawah)
+   Berapa pun jumlah kad dan sepanjang mana pun teksnya, semuanya kekal dalam skrin.
+   ========================================================================== */
+.q-timeline .quest-field { display: flex; flex-direction: column; gap: 8px; }
+
+.q-timeline .tl-board { position: relative; top: auto; left: auto; right: auto; height: 132px; flex: none; padding: 14px 0 0; }
+.q-timeline .tl-slots { gap: 6px; container-type: inline-size; }
+.q-timeline .tl-slot { flex: 1 1 0; min-width: 0; max-width: 150px; height: 118px; }
+.q-timeline .tl-slot .seal-card { overflow: hidden; }
+
+/* dek kad */
+.tl-deck { flex: 1; min-height: 0; display: flex; align-items: stretch; gap: 6px; }
+.q-timeline .tl-tray {
+  position: static; flex: 1; min-width: 0; min-height: 0;
+  display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 14px;
+  padding: 16px 10px 8px;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none; scroll-behavior: smooth;
+}
+.q-timeline .tl-tray::-webkit-scrollbar { display: none; }
+.q-timeline .tl-tray .seal-card { flex: 0 0 150px; width: 150px; min-height: 0; display: flex; flex-direction: column; }
+.q-timeline .tl-tray .sc-text { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; font-size: 16px; }
+.tl-arrow {
+  flex: none; width: 34px; align-self: center; height: 64px; cursor: pointer;
+  font-size: 16px; color: var(--gold-light); background: rgba(26, 15, 7, .9); border: 3px solid var(--wood-dark);
+}
+.tl-arrow:hover:not(:disabled) { border-color: var(--gold-light); filter: brightness(1.2); }
+.tl-arrow:disabled { opacity: .3; cursor: default; }
+
+/* teks panjang: huruf mengecil (kad dek dan kad dalam petak) */
+.seal-card.teks-sederhana .sc-text { font-size: 14px; line-height: 1.12; }
+.seal-card.teks-kecil .sc-text { font-size: 12px; line-height: 1.1; }
+.q-timeline .tl-tray .seal-card.teks-sederhana .sc-text { font-size: 14px; }
+.q-timeline .tl-tray .seal-card.teks-kecil .sc-text { font-size: 12px; }
+.q-timeline .tl-slot .sc-text { font-size: 13px; }
+.tl-slots.padat .tl-slot .sc-text { font-size: 11px; }
+.tl-slots.lebih-padat .tl-slot .sc-text { font-size: 9px; }
+.q-timeline .tl-slot .seal-card { padding: 14px 4px 4px; }
+
+/* kotak petunjuk: dalam aliran lajur (tidak lagi menutup kad); ditutup = butang kecil di kanan */
+.q-timeline .tl-link, .q-timeline .tl-link.closed { position: relative; top: auto; left: auto; right: auto; flex: none; }
+.q-timeline .tl-link { min-height: 52px; max-height: 84px; font-size: 17px; padding: 8px 16px; overflow: hidden; }
+.q-timeline .tl-link.closed { min-height: 0; align-self: flex-end; }
+.q-timeline .tl-link.empty { display: none; }
+
+/* tarikh tiga baris (DD / bulan / TTTT) dalam kad dan petak */
+.tkh { display: block; line-height: 1.35; }
+.sc-year { font-size: 9px; }
+.tl-slot .sc-year { margin-bottom: 3px; font-size: 9px; }
+.tl-slots.padat .tl-slot .sc-year { font-size: 8px; }
+.tl-slots.lebih-padat .tl-slot .sc-year { font-size: 7px; }
+.tl-slot-year { padding: 5px 8px; font-size: 10px; line-height: 1.3; white-space: normal; text-align: center; letter-spacing: 0; }
+.tl-slots.padat .tl-slot-year { font-size: 9px; padding: 4px 6px; }
+.tl-slots.lebih-padat .tl-slot-year { font-size: 8px; padding: 3px 4px; }
+
+/* butang Petunjuk dalam Training Grounds dan Kepungan Agung = butang HUD yang sama; hati baki di bawah label */
+.question-tools { display: flex; align-items: center; gap: 8px; }
+.question-tools .hud-btn { width: 64px; }
+.question-tools .hud-btn .hearts { font-size: 9px; line-height: 1; letter-spacing: 0; margin-left: 0; }
+.question-tools .hud-btn.is-empty { filter: grayscale(.8); }
+
+/* tiada penunjuk soalan: butang Petunjuk / Keluar rapat ke kanan */
+.question-panel-head { justify-content: flex-end; }
+
+/* Petunjuk dan Keluar sama tinggi */
+.question-tools { align-items: stretch; }
+.question-tools .btn-px { display: flex; align-items: center; justify-content: center; }
+
+/* butang Keluar: ikon pintu + merah (sama saiz dengan Petunjuk) */
+.hud-leave { border-color: #c0392b; background: rgba(92, 18, 12, .92); }
+.hud-leave:hover:not(:disabled) { border-color: #ff6b5a; background: rgba(140, 26, 16, .95); }
+.question-tools .hud-leave { width: 64px; }
+
+/* ==========================================================================
+   BUTANG MERAH "KELUAR / LOG KELUAR" (.danger) + KEPALA LOMPONG MASA
+   Semua butang keluar = merah + ikon pintu. Kepala Lompong Masa: tajuk di kiri, Keluar di kanan, sebaris.
+   ========================================================================== */
+.btn-px.danger { background: #b3261e; border-color: #5c120d; color: #fff; }
+.btn-px.danger:hover:not(:disabled) { background: #d6382e; }
+.btn-px i { font-style: normal; margin-right: 4px; }
+
+.rh-head { align-items: center; justify-content: space-between; gap: 14px; }
+.rh-judul { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.rh-title { line-height: 1.1; }
+.rh-leave { margin-left: 0; flex: none; white-space: nowrap; }

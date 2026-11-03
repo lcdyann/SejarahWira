@@ -73,7 +73,11 @@ const isBlockedPath = (rawPath) => {
 };
  
 app.use((req, res, next) => (isBlockedPath(req.path) ? res.status(404).end() : next()));
-app.use(express.static(PROJECT_ROOT));
+// Fail JS/CSS/HTML: pelayar WAJIB menyemak semula setiap kali (no-cache), supaya perubahan kod terus kelihatan
+// tanpa perlu "hard refresh". Gambar dan bunyi masih boleh disimpan dalam cache.
+app.use(express.static(PROJECT_ROOT, {
+  setHeaders: (res, fail) => { if (/\.(js|css|html)$/i.test(fail)) res.setHeader('Cache-Control', 'no-cache'); }
+}));
 
 // Health check for the host (is the server up, and can it reach the database?)
 app.get('/api/health', async (req, res) => {

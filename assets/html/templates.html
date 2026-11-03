@@ -97,13 +97,250 @@
        ditutup (butang ◀/▶), supaya tiada bukti tersembunyi di bawah nama. -->
   <template id="tpl-hotspot">
     <div class="hs-root">
-      <div class="hs-scene" data-ref="scene"></div>             <!-- gambar yang diklik -->
-      <aside class="hs-side px" data-ref="side">                 <!-- panel kanan -->
-        <button class="hs-toggle" data-ref="toggle" type="button" title="Buka / tutup senarai bukti">▶</button>
-        <div class="hs-side-title">BUKTI <span data-ref="count"></span></div>
-        <ol class="hs-slots" data-ref="slots"></ol>             <!-- 1. ??? / nama bukti yang dijumpai -->
-      </aside>
+      <!-- Kotak arahan: duduk DI ATAS gambar (bukan menutupnya) -->
+      <div class="hs-note" data-ref="note">   <!-- JS memindahkannya ke bar atas misi (quests.js: HotspotQuest.build) -->
+        <b>Cara bermain:</b> klik pada gambar untuk mencari bukti. Kesilapan hanya dikira jika klik jauh dari bukti.
+      </div>
+      <!-- Ruang gambar: pentas 16:9 di dalamnya dikira supaya SENTIASA muat (tidak melimpah) -->
+      <div class="hs-area">
+      <div class="hs-stage" data-ref="stage">
+        <div class="hs-scene" data-ref="scene"></div>             <!-- gambar yang diklik -->
+        <aside class="hs-side px" data-ref="side">                 <!-- panel kanan -->
+          <button class="hs-toggle" data-ref="toggle" type="button" title="Buka / tutup senarai bukti">▶</button>
+          <div class="hs-side-title">BUKTI <span data-ref="count"></span></div>
+          <ol class="hs-slots" data-ref="slots"></ol>             <!-- 1. ??? / nama bukti yang dijumpai -->
+        </aside>
+      </div>
+      </div>
     </div>
+  </template>
+
+  <!-- 5b. MODUL BANTUAN PEMBELAJARAN ADAPTIF --------------------------------
+       Dibuka dengan butang "?" (blok Mario) semasa dialog ATAU misi.
+       SATU SKRIN, tanpa tab dan tanpa skrol:
+         kiri  : "Apa yang berlaku?" + "Apa perlu dibuat?"  (teks pendek)
+         kanan : demo bergerak (mekanik misi, atau cara menggerakkan dialog)
+       JavaScript: support.js (SupportModule.open) -->
+  <template id="tpl-bantuan">
+    <div class="bt-wrap">
+      <div class="bt-text">
+        <section class="bt-block">
+          <h4>Apa yang berlaku?</h4>
+          <p class="bt-big" data-text="story"></p>
+          <p class="bt-last" data-text="last"></p>
+        </section>
+        <section class="bt-block">
+          <h4 data-text="doTitle"></h4>
+          <p class="bt-big" data-text="doText"></p>
+        </section>
+      </div>
+      <div class="bt-demo" data-ref="demo"></div>                 <!-- demo bergerak dimasukkan di sini -->
+    </div>
+  </template>
+
+  <!-- 5c. TUTORIAL MEKANIK (lima demo bergerak) -------------------------------
+       Tangan 👆 menunjukkan klik sebenar. Gerakan ditentukan oleh CSS (@keyframes tt-*).
+       Satu templat bagi setiap jenis misi: tpl-tutor-1 ... tpl-tutor-5 -->
+  <template id="tpl-tutor-0">   <!-- Cara menggerakkan dialog -->
+    <div class="tt-demo tt-t0">
+      <div class="tt-title">Cara bercerita</div>
+      <div class="tt-stage">
+        <div class="tt-dlg"><b>Watak</b><span>Ikut aku, kita ke dewan itu...</span><i class="tt-more">&#9660;</i></div>
+        <div class="tt-dlg tt-me"><b>Kau</b><span>Baik, aku datang!</span></div>
+        <span class="tt-hand">&#128070;</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Klik kotak dialog (atau tekan Enter) untuk teruskan.</li>
+        <li>Kotak biru = Giliran Anda: pilih jawapan.</li>
+        <li>Butang Petunjuk (&#128161;) hanya boleh dipakai semasa misi.</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-1">   <!-- Susun Garis Masa -->
+    <div class="tt-demo tt-t1">
+      <div class="tt-title">Susun Garis Masa</div>
+      <div class="tt-stage">
+        <div class="tt-row">
+          <span class="tt-slot s1">1</span><span class="tt-slot s2">2</span><span class="tt-slot s3">3</span>
+        </div>
+        <div class="tt-row">
+          <span class="tt-card c1">Peristiwa pertama</span><span class="tt-card c2">Peristiwa kedua</span><span class="tt-card c3">Peristiwa ketiga</span>
+        </div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Klik satu kad peristiwa.</li>
+        <li>Klik petak nombor tempat kad itu patut berada.</li>
+        <li>Kad yang betul akan terkunci. Kad yang salah memutuskan rantai (titisan air hilang).</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-2">   <!-- Cari Hotspot -->
+    <div class="tt-demo tt-t2">
+      <div class="tt-title">Cari Bukti</div>
+      <div class="tt-stage">
+        <div class="tt-pic"><span class="tt-target"></span><span class="tt-ripple"></span></div>
+        <div class="tt-list"><b>BUKTI <span>0/1</span></b><i>???</i></div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Perhatikan gambar dengan teliti.</li>
+        <li>Klik tempat yang kau rasa ada bukti.</li>
+        <li>Bukti yang betul ditandakan dan masuk ke senarai di kanan.</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-3">   <!-- Bantu NPC -->
+    <div class="tt-demo tt-t3">
+      <div class="tt-title">Bantu Watak</div>
+      <div class="tt-stage">
+        <div class="tt-ask">Watak memerlukan bantuanmu. Apa patut dilakukan?</div>
+        <div class="tt-opts"><span class="tt-opt o1">Pilihan A</span><span class="tt-opt o2">Pilihan B</span><span class="tt-opt o3">Pilihan C</span></div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Baca keadaan watak itu.</li>
+        <li>Klik satu pilihan sahaja.</li>
+        <li>Hati-hati: pada misi ini, sekali silap cerita runtuh.</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-4">   <!-- Padanan -->
+    <div class="tt-demo tt-t4">
+      <div class="tt-title">Padanan</div>
+      <div class="tt-stage">
+        <div class="tt-row"><span class="tt-card m1">Tunku Abdul Rahman</span><span class="tt-card m2">Bapa Kemerdekaan</span></div>
+        <div class="tt-row"><span class="tt-card m3">Tun Razak</span><span class="tt-card m4">Bapa Pembangunan</span></div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Klik satu kad.</li>
+        <li>Klik kad lain yang berpasangan dengannya (di mana-mana sahaja).</li>
+        <li>Pasangan yang betul bertukar hijau dan terkunci.</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-5">   <!-- Nyahkod Clue -->
+    <div class="tt-demo tt-t5">
+      <div class="tt-title">Nyahkod Petunjuk</div>
+      <div class="tt-stage">
+        <div class="tt-ask">Petunjuk: &quot;Dia ____ perjanjian itu.&quot;</div>
+        <div class="tt-opts"><span class="tt-opt o1">menolak</span><span class="tt-opt o2">menandatangani</span><span class="tt-opt o3">membakar</span></div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Baca petunjuk yang tidak lengkap.</li>
+        <li>Pilih perkataan yang melengkapkan maksudnya.</li>
+        <li>Rujuk cerita tadi jika ragu-ragu.</li>
+      </ol>
+    </div>
+  </template>
+
+  <!-- 5d. LOMPONG MASA (tempat rehat) ----------------------------------------
+       Ruang kosong di antara zaman. Dibuka di sempadan tahap, bila murid menyambung era,
+       DAN bila murid menekan Jeda (Esc). Semuanya muat dalam satu skrin (tanpa skrol):
+         atas   : tajuk + pedagang (Pendekar Bayang menyamar) bercakap
+         tengah : CAROUSEL tahap. Setiap tahap = jubin babak (latar babak itu).
+                  hijau = sudah selesai, bercahaya = seterusnya, kelabu = belum
+         bawah  : tiga mini game (butang besar) + Teruskan cerita
+       Mini game dibuka di tempat carousel (bukan di bawahnya) supaya tidak perlu skrol.
+       JavaScript: rehat.js (RehatPage.show) -->
+  <template id="tpl-rehat">
+    <div class="rh-root">
+      <div class="rh-drift" data-ref="drift"></div>               <!-- helaian & bintang melayang di kekosongan -->
+      <div class="rh-card px parchment">
+
+        <header class="rh-head">
+          <div class="rh-judul">                                    <!-- kiri: kicker kecil di atas, tajuk besar di bawah -->
+            <span class="rh-kicker" data-text="kicker"></span>
+            <h2 class="rh-title" data-text="title"></h2>
+          </div>
+          <button type="button" class="btn-px small danger rh-leave hidden" data-ref="btnLeave"><i class="fas fa-right-from-bracket"></i> Keluar ke peta</button>   <!-- kanan: merah + ikon Font Awesome, hanya semasa Jeda -->
+        </header>
+
+        <div class="rh-host">                                      <!-- pedagang + ucapannya -->
+          <div class="rh-merchant" data-ref="merchant"></div>
+          <p class="rh-say" data-ref="say"></p>
+        </div>
+
+        <!-- CAROUSEL TAHAP -->
+        <section class="rh-main" data-ref="main">
+          <div class="rh-carousel">
+            <button type="button" class="rh-arrow" data-ref="prev" title="Tahap sebelumnya">&#9664;</button>
+            <div class="rh-viewport">
+              <div class="rh-track" data-ref="track"></div>      <!-- satu .rh-panel bagi setiap tahap -->
+            </div>
+            <button type="button" class="rh-arrow" data-ref="next" title="Tahap seterusnya">&#9654;</button>
+          </div>
+          <div class="rh-dots" data-ref="dots"></div>
+        </section>
+
+        <!-- MINI GAME (dibuka di tempat carousel) -->
+        <section class="rh-arena hidden" data-ref="arena">
+          <div class="rh-arena-bar">
+            <span data-ref="gameName"></span>
+            <button type="button" class="btn-px small" data-ref="btnBack">Selesai, kembali</button>
+          </div>
+          <div class="rh-play" data-ref="play"></div>
+        </section>
+
+        <!-- BUTANG BAWAH: tiga mini game + teruskan -->
+        <footer class="rh-actions" data-ref="actions">
+          <button type="button" class="rh-game" data-ref="btnMemory">
+            <img src="../assets/gameAsset/hub/diari.png" alt=""><b>Padan Kad</b><small>Cari pasangan gambar</small>
+          </button>
+          <button type="button" class="rh-game" data-ref="btnBubble">
+            <img src="../assets/gameAsset/hub/moon.png" alt=""><b>Pecah Gelembung</b><small>Santai, tiada markah</small>
+          </button>
+          <button type="button" class="rh-game" data-ref="btnSeek">
+            <img src="../assets/gameAsset/hub/pintu.png" alt=""><b>Cari Pendekar</b><small>Dia bersembunyi!</small>
+          </button>
+          <!-- butang main: sama saiz dengan tiga mini game supaya sejajar -->
+          <button type="button" class="rh-game rh-play-btn" data-ref="btnGo" title="Teruskan cerita">
+            <i class="rh-play-ico"></i><b>Main</b><small>Teruskan cerita</small>
+          </button>
+        </footer>
+
+      </div>
+    </div>
+  </template>
+
+  <!-- 5e. PERALIHAN BABAK: TANGAN MENARIK JIWA -> BUKU DISELAK -----------------
+       Urutan: tangan menarik jiwa (soulPull, core.js) -> latar kekosongan dengan buku terbuka
+       memenuhi skrin dari tepi ke tepi -> halaman diselak beberapa kali -> babak baharu.
+       Pendekar Bayang berkata "Kisah ini belum selesai...".
+       Gambar & gerakan: CSS (.sb-*). JavaScript: halaman.js (selakBuku) -->
+  <template id="tpl-halaman">
+    <div class="sb-void">
+      <div class="sb-book">                                       <!-- hub/buku.png, diregang tepi ke tepi -->
+        <div class="sb-leaf"></div>                               <!-- tiga helaian (halaman.png) diselak berturut-turut -->
+        <div class="sb-leaf"></div>
+        <div class="sb-leaf"></div>
+      </div>
+      <div class="sb-line px">
+        <b data-text="speaker"></b>
+        <span data-text="line"></span>
+      </div>
+    </div>
+  </template>
+
+  <!-- 5f. LOG DIALOG (buku catatan) ------------------------------------------
+       Butang "Catatan" di HUD membuka senarai baris yang sudah dikatakan dalam BABAK SEMASA.
+       Baris murid berwarna biru (seperti Giliran Anda). Jawapan Giliran Anda tidak dipaparkan.
+       JavaScript: missionScene.js (logNow) -->
+  <template id="tpl-log">
+    <div class="lg-wrap">
+      <ol class="lg-list" data-ref="list"></ol>                   <!-- satu .lg-row bagi setiap baris -->
+    </div>
+  </template>
+  <template id="tpl-logrow">
+    <li class="lg-row">
+      <div class="lg-face" data-ref="face"></div>                 <!-- potret kecil pembicara -->
+      <div class="lg-msg">
+        <b data-text="name"></b>
+        <p data-text="text"></p>
+      </div>
+    </li>
   </template>
 
   <!-- 6. KEPINGAN LENCANA ---------------------------------------------------
