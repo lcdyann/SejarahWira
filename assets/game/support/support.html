@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat support</title></head>
+<body>
+<!--
+  ============================================================================
+  support/support.html  -  game boxes (templates) of the "support" module
+  Templates here: tpl-bantuan, tpl-tutor-0, tpl-tutor-1, tpl-tutor-2, tpl-tutor-3, tpl-tutor-4, tpl-tutor-5
+  How it works: core/core.js tpl('name') copies a <template id="tpl-name">, fills
+  [data-text] and exposes [data-ref] as element.refs.name. The colours / sizes
+  live in the css file next to this one (support.css).
+  ============================================================================
+-->
+
+  <!-- 5b. MODUL BANTUAN PEMBELAJARAN ADAPTIF --------------------------------
+       Dibuka dengan butang "?" (blok Mario) semasa dialog ATAU misi.
+       SATU SKRIN, tanpa tab dan tanpa skrol:
+         kiri  : "Apa yang berlaku?" + "Apa perlu dibuat?"  (teks pendek)
+         kanan : demo bergerak (mekanik misi, atau cara menggerakkan dialog)
+       JavaScript: support.js (SupportModule.open) -->
+<template id="tpl-bantuan">
+    <div class="bt-wrap">
+      <div class="bt-text">
+        <section class="bt-block">
+          <h4>Apa yang berlaku?</h4>
+          <p class="bt-big" data-text="story"></p>
+          <p class="bt-last" data-text="last"></p>
+        </section>
+        <section class="bt-block">
+          <h4 data-text="doTitle"></h4>
+          <p class="bt-big" data-text="doText"></p>
+        </section>
+      </div>
+      <div class="bt-demo" data-ref="demo"></div>                 <!-- demo bergerak dimasukkan di sini -->
+    </div>
+  </template>
+  <!-- 5c. TUTORIAL MEKANIK (lima demo bergerak) -------------------------------
+       Tangan 👆 menunjukkan klik sebenar. Gerakan ditentukan oleh CSS (@keyframes tt-*).
+       Satu templat bagi setiap jenis misi: tpl-tutor-1 ... tpl-tutor-5 -->
+<template id="tpl-tutor-0">   <!-- Cara menggerakkan dialog -->
+    <div class="tt-demo tt-t0">
+      <div class="tt-title">Cara bercerita</div>
+      <div class="tt-stage">
+        <div class="tt-dlg"><b>Watak</b><span>Ikut aku, kita ke dewan itu...</span><i class="tt-more">&#9660;</i></div>
+        <div class="tt-dlg tt-me"><b>Kau</b><span>Baik, aku datang!</span></div>
+        <span class="tt-hand">&#128070;</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Klik kotak dialog (atau tekan Enter) untuk teruskan.</li>
+        <li>Kotak biru = Giliran Anda: pilih jawapan.</li>
+        <li>Butang Petunjuk (&#128161;) hanya boleh dipakai semasa misi.</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-1">   <!-- Susun Garis Masa -->
+    <div class="tt-demo tt-t1">
+      <div class="tt-title">Susun Garis Masa</div>
+      <div class="tt-stage">
+        <div class="tt-row">
+          <span class="tt-slot s1">1</span><span class="tt-slot s2">2</span><span class="tt-slot s3">3</span>
+        </div>
+        <div class="tt-row">
+          <span class="tt-card c1">Peristiwa pertama</span><span class="tt-card c2">Peristiwa kedua</span><span class="tt-card c3">Peristiwa ketiga</span>
+        </div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Klik satu kad peristiwa.</li>
+        <li>Klik petak nombor tempat kad itu patut berada.</li>
+        <li>Kad yang betul akan terkunci. Kad yang salah memutuskan rantai (titisan air hilang).</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-2">   <!-- Cari Hotspot -->
+    <div class="tt-demo tt-t2">
+      <div class="tt-title">Cari Bukti</div>
+      <div class="tt-stage">
+        <div class="tt-pic"><span class="tt-target"></span><span class="tt-ripple"></span></div>
+        <div class="tt-list"><b>BUKTI <span>0/1</span></b><i>???</i></div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Perhatikan gambar dengan teliti.</li>
+        <li>Klik tempat yang kau rasa ada bukti.</li>
+        <li>Bukti yang betul ditandakan dan masuk ke senarai di kanan.</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-3">   <!-- Bantu NPC -->
+    <div class="tt-demo tt-t3">
+      <div class="tt-title">Bantu Watak</div>
+      <div class="tt-stage">
+        <div class="tt-ask">Watak memerlukan bantuanmu. Apa patut dilakukan?</div>
+        <div class="tt-opts"><span class="tt-opt o1">Pilihan A</span><span class="tt-opt o2">Pilihan B</span><span class="tt-opt o3">Pilihan C</span></div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Baca keadaan watak itu.</li>
+        <li>Klik satu pilihan sahaja.</li>
+        <li>Hati-hati: pada misi ini, sekali silap cerita runtuh.</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-4">   <!-- Padanan -->
+    <div class="tt-demo tt-t4">
+      <div class="tt-title">Padanan</div>
+      <div class="tt-stage">
+        <div class="tt-row"><span class="tt-card m1">Tunku Abdul Rahman</span><span class="tt-card m2">Bapa Kemerdekaan</span></div>
+        <div class="tt-row"><span class="tt-card m3">Tun Razak</span><span class="tt-card m4">Bapa Pembangunan</span></div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Klik satu kad.</li>
+        <li>Klik kad lain yang berpasangan dengannya (di mana-mana sahaja).</li>
+        <li>Pasangan yang betul bertukar hijau dan terkunci.</li>
+      </ol>
+    </div>
+  </template>
+  <template id="tpl-tutor-5">   <!-- Nyahkod Clue -->
+    <div class="tt-demo tt-t5">
+      <div class="tt-title">Nyahkod Petunjuk</div>
+      <div class="tt-stage">
+        <div class="tt-ask">Petunjuk: &quot;Dia ____ perjanjian itu.&quot;</div>
+        <div class="tt-opts"><span class="tt-opt o1">menolak</span><span class="tt-opt o2">menandatangani</span><span class="tt-opt o3">membakar</span></div>
+        <span class="tt-hand">👆</span>
+      </div>
+      <ol class="tt-steps">
+        <li>Baca petunjuk yang tidak lengkap.</li>
+        <li>Pilih perkataan yang melengkapkan maksudnya.</li>
+        <li>Rujuk cerita tadi jika ragu-ragu.</li>
+      </ol>
+    </div>
+  </template>
+</body>
+</html>

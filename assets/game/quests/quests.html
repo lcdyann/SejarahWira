@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat quests</title></head>
+<body>
+<!--
+  ============================================================================
+  quests/quests.html  -  game boxes (templates) of the "quests" module
+  Templates here: tpl-hotspot
+  How it works: core/core.js tpl('name') copies a <template id="tpl-name">, fills
+  [data-text] and exposes [data-ref] as element.refs.name. The colours / sizes
+  live in the css file next to this one (quests.css).
+  ============================================================================
+-->
+
+  <!-- 5. MISI CARI BUKTI ---------------------------------------------------
+       Gambar penuh untuk dicari. Senarai bukti ada di PANEL KANAN yang boleh
+       ditutup (butang ◀/▶), supaya tiada bukti tersembunyi di bawah nama. -->
+<template id="tpl-hotspot">
+    <div class="hs-root">
+      <!-- Kotak arahan: duduk DI ATAS gambar (bukan menutupnya) -->
+      <div class="hs-note" data-ref="note">   <!-- JS memindahkannya ke bar atas misi (quests/hotspot.js: HotspotQuest.build) -->
+        <b>Cara bermain:</b> klik pada gambar untuk mencari bukti. Kesilapan hanya dikira jika klik jauh dari bukti.
+      </div>
+      <!-- Ruang gambar: pentas 16:9 di dalamnya dikira supaya SENTIASA muat (tidak melimpah) -->
+      <div class="hs-area">
+      <div class="hs-stage" data-ref="stage">
+        <div class="hs-scene" data-ref="scene"></div>             <!-- gambar yang diklik -->
+        <aside class="hs-side px" data-ref="side">                 <!-- panel kanan -->
+          <button class="hs-toggle" data-ref="toggle" type="button" title="Buka / tutup senarai bukti">▶</button>
+          <div class="hs-side-title">BUKTI <span data-ref="count"></span></div>
+          <ol class="hs-slots" data-ref="slots"></ol>             <!-- 1. ??? / nama bukti yang dijumpai -->
+        </aside>
+      </div>
+      </div>
+    </div>
+  </template>
+</body>
+</html>

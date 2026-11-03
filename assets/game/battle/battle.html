@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat battle</title></head>
+<body>
+<!--
+  ============================================================================
+  battle/battle.html  -  game boxes (templates) of the "battle" module
+  Templates here: tpl-artifak
+  How it works: core/core.js tpl('name') copies a <template id="tpl-name">, fills
+  [data-text] and exposes [data-ref] as element.refs.name. The colours / sizes
+  live in the css file next to this one (battle.css).
+  ============================================================================
+-->
+
+  <!-- 7. ARTIFAK KEPUNGAN (BAYANG) ------------------------------------------
+       Sebelum perang: murid nampak artifak yang digelapkan + markah yang perlu dicapai.
+       Hanya motivasi; artifak sebenar dibuka selepas Kepungan (kesan meriam sedia ada). -->
+<template id="tpl-artifak">
+    <div class="af-wrap">
+      <div class="af-card px">
+        <div class="af-label">HADIAH KEPUNGAN</div>
+        <div class="af-stage">
+          <img class="af-base" src="../assets/gameAsset/collection/artifact_place_locked.png" alt="">
+          <img class="af-sprite" data-ref="sprite" alt="">       <!-- artifak (bayang gelap) -->
+        </div>
+        <div class="af-need" data-text="need"></div>             <!-- contoh: Capai 80% untuk membukanya -->
+      </div>
+      <div class="af-go" data-ref="go">Tekan Enter ▶</div>
+    </div>
+  </template>
+</body>
+</html>

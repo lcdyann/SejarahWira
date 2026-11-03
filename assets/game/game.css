@@ -1,0 +1,20 @@
+/* ============================================================================
+   assets/game/game.css  -  the ONLY stylesheet the pages link.
+   It just lists the module stylesheets, in the order they must load.
+   To style a screen, open the folder of that module (hub/, quests/, ...):
+   <module>.html (markup) + <module>.css (look) + *.js (behaviour) live together.
+   ============================================================================ */
+@import url('core/core.css');
+@import url('dialogue/dialogue.css');
+@import url('npc/npc.css');
+@import url('transition/transition.css');
+@import url('hub/hub.css');
+@import url('map/map.css');
+@import url('story/story.css');
+@import url('quests/quests.css');
+@import url('support/support.css');
+@import url('rest/rest.css');
+@import url('battle/battle.css');
+@import url('collection/collection.css');
+@import url('student/student.css');
+@import url('core/overrides.css');

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat story</title></head>
+<body>
+<!--
+  ============================================================================
+  story/story.html  -  game boxes (templates) of the "story" module
+  Templates here: tpl-aftermath, tpl-possession, tpl-diary, tpl-log, tpl-logrow, tpl-pieces, tpl-bookend
+  How it works: core/core.js tpl('name') copies a <template id="tpl-name">, fills
+  [data-text] and exposes [data-ref] as element.refs.name. The colours / sizes
+  live in the css file next to this one (story.css).
+  ============================================================================
+-->
+
+  <!-- 2. ADEGAN AKIBAT -------------------------------------------------------
+       Gambar latar dikuncupkan warnanya, retak, cop "SEJARAH BERUBAH",
+       kemudian akibat ditaip. -->
+<template id="tpl-aftermath">
+    <div class="am-wrap">
+      <div class="am-pic" data-ref="pic"></div>                  <!-- gambar latar babak -->
+      <div class="am-crack"><i></i><i></i></div>                 <!-- retakan benang cerita -->
+      <div class="am-card px">
+        <div class="am-stamp" data-text="title"></div>           <!-- cop: SEJARAH BERUBAH -->
+        <div class="am-label">Apa yang berlaku...</div>
+        <p class="am-text" data-ref="text"></p>                  <!-- akibat (ditaip) -->
+        <div class="am-go">Tekan Enter ▶</div>
+      </div>
+    </div>
+  </template>
+  <!-- 3. KAD PERASUKAN (POSSESSION) -----------------------------------------
+       Avatar pelajar  ⟶  tokoh sebenar. Kemudian Pendekar Bayang menerangkan. -->
+<template id="tpl-possession">
+    <div class="pos-wrap">
+      <div class="pos-glow"></div>
+      <div class="pos-stage">
+        <div class="pos-from" data-ref="from"></div>             <!-- avatar pelajar -->
+        <div class="pos-arrow">⟶</div>
+        <div class="pos-to" data-ref="to"></div>                 <!-- tokoh peranan -->
+      </div>
+      <div class="pos-card px">
+        <div class="pos-label">KAU KINI IALAH</div>
+        <div class="pos-name" data-text="name"></div>            <!-- nama tokoh -->
+        <div class="pos-task" data-text="task"></div>            <!-- sumbangan tokoh -->
+        <div class="pos-go" data-ref="go">Tekan Enter ▶</div>
+      </div>
+    </div>
+  </template>
+  <!-- 4. HALAMAN DIARI + NOTA LEKAT -----------------------------------------
+       Dipaparkan dalam tetingkap selepas misi berjaya. Kertas = halaman.png
+       (ditetapkan sebagai --paper-img dalam story/story.css). -->
+<template id="tpl-diary">
+    <div class="diary-page">
+      <span class="diary-tab" data-text="tab"></span>            <!-- "Diari <nama tokoh>" -->
+      <p class="sticky" data-text="note"></p>                    <!-- catatan (nota lekat kuning) -->
+    </div>
+  </template>
+  <!-- 5f. LOG DIALOG (buku catatan) ------------------------------------------
+       Butang "Catatan" di HUD membuka senarai baris yang sudah dikatakan dalam BABAK SEMASA.
+       Baris murid berwarna biru (seperti Giliran Anda). Jawapan Giliran Anda tidak dipaparkan.
+       JavaScript: story/missionScene.js (logNow) -->
+<template id="tpl-log">
+    <div class="lg-wrap">
+      <ol class="lg-list" data-ref="list"></ol>                   <!-- satu .lg-row bagi setiap baris -->
+    </div>
+  </template>
+  <template id="tpl-logrow">
+    <li class="lg-row">
+      <div class="lg-face" data-ref="face"></div>                 <!-- potret kecil pembicara -->
+      <div class="lg-msg">
+        <b data-text="name"></b>
+        <p data-text="text"></p>
+      </div>
+    </li>
+  </template>
+  <!-- 6. KEPINGAN LENCANA ---------------------------------------------------
+       Dipaparkan selepas setiap misi (kecuali yang terakhir, kerana lencana penuh
+       terus diberikan). Latar = kertas koyak (hub/halaman.png).
+       Atas: nama era. Tengah: lencana sebagai bayang; kepingan koyak yang sudah diperoleh berwarna.
+       Bawah: bilangan kepingan. Satu misi = satu kepingan.
+       JavaScript (story/missionScene.js: showPieces) mengisi <svg data-ref="svg"> dengan kepingan;
+       bentuk kepingan dikira dalam koyak.js. -->
+<template id="tpl-pieces">
+    <div class="pc-wrap">
+      <div class="pc-sheet">                                      <!-- bayang kertas (drop-shadow tidak ikut koyakan jika di luar clip) -->
+        <div class="pc-paper">                                    <!-- halaman.png, tepi dikoyakkan dengan clip-path -->
+          <div class="pc-era" data-text="era"></div>             <!-- nama era -->
+          <svg class="pc-svg" data-ref="svg" viewBox="0 0 300 300"></svg>   <!-- kepingan kertas koyak lencana -->
+          <div class="pc-count" data-text="count"></div>         <!-- contoh: 2 / 5 -->
+          <div class="pc-note">kepingan lencana</div>
+        </div>
+      </div>
+      <button class="btn-px gold pc-go" data-ref="go">Halaman seterusnya ▶</button>   <!-- Enter pun boleh -->
+    </div>
+  </template>
+  <!-- 8. KISAH ERA LENGKAP -------------------------------------------------
+       Akhir cerita: setiap misi = satu halaman kertas yang terbang masuk ke dalam buku.
+       JavaScript (story/missionScene.js: showBookEnd) menambah halaman ke <div data-ref="pages">. -->
+<template id="tpl-bookend">
+    <div class="be-wrap">
+      <div class="be-pages" data-ref="pages"></div>              <!-- halaman kertas (satu setiap misi) -->
+      <div class="be-book" data-ref="book"></div>                <!-- buku.png -->
+      <div class="be-title" data-text="title"></div>             <!-- contoh: Kisah Era 2 lengkap -->
+      <div class="be-count" data-text="count"></div>             <!-- contoh: 5 halaman -->
+    </div>
+  </template>
+</body>
+</html>

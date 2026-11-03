@@ -1,0 +1,234 @@
+/* ============================================================================
+   assets/game/rest/rest.css  -  Lompong Masa: rest page between missions (mini games)
+   USE CASE: UC-03   CLASS DIAGRAM: -
+   Markup: rest/rest.html (if any)   Logic: the .js files in this folder.
+   ============================================================================ */
+
+.rh-root {
+  position: absolute; inset: 0; z-index: 40; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  padding: 46px 14px 10px;                                  /* 46px atas = ruang butang HUD */
+  background: radial-gradient(ellipse at 50% 40%, #1a0f33 0%, #05020c 80%);
+}
+
+.rh-card {
+  position: relative; z-index: 1; width: 100%; height: 100%;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 16px 12px; color: #fff3d6; overflow: hidden;
+  background: none; border: none; box-shadow: none;          /* lutsinar: latar kekosongan kelihatan */
+}
+
+.rh-card .hidden { display: none !important; }
+
+/* kekosongan: helaian & bintang melayang naik (hiasan) */
+.rh-drift { position: absolute; inset: 0; pointer-events: none; }
+
+.rh-star, .rh-leaf { position: absolute; bottom: -40px; animation: rh-rise linear infinite; }
+
+.rh-star { width: 4px; height: 4px; background: #ffe9a8; border-radius: 50%; box-shadow: 0 0 8px 2px #ffd86b88; }
+
+.rh-leaf { width: 22px; height: 30px; background: url('../../gameAsset/hub/halaman.png') center / cover; opacity: .55; border-radius: 2px; }
+
+@keyframes rh-rise { to { transform: translateY(-110vh) rotate(160deg); } }
+
+/* ---- kepala ---- */
+.rh-head { flex: 0 0 auto; display: flex; align-items: baseline; gap: 14px; }
+
+.rh-kicker { font-family: var(--font-pixel); font-size: 9px; color: #ffd86b; }
+
+.rh-title { margin: 0; font-size: 22px; color: #fff; text-shadow: 0 2px 8px #000; }
+
+/* ---- pedagang (Pendekar Bayang menyamar) + ucapan ---- */
+.rh-host { flex: 0 0 auto; display: flex; align-items: center; gap: 12px; }
+
+.rh-merchant { --misai-y: 62%; --misai-w: 40px; position: relative; flex: 0 0 72px; height: 76px; }
+
+.rh-merchant .entity-portrait { width: 100%; height: 100%; }
+
+.rh-merchant .entity-portrait img { max-width: 100%; max-height: 100%; }
+
+/* misai palsu (CSS): dua lengkung di atas mulut. Laraskan --misai-y (atas-bawah) / --misai-w (lebar) */
+.rh-merchant::before, .rh-merchant::after {
+  content: ''; position: absolute; top: var(--misai-y); z-index: 2;
+  width: calc(var(--misai-w) / 2); height: 10px; background: #8a4b1a; box-shadow: 0 0 0 1px #1b0f05;
+  border-radius: 100% 0 60% 40% / 100% 0 100% 40%;
+}
+
+.rh-merchant::before { left: calc(50% - var(--misai-w) / 2); transform: rotate(8deg); }
+
+.rh-merchant::after  { left: 50%; transform: scaleX(-1) rotate(8deg); }
+
+.rh-say {
+  flex: 1; margin: 0; padding: 8px 12px; font-size: 16px; line-height: 1.35;
+  background: #fff; color: #111; border: 3px solid #3a2a14; position: relative;
+}
+
+.rh-say::before { content: ''; position: absolute; left: -11px; top: 50%; margin-top: -8px; border: 8px solid transparent; border-right-color: #3a2a14; border-left: 0; }
+
+/* ---- CAROUSEL TAHAP ---- */
+.rh-main { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+
+.rh-carousel { flex: 1 1 0; min-height: 0; display: flex; align-items: stretch; gap: 6px; }
+
+.rh-arrow {
+  flex: 0 0 38px; font-size: 18px; cursor: pointer; color: #ffd86b;
+  background: #2a1c0e; border: 3px solid #6b4a22;
+}
+
+.rh-arrow:disabled { opacity: .3; cursor: default; }
+
+.rh-viewport { flex: 1; min-width: 0; overflow: hidden; }
+
+.rh-track {
+  --i: 0; height: 100%; display: flex; gap: 2%;
+  transform: translateX(calc(15% - var(--i) * 72%));        /* panel di tengah, jiran separuh kelihatan */
+  transition: transform .4s ease;
+}
+
+.rh-panel {
+  flex: 0 0 70%; display: flex; flex-direction: column; gap: 6px; padding: 8px;
+  background: rgba(30, 18, 8, .85); border: 3px solid #6b4a22; color: #fff3d6;
+  opacity: .45; transform: scale(.94); transition: opacity .4s, transform .4s; cursor: pointer;
+}
+
+.rh-panel.on { opacity: 1; transform: none; border-color: #ffd86b; cursor: default; }
+
+.rh-panel-head { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: baseline; }
+
+.rh-panel-head b { font-size: 18px; }
+
+.rh-panel-head span { font-family: var(--font-pixel); font-size: 9px; color: #ffd86b; }
+
+/* jubin babak: tiada skrol. Lajur menyesuaikan bilangan babak; jika guru menambah babak, jubin mengecil */
+.rh-tiles {
+  flex: 1 1 0; min-height: 0; display: grid; gap: 6px;
+  grid-auto-rows: 1fr;                                          /* lajur ditetapkan oleh rehat.js */
+}
+
+.rh-tile {
+  position: relative; min-height: 0; overflow: hidden; border: 3px solid #3a2a14;
+  background: #222 center / cover no-repeat;
+}
+
+.rh-tile::after { content: ''; position: absolute; inset: 0; }
+
+/* lapisan warna status */
+.rh-tile-no {
+  position: absolute; left: 4px; top: 3px; z-index: 2; font-style: normal; font-family: var(--font-pixel);
+  font-size: 10px; color: #fff; text-shadow: 0 1px 3px #000;
+}
+
+.rh-tile-mark { position: absolute; right: 5px; bottom: 3px; z-index: 2; font-style: normal; font-size: 18px; color: #fff; text-shadow: 0 1px 3px #000; }
+
+/* siap = hijau */
+.rh-tile.siap { border-color: #4caf50; }
+
+.rh-tile.siap::after { background: rgba(46, 160, 67, .55); }
+
+/* seterusnya = bercahaya */
+.rh-tile.semasa { border-color: #ffd86b; animation: rh-glow 1.3s ease-in-out infinite; z-index: 1; }
+
+.rh-tile.semasa::after { background: rgba(255, 216, 107, .12); }
+
+@keyframes rh-glow { 50% { box-shadow: 0 0 16px 4px #ffd86b; transform: scale(1.04); } }
+
+/* belum sampai = kelabu */
+.rh-tile.kunci { filter: grayscale(1) brightness(.55); }
+
+.rh-dots { flex: 0 0 auto; display: flex; justify-content: center; gap: 8px; }
+
+.rh-dot { width: 10px; height: 10px; border-radius: 50%; background: #6b4a22; }
+
+.rh-dot.on { background: #ffd86b; }
+
+/* ---- butang bawah: tiga mini game besar + teruskan ---- */
+.rh-actions { flex: 0 0 auto; display: flex; gap: 8px; align-items: stretch; }
+
+.rh-game {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px;
+  cursor: pointer; background: #fff7e2; color: #2b1a0a; border: 3px solid #8a5a00;
+}
+
+.rh-game:hover { background: #ffe9a8; border-color: #ffd86b; }
+
+.rh-game img { height: 44px; width: auto; object-fit: contain; }
+
+.rh-game b { font-size: 15px; }
+
+.rh-game small { font-size: 12px; color: #5a4a30; }
+
+/* ---- ARENA MINI GAME: mengambil tempat carousel (muat tanpa skrol) ---- */
+.rh-arena { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+
+.rh-arena-bar { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-pixel); font-size: 11px; color: #ffd86b; }
+
+.rh-play { flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 8px; background: rgba(255, 247, 226, .92); border: 3px solid #c9b88e; overflow: hidden; color: #2b1a0a; }
+
+.rh-note { margin: 0; font-size: 14px; text-align: center; color: #5a4a30; }
+
+.rh-done { margin: 0; text-align: center; font-size: 17px; font-weight: bold; color: #2f7d32; }
+
+/* Padan Kad: 6 lajur x 2 baris */
+.rh-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; max-width: 560px; width: 100%; margin: 0 auto; }
+
+.rh-card-flip { aspect-ratio: 1; font-size: 24px; cursor: pointer; background: #8a5a00; color: #fff3d6; border: 3px solid #4a2f00; transition: transform .2s; }
+
+.rh-card-flip img { width: 80%; height: 80%; object-fit: contain; }
+
+.rh-card-flip.open { background: #fff; color: #111; transform: scale(1.04); }
+
+.rh-card-flip.matched { background: #bfe8bb; color: #111; border-color: #4caf50; }
+
+/* Pecah Gelembung */
+.rh-sky { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; background: linear-gradient(#bfe6f7, #fff7e2); border: 2px solid #c9b88e; }
+
+.rh-bubble { position: absolute; bottom: -60px; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.75); border: 3px solid #7fc4e0; cursor: pointer; animation: rh-float 8s linear forwards; }
+
+.rh-bubble img { width: 70%; height: 70%; object-fit: contain; pointer-events: none; }
+
+.rh-bubble.pop { animation: none; transform: scale(1.6); opacity: 0; transition: .25s; }
+
+@keyframes rh-float { to { transform: translateY(-300px); } }
+
+/* Cari Pendekar: satu baris enam benda */
+.rh-seek-say { min-height: 24px; text-align: center; font-size: 17px; font-weight: bold; }
+
+.rh-seek-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-width: 620px; width: 100%; margin: 0 auto; }
+
+.rh-spot { position: relative; aspect-ratio: 1; padding: 4px; cursor: pointer; overflow: hidden; background: #fff; border: 3px solid #c9b88e; }
+
+.rh-spot img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+
+.rh-spot:hover { border-color: #ffd86b; }
+
+.rh-spot.wiggle { animation: shake .4s; }
+
+.rh-spot.found { border-color: #4caf50; background: #dff3d8; }
+
+.rh-seek-pendekar { position: absolute; inset: 0; animation: rh-pop .35s ease-out; background: rgba(223, 243, 216, .92); }
+
+.rh-seek-pendekar img { width: 100%; height: 100%; object-fit: contain; }
+
+@keyframes rh-pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* butang MAIN (segi tiga): sama saiz dan sejajar dengan tiga mini game */
+.rh-play-btn { background: #ffd86b; border-color: #8a5a00; }
+
+.rh-play-btn:hover { background: #ffe9a8; }
+
+.rh-play-ico {
+  display: block; width: 0; height: 0; margin: 8px 0 8px 10px;
+  border-style: solid; border-width: 15px 0 15px 26px; border-color: transparent transparent transparent #2b1a0a;   /* segi tiga ▶ */
+}
+
+.rh-head { align-items: center; }
+
+.rh-leave { margin-left: auto; }
+
+.rh-head { align-items: center; justify-content: space-between; gap: 14px; }
+
+.rh-judul { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+
+.rh-title { line-height: 1.1; }
+
+.rh-leave { margin-left: 0; flex: none; white-space: nowrap; }

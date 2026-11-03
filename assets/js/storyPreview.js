@@ -15,9 +15,9 @@
  * Only the data source differs (it comes from the editor, not the database) and nothing is saved.
  * ============================================================================
  */
-import { Game } from './game/game.js';
-import { MissionScene } from './game/missionScene.js';
-import { PendekarBayang } from './game/entity.js';
+import { Game } from '../game/game.js';
+import { MissionScene } from '../game/story/missionScene.js';
+import { PendekarBayang } from '../game/npc/entity.js';
 
 const PLAYER_FALLBACK = '../assets/gameAsset/avatar/avatar_melayu_lelaki.png';
 
@@ -50,7 +50,7 @@ class PreviewMission extends MissionScene {
           speaker: npc ? { npcID: npc.npcID, name: npc.name, asset: npc.url, biography: npc.biography, contribution: npc.contribution } : { npcID: 0 } };
       })
     }));
-    const { Narrative } = await import('./game/domain.js');
+    const { Narrative } = await import('../game/core/domain.js');
     const r = story.role && npcOf(story.role.npcID);
     const role = r ? { npcID: r.npcID, name: r.name, asset: r.url, biography: r.biography, contribution: r.contribution, lines: story.role.lines || {} } : null;
     this.narrative = new Narrative({ narrativeID: 1, narrativeTitle: story.title, scenes, role });

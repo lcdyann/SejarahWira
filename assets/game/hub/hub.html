@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat hub</title></head>
+<body>
+<!--
+  ============================================================================
+  hub/hub.html  -  game boxes (templates) of the "hub" module
+  Templates here: tpl-sound
+  How it works: core/core.js tpl('name') copies a <template id="tpl-name">, fills
+  [data-text] and exposes [data-ref] as element.refs.name. The colours / sizes
+  live in the css file next to this one (hub.css).
+  ============================================================================
+-->
+
+  <!-- 9. TETAPAN BUNYI -----------------------------------------------------
+       Dipaparkan dalam kotak "Pintu" di hab. Gelangsar 0 - 100, disimpan dalam pelayar.
+       JavaScript (hub/hubScene.js: doorMenu) mengisi nilai dan mendengar perubahan. -->
+<template id="tpl-sound">
+    <div class="set-sound">
+      <button class="btn-px small set-mute" data-ref="mute"></button>   <!-- senyap / hidupkan -->
+      <label class="set-row">Muzik <input type="range" min="0" max="100" data-ref="music"></label>
+      <label class="set-row">Kesan bunyi <input type="range" min="0" max="100" data-ref="sfx"></label>
+    </div>
+  </template>
+</body>
+</html>

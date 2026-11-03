@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat dialogue</title></head>
+<body>
+<!--
+  ============================================================================
+  dialogue/dialogue.html  -  game boxes (templates) of the "dialogue" module
+  Templates here: tpl-dialogue
+  How it works: core/core.js tpl('name') copies a <template id="tpl-name">, fills
+  [data-text] and exposes [data-ref] as element.refs.name. The colours / sizes
+  live in the css file next to this one (dialogue.css).
+  ============================================================================
+-->
+
+<!-- 1. KOTAK DIALOG ------------------------------------------------------
+       Tokoh lain: potret di kiri. Kau (pelajar): potret di kanan, kotak biru
+       (data-tone="me" ditetapkan oleh JavaScript, rupanya dalam dialogue/dialogue.css). -->
+<template id="tpl-dialogue">
+    <div class="dlg hidden">
+      <div class="dlg-portrait" data-ref="portrait"></div>      <!-- potret penutur -->
+      <div class="dlg-portrait dlg-me" data-ref="mePortrait"></div> <!-- potret kau, hanya semasa Giliran Anda -->
+      <div class="dlg-panel px" data-ref="panel">
+        <div class="dlg-name" data-ref="name"></div>             <!-- nama penutur -->
+        <div class="dlg-text" data-ref="text"></div>             <!-- ayat (ditaip satu-satu) -->
+        <div class="dlg-more" data-ref="more">▼</div>           <!-- tanda "tekan Enter" -->
+      </div>
+      <div class="dlg-choices" data-ref="choices"></div>         <!-- butang pilihan jawapan -->
+    </div>
+  </template>
+</body>
+</html>

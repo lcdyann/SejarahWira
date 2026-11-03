@@ -6,12 +6,12 @@
  *   parent -> here   { type: 'quest-preview', quest: { questName, questType, content }, background }
  *   here -> parent   { type: 'quest-preview-ready' }   (when the page can receive a quest)
  *                    { type: 'quest-preview-result', ok: boolean }
- * Uses the same QuestMechanic and the same game.css as the game. Nothing is saved.
+ * Uses the same QuestMechanic and the same game.css (assets/game/game.css) as the game. Nothing is saved.
  * ============================================================================
  */
-import { Stage, el } from './game/core.js';
-import { QuestMechanic } from './game/quests.js';
-import { buildAftermath } from './game/aftermath.js';
+import { Stage, el } from '../game/core/core.js';
+import { QuestMechanic } from '../game/quests/index.js';
+import { buildAftermath } from '../game/story/aftermath.js';
 
 const stage = new Stage(document.getElementById('game-root'));
 const layer = stage.sceneLayer;

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat transition</title></head>
+<body>
+<!--
+  ============================================================================
+  transition/transition.html  -  game boxes (templates) of the "transition" module
+  Templates here: tpl-halaman
+  How it works: core/core.js tpl('name') copies a <template id="tpl-name">, fills
+  [data-text] and exposes [data-ref] as element.refs.name. The colours / sizes
+  live in the css file next to this one (transition.css).
+  ============================================================================
+-->
+
+  <!-- 5e. PERALIHAN BABAK: TANGAN MENARIK JIWA -> BUKU DISELAK -----------------
+       Urutan: tangan menarik jiwa (soulPull, core.js) -> latar kekosongan dengan buku terbuka
+       memenuhi skrin dari tepi ke tepi -> halaman diselak beberapa kali -> babak baharu.
+       Pendekar Bayang berkata "Kisah ini belum selesai...".
+       Gambar & gerakan: CSS (.sb-*). JavaScript: halaman.js (selakBuku) -->
+<template id="tpl-halaman">
+    <div class="sb-void">
+      <div class="sb-book">                                       <!-- hub/buku.png, diregang tepi ke tepi -->
+        <div class="sb-leaf"></div>                               <!-- tiga helaian (halaman.png) diselak berturut-turut -->
+        <div class="sb-leaf"></div>
+        <div class="sb-leaf"></div>
+      </div>
+      <div class="sb-line px">
+        <b data-text="speaker"></b>
+        <span data-text="line"></span>
+      </div>
+    </div>
+  </template>
+</body>
+</html>

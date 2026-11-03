@@ -1,0 +1,12 @@
+/* ============================================================================
+   assets/game/core/overrides.css  -  Base layer: stage, helpers, templates loader, API, domain model, sound
+   USE CASE: all   CLASS DIAGRAM: User, Student, Teacher, Avatar, ... (domain.js mirrors the class diagram)
+   Markup: core/core.html (if any)   Logic: the .js files in this folder.
+   LOADED LAST (see core/core.css): button variants that must win over every module.
+   ============================================================================ */
+
+.btn-px.danger { background: #b3261e; border-color: #5c120d; color: #fff; }
+
+.btn-px.danger:hover:not(:disabled) { background: #d6382e; }
+
+.btn-px i { font-style: normal; margin-right: 4px; }

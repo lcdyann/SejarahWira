@@ -1,0 +1,157 @@
+/* ============================================================================
+   assets/game/dialogue/dialogue.css  -  Dialogue box (typewriter text, choices, portraits)
+   USE CASE: UC-03   CLASS DIAGRAM: DialogueLine
+   Markup: dialogue/dialogue.html (if any)   Logic: the .js files in this folder.
+   ============================================================================ */
+
+/* Lapisan dialog menerima klik di mana-mana (klik = teruskan) KECUALI jalur atas 66px:
+   jalur itu dikosongkan supaya butang HUD (Bantuan / Petunjuk / Jeda) tidak tertutup dan tidak menjadi kelabu. */
+.dlg {
+  position: absolute;
+  inset: 66px 0 0 0;
+  pointer-events: auto;
+}
+
+.dlg-panel {
+  position: absolute;
+  left: 150px;
+  right: 40px;
+  bottom: 22px;
+  min-height: 124px;
+  padding: 24px 28px 16px;
+  /* Kotak dialog: latar putih dan tulisan hitam supaya mudah dibaca */
+  background: #ffffff;
+  color: #111111;
+  border-color: #3a2a14;
+  box-shadow:
+    inset 0 0 0 2px #d9d2c3,
+    0 4px 0 rgba(0, 0, 0, 0.55);
+}
+
+.dlg[data-side="right"] .dlg-panel {
+  left: 40px;
+  right: 150px;
+}
+
+.dlg-name {
+  position: absolute;
+  top: -20px;
+  left: 20px;
+  padding: 6px 12px;
+  background: var(--gold);
+  color: var(--ink);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  border: 3px solid var(--wood-dark);
+}
+
+.dlg-text {
+  color: #111111;
+  min-height: 62px;
+  font-size: 23px;
+  line-height: 1.3;
+  white-space: pre-wrap;
+}
+
+.dlg-more {
+  position: absolute;
+  right: 16px;
+  bottom: 6px;
+  color: #8a5a00;   /* anak panah 'seterusnya' dalam warna emas tua supaya nampak pada latar putih */
+  animation: bounce 0.8s infinite;
+}
+
+.dlg-portrait {
+  position: absolute;
+  bottom: 22px;
+  left: 22px;
+  width: 120px;
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.dlg[data-side="right"] .dlg-portrait {
+  left: auto;
+  right: 22px;
+}
+
+.dlg-portrait img {
+  max-width: 120px;
+  max-height: 170px;
+  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.5));
+}
+
+/* Potret dalam kotak dialog mengikut saiz .dlg-portrait (kelas asal .entity-portrait dan .npc-portrait
+   bersaiz tetap 120x150 sehingga menimpa saiz besar di atas) */
+.dlg-portrait .entity-portrait,
+.dlg-portrait .npc-portrait {
+  width: 100%;
+  height: 100%;
+}
+
+.dlg-portrait .entity-portrait img,
+.dlg-portrait .npc-portrait img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.dlg-choices {
+  position: absolute;
+  right: 40px;
+  bottom: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* "kau": the student's own lines, in their own colour on the right */
+.dlg-me { display: none; left: auto; right: 22px; }
+
+.dlg[data-turn="1"] .dlg-me { display: flex; }
+
+.dlg[data-turn="1"] .dlg-panel { left: 150px; right: 170px; }
+
+.dlg[data-turn="1"] .dlg-choices { right: 170px; bottom: 160px; align-items: flex-end; max-width: 62%; }
+
+.dlg[data-turn="1"] .dlg-choices .btn-px {
+  /* Pilihan Giliran Anda: biru muda dan tulisan hitam */
+  background: #bfe6f7; color: #111111; border-color: #2a8fb0; text-align: left;
+}
+
+.dlg[data-turn="1"] .dlg-choices .btn-px:hover { background: #9ad6ef; }
+
+.dlg[data-tone="me"] .dlg-panel {
+  background: #eaf8ff;   /* putih kebiruan: dialog pemain */
+  box-shadow: inset 0 0 0 2px #2a8fb0, 0 4px 0 rgba(0, 0, 0, 0.55);
+}
+
+.dlg[data-tone="me"] .dlg-name { background: #5fd0f0; color: #062330; border-color: #0b2a36; }
+
+.dlg[data-tone="me"] .dlg-text { color: #111111; }
+
+/* tone: how Pendekar Bayang speaks */
+.dlg[data-tone="loud"] .dlg-panel {
+  background: #fff1ee;   /* putih kemerahan: suara kuat */
+  border-color: #7a1209;
+  animation: shake 0.35s 1;
+}
+
+.dlg[data-tone="loud"] .dlg-text {
+  color: #111111;
+  font-weight: bold;
+}
+
+.dlg[data-tone="whisper"] .dlg-text {
+  color: #111111;
+  font-style: italic;
+}
+
+.dlg[data-tone="whisper"] .dlg-panel {
+  background: #f5f1ff;   /* putih keungunan: bisikan */
+  box-shadow:
+    inset 0 0 0 2px #5b3fa8,
+    0 0 24px #8a5cff55,
+    0 4px 0 rgba(0, 0, 0, 0.55);
+}

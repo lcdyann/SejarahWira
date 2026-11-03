@@ -1,0 +1,203 @@
+/**
+ * assets/game/dialogue/dialogueBox.js  -  Dialogue box
+ * MODULE: dialogue  (Dialogue box (typewriter text, choices, portraits))
+ * USE CASE: UC-03   CLASS DIAGRAM: DialogueLine
+ */
+import { el, esc, tpl } from '../core/core.js';
+import { sound } from '../core/sound.js';
+
+/* ========================================================================== */
+/* DialogueBox                                                                */
+/* ========================================================================== */
+/**
+ * Cut a long text into pages for the dialogue box. Pages end at a sentence end when they can;
+ * a sentence longer than one page is cut at a space. A short text stays one page.
+ */
+export const DIALOG_PAGE_CHARS = 150;
+
+
+export function paginateText(text, max = DIALOG_PAGE_CHARS) {
+  const full = String(text ?? '').replace(/\s+/g, ' ').trim();
+  if (full.length <= max) return [String(text ?? '')];
+  const sentences = full.match(/[^.!?\u2026]+[.!?\u2026]+["')\]]*\s*|[^.!?\u2026]+$/g) || [full];
+  const pages = [];
+  let cur = '';
+  const flush = () => { if (cur) pages.push(cur); cur = ''; };
+  sentences.forEach((raw) => {
+    const sentence = raw.trim();
+    if (!sentence) return;
+    if (sentence.length > max) {                         // one very long sentence: cut at spaces
+      flush();
+      let part = '';
+      sentence.split(' ').forEach((word) => {
+        if ((`${part} ${word}`).trim().length > max) { pages.push(part); part = word; } else part = `${part} ${word}`.trim();
+      });
+      cur = part;
+      return;
+    }
+    if ((`${cur} ${sentence}`).trim().length <= max) cur = `${cur} ${sentence}`.trim();
+    else { flush(); cur = sentence; }
+  });
+  flush();
+  return pages.length ? pages : [full];
+}
+
+
+export class DialogueBox {
+  /**
+   * @param {Stage} stage
+   * @param {Input} input
+   */
+  constructor(stage, input) {
+    this.stage = stage;
+    this.input = input;
+    this.speed = 22;                 // ms per character
+    // Susun atur kotak dialog: lihat <template id="tpl-dialogue"> dalam assets/game/dialogue/dialogue.html
+    this.root = tpl('dialogue');
+    ({ portrait: this.portrait, mePortrait: this.mePortrait, panel: this.panel,
+       name: this.name, text: this.text, more: this.more, choices: this.choices } = this.root.refs);
+    stage.dialogLayer.appendChild(this.root);
+    this._current = null;
+  }
+
+  /**
+   * Show one line. Resolves when the player advances (Enter / Space / click).
+   * A long text is cut into pages (at sentence ends where possible) and the pages follow each
+   * other, so a long moral lesson never overflows the box. Resolves after the last page.
+   * @param {{name?:string, text:string, portrait?:HTMLElement|null, side?:'left'|'right', tone?:string}} line
+   */
+  async say(line) {
+    const pages = paginateText(line.text);
+    for (let i = 0; i < pages.length; i += 1) {
+      await this._sayPage({ ...line, text: pages[i] }, pages.length > 1 ? `${i + 1}/${pages.length}` : '');
+    }
+  }
+
+  _sayPage({ name = '', text, portrait = null, side = 'left', tone = '' }, pageNote = '') {
+    return new Promise((resolve) => {
+      this.root.classList.remove('hidden');
+      this.root.dataset.side = side;
+      this.root.dataset.tone = tone;
+      delete this.root.dataset.turn;
+      this.mePortrait.innerHTML = '';
+      this.choices.innerHTML = '';
+      this.name.textContent = name;
+      this.name.style.display = name ? '' : 'none';
+      this.portrait.innerHTML = '';
+      this.portrait.style.display = portrait ? '' : 'none';
+      if (portrait) this.portrait.appendChild(portrait);
+      this.text.textContent = '';
+      this.more.style.visibility = 'hidden';
+      this.more.textContent = pageNote ? `${pageNote} \u25BC` : '\u25BC';
+
+      const full = String(text ?? '');
+      let i = 0;
+      let typing = true;
+      let timer = null;
+      const finishTyping = () => {
+        clearInterval(timer);
+        typing = false;
+        sound.talkStop();                                  // teks sudah habis ditaip: bunyi bercakap berhenti
+        this.text.textContent = full;
+        this.more.style.visibility = 'visible';
+      };
+      if (full) sound.talkStart();                         // dialog dibuka: bunyi bercakap bermula
+      timer = setInterval(() => {
+        if (this._frozen) return;                          // Jeda: taipan berhenti di huruf semasa
+        i += 1;
+        this.text.textContent = full.slice(0, i);
+        if (i >= full.length) finishTyping();
+      }, this.speed);
+      if (!full) finishTyping();
+
+      const advance = () => {
+        if (this._frozen) return;                          // Jeda: dialog tidak boleh dimajukan
+        if (typing) { finishTyping(); return; }
+        cleanup();
+        resolve();
+      };
+      const onClick = () => advance();
+      this.panel.addEventListener('click', onClick);
+      const pop = this.input.push({
+        onKeyDown: (k) => {
+          if (k === 'Enter' || k === ' ') { advance(); return true; }
+          // a scene may ask for Escape while a line is showing (the prologue uses it to skip)
+          if (k === 'Escape' && this.onEscape) return this.onEscape();
+          return false;
+        }
+      });
+      const cleanup = () => {
+        clearInterval(timer);
+        sound.talkStop();
+        this.panel.removeEventListener('click', onClick);
+        pop();
+        this._current = null;
+      };
+      this._current = { skip: () => { cleanup(); resolve(); }, isTyping: () => typing };
+    });
+  }
+
+  /** Show a line then a list of choices (keys 1-5 or click). Resolves with the chosen index. */
+  ask({ name = '', text, portrait = null, side = 'left', options, mePortrait = null }) {
+    return new Promise((resolve) => {
+      this.root.classList.remove('hidden');
+      this.root.dataset.side = side;
+      this.root.dataset.tone = '';
+      this.mePortrait.innerHTML = '';
+      if (mePortrait) { this.root.dataset.turn = '1'; this.mePortrait.appendChild(mePortrait); } else delete this.root.dataset.turn;
+      this.name.textContent = name;
+      this.name.style.display = name ? '' : 'none';
+      this.portrait.innerHTML = '';
+      this.portrait.style.display = portrait ? '' : 'none';
+      if (portrait) this.portrait.appendChild(portrait);
+      this.text.textContent = text;
+      this.more.style.visibility = 'hidden';
+      this.choices.innerHTML = '';
+      sound.talkStop();                                    // menunggu pilihan murid: TIADA bunyi bercakap
+      const choose = (idx) => { pop(); this.choices.innerHTML = ''; resolve(idx); };   // bunyi bercakap bermula hanya bila jawapan dipilih dan say() menaip teksnya
+      options.forEach((label, idx) => {
+        const b = el('button', 'btn-px small', `<span class="key">${idx + 1}</span> ${esc(label)}`);
+        b.addEventListener('click', () => choose(idx));
+        this.choices.appendChild(b);
+      });
+      const pop = this.input.push({
+        onKeyDown: (k) => {
+          const n = Number(k);
+          if (n >= 1 && n <= options.length) { choose(n - 1); return true; }
+          return false;
+        }
+      });
+    });
+  }
+
+  /**
+   * JEDA: bekukan dialog tepat di tempat ia berhenti. Taipan berhenti, bunyi bercakap berhenti,
+   * klik tidak memajukan. thaw() menyambung dari huruf yang sama.
+   */
+  freeze(sembunyi = false) {
+    this._frozen = true;
+    sound.talkStop();
+    // sembunyi: seluruh kotak (termasuk anak panah \u25BC) dilenyapkan; tanda _kitaSorok mengingatkan kotak ini
+    // hanya dimunculkan semula jika KITA yang menyorokkannya (bukan jika dialog memang sudah ditutup)
+    this._kitaSorok = sembunyi && !this.root.classList.contains('hidden');
+    if (this._kitaSorok) this.root.classList.add('hidden');
+  }
+
+  /** Sambung selepas Jeda (bunyi bercakap bermula semula jika teks masih ditaip). */
+  thaw() {
+    this._frozen = false;
+    if (this._kitaSorok) { this.root.classList.remove('hidden'); this._kitaSorok = false; }
+    if (this._current && this._current.isTyping && this._current.isTyping()) sound.talkStart();
+  }
+
+  hide() {
+    this._frozen = false;
+    this._kitaSorok = false;
+    sound.talkStop();
+    if (this._current) this._current.skip();
+    this.root.classList.add('hidden');
+    delete this.root.dataset.turn;
+    this.mePortrait.innerHTML = '';
+    this.choices.innerHTML = '';
+  }
+}

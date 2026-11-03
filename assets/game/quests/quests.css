@@ -1,0 +1,1243 @@
+/* ============================================================================
+   assets/game/quests/quests.css  -  The 5 quest mechanics (timeline, hotspot, choice, help character, decode, matching)
+   USE CASE: UC-03   CLASS DIAGRAM: Quest
+   Markup: quests/quests.html (if any)   Logic: the .js files in this folder.
+   ============================================================================ */
+
+.quest-screen {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  background: #1b120a;
+}
+
+.quest-title {
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  color: var(--gold-light);
+}
+
+.quest-ink {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.drop {
+  width: 14px;
+  height: 20px;
+  /* titisan air: biru jernih dengan kilauan di kiri atas */
+  background: radial-gradient(circle at 35% 30%, #d8f3ff 0 14%, #4fb6ff 40%, #1f78d1 100%);
+  border: 2px solid #8fd3ff;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  box-shadow: 0 0 6px #4fb6ff88;
+}
+
+.drop.spent {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+  opacity: 0.4;
+}
+
+.seal-warn {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #ffb4a8;
+}
+
+.quest-field {
+  position: relative;
+  flex: 1;
+  min-height: 0; /* benarkan medan mengecut supaya kandungan panjang tidak melimpah keluar pentas */
+  margin: 8px 12px 12px;
+}
+
+.quest-screen.shake {
+  animation: shake 0.4s;
+}
+
+.quest-screen.ruined {
+  filter: grayscale(0.8) brightness(0.6);
+  transition: filter 0.8s;
+}
+
+.quest-screen.done {
+  box-shadow: inset 0 0 80px #4ade8066;
+}
+
+/* ---------- timeline quest ---------- */
+.q-timeline {
+  background: radial-gradient(circle at 50% 30%, #4a331b, #1b120a);
+}
+
+.tl-board {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 190px;
+  padding: 16px;
+}
+
+.tl-rope {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 96px;
+  height: 6px;
+  background: repeating-linear-gradient(90deg, #7a5a30 0 10px, #5c3510 10px 20px);
+}
+
+.tl-slots {
+  position: relative;
+  height: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.tl-slots.good .tl-slot { border-color: var(--good); }
+
+.tl-slots.bad .tl-slot  { border-color: var(--bad); }
+
+.tl-slot {
+  position: relative;
+  flex: 1;
+  max-width: 140px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px dashed #8c5d31;
+  background: #0001;
+}
+
+.tl-slot.filled {
+  border-style: solid;
+  background: none;
+}
+
+.tl-no {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  padding: 3px 6px;
+  background: var(--wood-light);
+  color: var(--gold-light);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+}
+
+.tl-tray {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 214px;
+  min-height: 140px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.seal-card {
+  position: relative;
+  width: 132px;
+  min-height: 130px;
+  padding: 18px 8px 8px;
+  background: #f0e2c8;
+  color: var(--ink);
+  border: 3px solid #8c5d31;
+  text-align: center;
+  cursor: grab;
+  box-shadow: 0 4px 0 #000a;
+}
+
+.seal-card .wax {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d94b2b, #8a1a08);
+  box-shadow: 0 2px 0 #0008;
+}
+
+.sc-year {
+  margin-bottom: 6px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #8a3a1c;
+}
+
+.sc-text {
+  font-size: 16px;
+  line-height: 1.15;
+}
+
+.seal-card.sel {
+  outline: 4px solid var(--gold-light);
+  transform: translateY(-6px);
+}
+
+.seal-card.clue::after {
+  content: '\2605';
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  color: var(--gold);
+  font-size: 20px;
+  text-shadow: 0 0 8px #ffd35a;
+}
+
+.tl-slot .seal-card {
+  width: 100%;
+  min-height: 100%;
+}
+
+.tl-actions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  text-align: center;
+}
+
+/* ---------- hotspot quest ---------- */
+/* Cari Bukti: bar atas (tajuk + arahan + titisan) berada DALAM aliran, di bawah butang HUD,
+   dan gambar mengambil ruang yang tinggal. Tiada apa-apa menindih gambar. */
+.q-hotspot .quest-field {
+  margin: 6px 12px 10px;
+}
+
+.q-hotspot .quest-top {
+  gap: 14px;
+  margin-top: 64px;   /* turun sedikit supaya tidak bertindih dengan papan buku di HUD */
+}
+
+/* Cari Bukti: lajur = kotak arahan (atas) + pentas gambar 16:9 (bawah).
+   Tiada apa-apa menindih gambar; pentas mengecut mengikut ruang yang ada. */
+.hs-root {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* kotak arahan: dipindahkan oleh JS ke dalam bar atas (antara tajuk dan titisan) */
+.hs-note {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 4px 10px;
+  font-size: 13px;
+  line-height: 1.3;
+  color: #fff3d6;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid #c9b88e;
+}
+
+.hs-note b { color: var(--gold-light); }
+
+/* ruang gambar: container query supaya pentas 16:9 sentiasa muat dalam ruang yang tinggal */
+.hs-area {
+  flex: 1 1 0;
+  min-height: 0;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
+.hs-stage {
+  position: relative;
+  width: min(100cqw, 177.78cqh);
+  aspect-ratio: 16 / 9;
+}
+
+.hs-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #222 center / 100% 100% no-repeat;
+  cursor: zoom-in;
+}
+
+/* panel bukti di kanan: boleh ditutup supaya tiada bukti terlindung */
+.hs-side {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 210px;
+  max-height: calc(100% - 24px);
+  padding: 10px 12px 12px;
+  z-index: 3;
+  transition: transform 0.25s ease;
+}
+
+.hs-side.closed {
+  transform: translateX(calc(100% + 4px));
+}
+
+.hs-toggle {
+  position: absolute;
+  left: -34px;
+  top: 0;
+  width: 30px;
+  height: 36px;
+  background: rgba(26, 15, 7, 0.96);
+  color: var(--gold-light);
+  border: 3px solid var(--wood-dark);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.hs-side-title {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-light);
+  margin-bottom: 8px;
+}
+
+.hs-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: bukti;
+}
+
+.hs-slot {
+  counter-increment: bukti;
+  padding: 3px 8px;
+  background: #000a;
+  border: 2px solid #666;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.hs-slot::before {
+  content: counter(bukti) ". ";
+  color: var(--gold-light);
+}
+
+.hs-slot.found {
+  border-color: var(--good);
+  color: #bff7d2;
+}
+
+/* bukti yang baru dijumpai: slot berkelip hijau sebentar */
+.hs-slot.just-found {
+  animation: hs-slot-glow 1.6s ease-out;
+}
+
+@keyframes hs-slot-glow {
+  0%, 60% { box-shadow: 0 0 14px 3px var(--good); background: #14532dcc; }
+  100% { box-shadow: none; }
+}
+
+/* semua bukti dijumpai: seluruh panel bercahaya (±4.5 saat) sebelum cerita diteruskan */
+.hs-side.all-found {
+  animation: hs-panel-glow 1.1s ease-in-out infinite alternate;
+  border-color: var(--good);
+}
+
+.hs-side.all-found .hs-slot.found {
+  background: #14532dcc;
+  color: #fff;
+}
+
+@keyframes hs-panel-glow {
+  from { box-shadow: 0 0 8px 2px var(--good); }
+  to   { box-shadow: 0 0 26px 8px var(--good); }
+}
+
+.hs-ripple {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  animation: ripple 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+.hs-ripple.good {
+  border-color: var(--good);
+}
+
+.hs-found {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin: -22px;
+  border: 4px solid var(--good);
+  border-radius: 50%;
+  box-shadow: 0 0 16px var(--good);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  cursor: help;
+}
+
+.hs-found b {
+  font-family: var(--font-pixel);
+  font-size: 12px;
+  color: #bff7d2;
+}
+
+/* nama bukti hanya muncul bila tetikus di atas penanda */
+.hs-found span {
+  display: none;
+  position: absolute;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 8px;
+  background: #000d;
+  font-size: 15px;
+  color: #bff7d2;
+  white-space: nowrap;
+  z-index: 4;
+}
+
+.hs-found:hover span {
+  display: block;
+}
+
+.hs-radar {
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  margin: -95px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd35a40, transparent 70%);
+  animation: pulse 1.4s infinite;
+  pointer-events: none;
+}
+
+/* ---------- choice quest ---------- */
+.q-choice {
+  background: #170f1f;
+}
+
+.q-choice .quest-field {
+  display: flex;
+  gap: 14px;
+}
+
+.cq-visual {
+  flex: 1.5;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+  background: #0008 center / cover no-repeat;
+  border: 4px solid var(--wood-dark);
+}
+
+.cq-prompt {
+  width: 100%;
+  padding: 16px 20px;
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+.cq-menu {
+  flex: 1;
+  min-height: 0; /* menu tidak melebihi pentas; senarai di dalamnya yang tatal */
+  align-self: stretch;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cq-menu-title {
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--gold);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: var(--gold-light);
+}
+
+.cq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto; /* kad panjang atau banyak: senarai boleh ditatal */
+}
+
+/* kad jawapan tidak dipenyek apabila teks panjang */
+.cq-list > * {
+  flex: none;
+}
+
+/* answer button (used by choice quests and by the battle question panel) */
+.menu-opt {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: var(--font-text);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.menu-opt .opt-text {
+  flex: 1;
+}
+
+.menu-opt.right {
+  background: linear-gradient(180deg, #1c8a4a, #0d5a2c) !important;
+  border-color: #8cf0b0;
+}
+
+.menu-opt.wrong {
+  background: linear-gradient(180deg, #b91c1c, #7a0f0f) !important;
+  border-color: #f87171;
+}
+
+.menu-opt.struck {
+  opacity: 0.3;
+  text-decoration: line-through;
+}
+
+.menu-opt.right:disabled,
+.menu-opt.wrong:disabled {
+  opacity: 1;
+}
+
+.menu-opt:disabled:not(.right):not(.wrong):not(.struck) {
+  opacity: 0.55;
+}
+
+/* ---------- bantu NPC ---------- */
+/* tema biru kehijauan + kad benda, supaya berbeza daripada Giliran Anda (emas) */
+.q-help {
+  background: #0c1f2a;
+}
+
+.help-visual {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+/* gelembung fikiran NPC */
+.help-bubble {
+  width: 90%;
+  padding: 18px 22px;
+  background: #f1fbff;
+  color: #0b2b38;
+  border: 4px solid #2aa5c9;
+  border-radius: 28px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+}
+
+.help-bubble-title {
+  margin-bottom: 8px;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: #1b7a96;
+}
+
+.help-bubble-text {
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+/* ekor gelembung menghala ke NPC */
+.help-bubble-tail {
+  width: 0;
+  height: 0;
+  margin-top: -2px;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 22px solid #2aa5c9;
+}
+
+.help-give {
+  margin-top: 14px;
+  padding: 6px 12px;
+  background: #0008;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  line-height: 1.5;
+  color: #8fe3ff;
+}
+
+.help-menu {
+  background: #12394a;
+  border-color: #07202b;
+  box-shadow: inset 0 0 0 2px #2aa5c9, 0 4px 0 rgba(0, 0, 0, 0.55);
+}
+
+.help-menu .cq-menu-title {
+  color: #8fe3ff;
+  border-bottom-color: #2aa5c9;
+}
+
+/* kad benda: seperti tiket kertas */
+.help-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  background: #f4ead2;
+  color: #2b1402;
+  border: 3px dashed #8a6a3a;
+  border-radius: 6px;
+  font-family: var(--font-text);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: left;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.45);
+  transition: transform 0.12s;
+}
+
+.help-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: #2aa5c9;
+}
+
+.help-card .key {
+  flex: none;
+  padding: 4px 5px;
+  background: #1b7a96;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: #fff;
+}
+
+.help-card .help-icon {
+  flex: none;
+  min-width: 40px;
+  font-size: 26px;
+  text-align: center;
+}
+
+.help-card .opt-text {
+  flex: 1;
+}
+
+/* kaset lagu dilukis dengan CSS */
+.kaset {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 30px;
+  background: #2b2b2b;
+  border: 2px solid #111;
+  border-radius: 3px;
+}
+
+.kaset::before {                      /* pelekat label putih */
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 3px;
+  height: 11px;
+  background: #f4ead2;
+}
+
+.kaset i {                            /* dua gelendong pita */
+  position: absolute;
+  bottom: 4px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #555;
+}
+
+.kaset i:first-child { left: 8px; }
+
+.kaset i:last-child  { right: 8px; }
+
+/* kad dihulurkan kepada NPC */
+.help-card.diberi {
+  animation: beri-benda 0.4s ease-out;
+}
+
+@keyframes beri-benda {
+  from { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(-60px, -40px) scale(1.08); }
+  to   { transform: translate(0, 0) scale(1); }
+}
+
+.help-card.right {
+  border: 3px solid #1c8a4a;
+  background: #d9f5df;
+}
+
+.help-card.wrong {
+  border: 3px solid #b91c1c;
+  background: #f6d0d0;
+}
+
+.help-card.struck {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.help-card:disabled:not(.right):not(.wrong):not(.struck) {
+  opacity: 0.6;
+}
+
+/* ---------- nyahkod petunjuk ---------- */
+/* kertas lama bertulisan kod yang dinyahkod, jawapan = nota lekat yang ditempel */
+.decode-visual {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-image: radial-gradient(circle, #4a2e18, #0e0804);
+}
+
+.clue-paper {
+  position: relative;
+  width: 94%;
+  max-height: 100%;
+  overflow: auto;
+  padding: 30px 30px 22px;
+  transform: rotate(-0.8deg);
+}
+
+/* cop merah di penjuru kertas */
+.clue-stamp {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  padding: 5px 9px;
+  border: 3px solid var(--crimson);
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--crimson);
+  transform: rotate(6deg);
+  opacity: 0.85;
+}
+
+/* teks petunjuk dalam tulisan tangan */
+.clue-text {
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #3a1d08;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* perkataan yang masih berkod: simbol pudar */
+.clue-text .w.kod {
+  font-family: monospace;
+  font-size: 24px;
+  letter-spacing: 2px;
+  color: #8a6a3a;
+}
+
+/* perkataan yang baru dinyahkod: menyala sekejap */
+.clue-text .w.kini {
+  background: #ffe08a;
+  box-shadow: 0 0 10px #ffd04a;
+}
+
+.clue-text .w.terbuka {
+  animation: nyahkod-masuk 0.35s ease-out;
+}
+
+@keyframes nyahkod-masuk {
+  from { transform: scale(1.3); color: var(--crimson); }
+  to   { transform: scale(1);   color: inherit; }
+}
+
+/* baris "menunjuk kepada" + ruang tempel jawapan */
+.clue-point {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 3px dashed #8a6a3a;
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--crimson);
+}
+
+.clue-slot {
+  min-width: 70px;
+  padding: 6px 14px;
+  border: 3px dashed var(--crimson);
+  text-align: center;
+  transform: rotate(-1deg);
+}
+
+/* selepas nota ditempel */
+.clue-slot.filled {
+  border-style: solid;
+  border-color: transparent;
+  color: var(--ink);
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.4);
+  animation: nota-tempel 0.3s ease-out;
+}
+
+@keyframes nota-tempel {
+  from { transform: translateY(-30px) rotate(8deg) scale(1.3); opacity: 0.2; }
+  to   { transform: translateY(0) rotate(-1deg) scale(1);      opacity: 1; }
+}
+
+.clue-hint {
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #c9a063;
+  opacity: 0.8;
+}
+
+/* papan gabus tempat nota lekat */
+.cq-menu.cork {
+  background:
+    radial-gradient(circle at 20% 30%, #c08a52 0 2px, transparent 3px) 0 0 / 22px 22px,
+    radial-gradient(circle at 70% 70%, #8a5a2c 0 2px, transparent 3px) 0 0 / 18px 18px,
+    #a87440;
+  color: var(--ink);
+}
+
+.cork .cq-menu-title {
+  color: #fff;
+  border-bottom-color: #5c3510;
+}
+
+/* nota lekat: lima warna, sedikit senget */
+.note-opt {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 14px 14px 14px 12px;
+  border: none;
+  font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ink);
+  text-align: left;
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.4);
+  transform: rotate(var(--r, 0deg));
+  transition: transform 0.12s;
+}
+
+.note-opt:nth-child(odd)  { --r: -1.2deg; }
+
+.note-opt:nth-child(even) { --r: 1deg; }
+
+.note-0 { background: #ffb6d2; }
+
+/* merah jambu */
+.note-1 { background: #9fd3ff; }
+
+/* biru */
+.note-2 { background: #d0b4ff; }
+
+/* ungu */
+.note-3 { background: #b6f0a8; }
+
+/* hijau */
+.note-4 { background: #8eeaf0; }
+
+/* sian */
+.note-opt:hover:not(:disabled) {
+  transform: rotate(0deg) translateY(-2px);
+}
+
+.note-opt .key {
+  flex: none;
+  padding: 4px 5px;
+  background: var(--ink);
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  color: #fff;
+}
+
+.note-opt .opt-text {
+  flex: 1;
+}
+
+/* pin merah di atas nota */
+.note-opt::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d62828;
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.note-opt.right {
+  outline: 4px solid #1c8a4a;
+}
+
+.note-opt.wrong {
+  outline: 4px solid #b91c1c;
+  filter: saturate(0.5);
+}
+
+.note-opt.struck {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+
+.note-opt:disabled:not(.right):not(.wrong):not(.struck) {
+  opacity: 0.6;
+}
+
+/* ---------- matching quest ---------- */
+.q-matching {
+  background: radial-gradient(circle at 50% 40%, #3a2a1a, #140c06);
+}
+
+.mt-table {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: #2b4a2b;
+  box-shadow: inset 0 0 40px #000a;
+}
+
+.mt-help {
+  flex: none;
+  margin: 0 0 8px;
+  font-family: var(--font-text);
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: center;
+  color: #f4ead2;
+}
+
+.mt-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-content: center;
+}
+
+.mt-card {
+  min-height: 100px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-family: var(--font-text);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.15;
+  transition: transform 0.15s;
+}
+
+.mt-card:hover:not(.ok) {
+  transform: translateY(-4px);
+}
+
+.mt-card.sel {
+  outline: 4px solid var(--gold-light);
+}
+
+.mt-card.ok {
+  background: #9be3b0;
+  outline: 3px solid #1c8a4a;
+  opacity: 0.75;
+  cursor: default;
+}
+
+.mt-card.bad {
+  background: #f3a29a;
+  animation: shake 0.4s;
+}
+
+.mt-card.glow {
+  outline: 3px solid #ffd35a;
+  animation: glow-pulse 1s infinite;
+}
+
+/* ---------- timeline quest: chain of cause and effect ---------- */
+.tl-slot.next {
+  border-color: var(--gold-light);
+  background: #ffd35a22;
+  animation: tl-glow 1.2s ease-in-out infinite;
+  cursor: pointer;
+}
+
+@keyframes tl-glow { 0%, 100% { box-shadow: 0 0 0 0 #ffd35a00; } 50% { box-shadow: 0 0 16px 2px #ffd35a99; } }
+
+.tl-slot.bad { border-color: var(--bad); animation: shake 0.4s 1; }
+
+.seal-card.locked { cursor: default; border-color: var(--gold); box-shadow: 0 4px 0 #000a, 0 0 10px #ffd35a66; }
+
+.sc-year.hidden-date { color: #8c5d31; opacity: 0.7; letter-spacing: 2px; }
+
+.sc-year.stamp-in { animation: stamp-in 0.55s cubic-bezier(.2, 1.6, .4, 1) 1; }
+
+@keyframes stamp-in { 0% { transform: scale(2.6) rotate(-8deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+
+.tl-link {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 372px;
+  min-height: 70px;
+  padding: 12px 16px;
+  font-size: 20px;
+  line-height: 1.25;
+  color: var(--gold-light);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tl-link.empty { visibility: hidden; }
+
+.tl-link-text { padding-right: 64px; }
+
+.tl-link.broken { color: #ffb4a8; border-color: #7a1209; }
+
+.tl-peek.hidden { visibility: hidden; }
+
+.q-timeline.chain-done .tl-slots { filter: drop-shadow(0 0 12px #ffd35a); }
+
+/* content manager: quest preview (teacher/quest_preview.html) */
+.qpv-result {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  width: 560px;
+  padding: 22px 26px;
+  text-align: center;
+  color: var(--gold-light);
+  background: #1b120af2;
+}
+
+.qpv-result b { font-family: var(--font-pixel); font-size: 14px; }
+
+.qpv-result p { margin: 12px 0 16px; font-size: 22px; }
+
+.q-timeline .tl-link { top: 366px; min-height: 60px; font-size: 19px; }
+
+/* ---- kotak petunjuk garis masa: boleh disembunyikan (seperti panel BUKTI) ---- */
+.tl-link-toggle {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  padding: 4px 8px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: var(--gold-light);
+  background: rgba(26, 15, 7, 0.96);
+  border: 2px solid var(--wood-dark);
+  cursor: pointer;
+}
+
+.tl-link-toggle:hover { filter: brightness(1.25); }
+
+/* Ditutup: kotak mengecil menjadi satu butang kecil di penjuru kanan bawah, jauh dari kad */
+.q-timeline .tl-link.closed {
+  top: 388px;
+  left: auto;
+  right: 12px;
+  min-height: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.tl-link.closed .tl-link-text { display: none; }
+
+.tl-link.closed .tl-link-toggle {
+  position: static;
+  padding: 7px 10px;
+  font-size: 9px;
+}
+
+/* ada petunjuk baharu semasa ditutup: butang berdenyut */
+.tl-link.closed.has-new .tl-link-toggle {
+  border-color: var(--gold-light);
+  animation: tl-new 1s ease-in-out infinite alternate;
+}
+
+@keyframes tl-new { from { box-shadow: 0 0 0 0 #ffd35a00; } to { box-shadow: 0 0 12px 3px #ffd35acc; } }
+
+/* ---------- tahun pada petak garis masa (selepas "Tunjuk tarikh pada petak") ---------- */
+.tl-slot-year {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: var(--wood-light);
+  border: 2px solid var(--gold-light);
+  color: var(--gold-light);
+  font-family: var(--font-pixel);
+  font-size: 13px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  animation: tl-year-in 0.5s ease-out 1;
+}
+
+@keyframes tl-year-in {
+  0% { opacity: 0; bottom: 0; }
+  100% { opacity: 1; bottom: 12px; }
+}
+
+.q-timeline {
+  background:
+    linear-gradient(rgba(18, 8, 2, .38), rgba(18, 8, 2, .38)),
+    url('../../gameAsset/hub/hub.jpg') 50% 91% / auto 300% no-repeat,
+    #1b120a;
+}
+
+.q-timeline .tl-board { background: none; border: none; box-shadow: none; }
+
+.q-timeline .tl-rope { display: none; }
+
+.q-timeline .tl-slot { background: rgba(255, 255, 255, .13); border: 3px dashed #f3e6c4aa; }
+
+.q-timeline .tl-slot.next { border-color: var(--gold-light); background: rgba(255, 216, 107, .2); }
+
+.q-timeline .seal-card {
+  background: url('../../gameAsset/hub/halaman.png') center / cover, #f0e2c8;
+  border: 1px solid #8c5d31; box-shadow: 1px 4px 8px #000a;
+}
+
+/* kertas bertaburan: setiap kad sedikit senget, berbeza-beza */
+.q-timeline .tl-tray .seal-card:nth-child(4n+1) { transform: rotate(-3deg); }
+
+.q-timeline .tl-tray .seal-card:nth-child(4n+2) { transform: rotate(2deg); }
+
+.q-timeline .tl-tray .seal-card:nth-child(4n+3) { transform: rotate(-1.5deg); }
+
+.q-timeline .tl-tray .seal-card:nth-child(4n)   { transform: rotate(3deg); }
+
+.q-timeline .tl-tray .seal-card.sel { transform: translateY(-8px) rotate(0deg); }
+
+.q-hotspot .quest-top { margin-top: 58px; }
+
+/* Nyahkod / pilihan: tiada skrol dalam kertas dan papan gabus */
+.clue-paper { overflow-x: hidden; }
+
+.clue-paper.muat-sederhana .clue-text { font-size: 26px; }
+
+.clue-paper.muat-sederhana .clue-point { font-size: 24px; margin-top: 12px; padding-top: 10px; }
+
+.clue-paper.muat-kecil .clue-text { font-size: 21px; line-height: 1.25; }
+
+.clue-paper.muat-kecil .clue-point { font-size: 22px; margin-top: 10px; padding-top: 8px; }
+
+.clue-paper.muat-kecil, .clue-paper.muat-sederhana { padding: 22px 24px 16px; }
+
+.cq-list { overflow-x: hidden; padding: 4px 6px; }
+
+.q-timeline .quest-field { display: flex; flex-direction: column; gap: 8px; }
+
+.q-timeline .tl-board { position: relative; top: auto; left: auto; right: auto; height: 132px; flex: none; padding: 14px 0 0; }
+
+.q-timeline .tl-slots { gap: 6px; container-type: inline-size; }
+
+.q-timeline .tl-slot { flex: 1 1 0; min-width: 0; max-width: 150px; height: 118px; }
+
+.q-timeline .tl-slot .seal-card { overflow: hidden; }
+
+/* dek kad */
+.tl-deck { flex: 1; min-height: 0; display: flex; align-items: stretch; gap: 6px; }
+
+.q-timeline .tl-tray {
+  position: static; flex: 1; min-width: 0; min-height: 0;
+  display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 14px;
+  padding: 16px 10px 8px;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: none; scroll-behavior: smooth;
+}
+
+.q-timeline .tl-tray::-webkit-scrollbar { display: none; }
+
+.q-timeline .tl-tray .seal-card { flex: 0 0 150px; width: 150px; min-height: 0; display: flex; flex-direction: column; }
+
+.q-timeline .tl-tray .sc-text { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; font-size: 16px; }
+
+.tl-arrow {
+  flex: none; width: 34px; align-self: center; height: 64px; cursor: pointer;
+  font-size: 16px; color: var(--gold-light); background: rgba(26, 15, 7, .9); border: 3px solid var(--wood-dark);
+}
+
+.tl-arrow:hover:not(:disabled) { border-color: var(--gold-light); filter: brightness(1.2); }
+
+.tl-arrow:disabled { opacity: .3; cursor: default; }
+
+/* teks panjang: huruf mengecil (kad dek dan kad dalam petak) */
+.seal-card.teks-sederhana .sc-text { font-size: 14px; line-height: 1.12; }
+
+.seal-card.teks-kecil .sc-text { font-size: 12px; line-height: 1.1; }
+
+.q-timeline .tl-tray .seal-card.teks-sederhana .sc-text { font-size: 14px; }
+
+.q-timeline .tl-tray .seal-card.teks-kecil .sc-text { font-size: 12px; }
+
+.q-timeline .tl-slot .sc-text { font-size: 13px; }
+
+.tl-slots.padat .tl-slot .sc-text { font-size: 11px; }
+
+.tl-slots.lebih-padat .tl-slot .sc-text { font-size: 9px; }
+
+.q-timeline .tl-slot .seal-card { padding: 14px 4px 4px; }
+
+/* kotak petunjuk: dalam aliran lajur (tidak lagi menutup kad); ditutup = butang kecil di kanan */
+.q-timeline .tl-link, .q-timeline .tl-link.closed { position: relative; top: auto; left: auto; right: auto; flex: none; }
+
+.q-timeline .tl-link { min-height: 52px; max-height: 84px; font-size: 17px; padding: 8px 16px; overflow: hidden; }
+
+.q-timeline .tl-link.closed { min-height: 0; align-self: flex-end; }
+
+.q-timeline .tl-link.empty { display: none; }
+
+/* tarikh tiga baris (DD / bulan / TTTT) dalam kad dan petak */
+.tkh { display: block; line-height: 1.35; }
+
+.sc-year { font-size: 9px; }
+
+.tl-slot .sc-year { margin-bottom: 3px; font-size: 9px; }
+
+.tl-slots.padat .tl-slot .sc-year { font-size: 8px; }
+
+.tl-slots.lebih-padat .tl-slot .sc-year { font-size: 7px; }
+
+.tl-slot-year { padding: 5px 8px; font-size: 10px; line-height: 1.3; white-space: normal; text-align: center; letter-spacing: 0; }
+
+.tl-slots.padat .tl-slot-year { font-size: 9px; padding: 4px 6px; }
+
+.tl-slots.lebih-padat .tl-slot-year { font-size: 8px; padding: 3px 4px; }

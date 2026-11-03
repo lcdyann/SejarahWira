@@ -1,0 +1,158 @@
+/* ============================================================================
+   assets/game/support/support.css  -  Adaptive learning support (? button, tutorials)
+   USE CASE: UC-04   CLASS DIAGRAM: LearningSupport
+   Markup: support/support.html (if any)   Logic: the .js files in this folder.
+   ============================================================================ */
+
+/* Bantuan: SATU skrin. Modal dilebarkan (bukan skrol): kiri teks, kanan demo bergerak. */
+.modal-card:has(.bt-wrap) { width: min(860px, 94vw); max-height: none; overflow: visible; }
+
+.bt-wrap { display: flex; gap: 18px; align-items: stretch; color: #2b1a0a; }
+
+.bt-text { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+
+.bt-block h4 { margin: 0 0 4px; font-family: var(--font-pixel); font-size: 10px; color: #8a5a00; }
+
+.bt-big { margin: 0; font-size: 18px; line-height: 1.4; }
+
+.bt-wrap.long .bt-big { font-size: 15px; }
+
+/* teks panjang: kecilkan sedikit, jangan potong */
+.bt-last { margin: 6px 0 0; padding: 6px 10px; font-size: 15px; line-height: 1.35; background: #fff; border: 2px solid #c9b88e; }
+
+.bt-demo { flex: 0 0 380px; }
+
+.bt-demo.hot { outline: 4px solid var(--gold-light); animation: bt-hot 1s ease-in-out infinite; }
+
+@keyframes bt-hot { 50% { outline-color: transparent; } }
+
+@media (max-width: 760px) { .bt-wrap { flex-direction: column; } .bt-demo { flex-basis: auto; } }
+
+/* ---- demo bergerak ---- */
+.bt-demo { display: flex; justify-content: center; }
+
+.tt-demo { width: 100%; }
+
+.tt-title { font-family: var(--font-pixel); font-size: 11px; color: #8a5a00; margin-bottom: 8px; }
+
+.bt-demo .tt-title { display: none; }
+
+.tt-stage {
+  position: relative; height: 170px; overflow: hidden; padding: 10px;
+  background: #1b120a; border: 3px solid #6b4a22; color: #fff3d6; font-size: 13px;
+}
+
+.tt-row { display: flex; gap: 8px; margin-bottom: 14px; }
+
+.tt-slot, .tt-card, .tt-opt {
+  flex: 1; padding: 8px 6px; text-align: center; border: 2px solid #c9b88e; background: #3b2a16;
+}
+
+.tt-slot { border-style: dashed; background: transparent; }
+
+.tt-card, .tt-opt { background: #f3e6c4; color: #111; }
+
+.tt-ask { margin-bottom: 12px; line-height: 1.35; }
+
+.tt-opts { display: flex; flex-direction: column; gap: 6px; width: 60%; }
+
+.tt-steps { margin: 10px 0 0; padding-left: 22px; font-size: 15px; line-height: 1.45; }
+
+.tt-steps li { margin-bottom: 3px; }
+
+/* tangan: kedudukan mutlak, digerakkan oleh @keyframes (loop 6s) */
+.tt-hand { position: absolute; left: 0; top: 0; font-size: 30px; z-index: 5; pointer-events: none; }
+
+/* 1. Garis masa: tangan -> kad 3 -> petak 1 (kad 1 tak perlu, cukup tunjuk mekanik) */
+.tt-t1 .tt-hand { animation: tt1-hand 6s infinite; }
+
+@keyframes tt1-hand {
+  0%   { transform: translate(250px, 120px); }
+  20%  { transform: translate(250px, 82px); }
+  30%  { transform: translate(250px, 82px) scale(.85); }
+  60%  { transform: translate(40px, 28px) scale(.85); }
+  70%  { transform: translate(40px, 28px) scale(1); }
+  100% { transform: translate(250px, 120px); }
+}
+
+.tt-t1 .c3 { animation: tt1-card 6s infinite; }
+
+@keyframes tt1-card { 0%,28% { background: #f3e6c4; } 32%,100% { background: #ffd86b; } }
+
+.tt-t1 .s1 { animation: tt1-slot 6s infinite; }
+
+@keyframes tt1-slot { 0%,60% { background: transparent; } 70%,100% { background: #4caf50; } }
+
+/* 2. Hotspot: tangan -> sasaran -> riak -> senarai berubah */
+.tt-pic {
+  position: absolute; left: 10px; top: 10px; width: 62%; height: calc(100% - 20px);
+  background: linear-gradient(#7fb6d6, #c9b27a); border: 2px solid #c9b88e;
+}
+
+.tt-target { position: absolute; left: 62%; top: 55%; width: 16px; height: 16px; background: #6b3a1a; border-radius: 3px; }
+
+.tt-ripple {
+  position: absolute; left: calc(62% - 8px); top: calc(55% - 8px); width: 32px; height: 32px;
+  border: 3px solid #ffd86b; border-radius: 50%; opacity: 0; animation: tt2-ripple 6s infinite;
+}
+
+@keyframes tt2-ripple { 0%,38% { opacity: 0; transform: scale(.3); } 45% { opacity: 1; } 70%,100% { opacity: 0; transform: scale(1.6); } }
+
+.tt-list { position: absolute; right: 10px; top: 10px; width: 30%; padding: 8px; background: #2a1c0e; border: 2px solid #c9b88e; }
+
+.tt-list b { display: block; font-size: 11px; margin-bottom: 6px; color: #ffd86b; }
+
+.tt-list i { font-style: normal; animation: tt2-list 6s infinite; display: block; padding: 3px; }
+
+@keyframes tt2-list { 0%,45% { background: transparent; } 55%,100% { background: #4caf50; color: #111; } }
+
+.tt-t2 .tt-hand { animation: tt2-hand 6s infinite; }
+
+@keyframes tt2-hand {
+  0%   { transform: translate(40px, 120px); }
+  30%  { transform: translate(150px, 90px); }
+  38%  { transform: translate(150px, 90px) scale(.8); }
+  46%  { transform: translate(150px, 90px) scale(1); }
+  100% { transform: translate(40px, 120px); }
+}
+
+/* 3 & 5. Pilihan: tangan -> pilihan tengah (nyahkod: pilihan betul = tengah) */
+.tt-t3 .tt-hand, .tt-t5 .tt-hand { animation: tt3-hand 6s infinite; }
+
+@keyframes tt3-hand {
+  0%   { transform: translate(260px, 130px); }
+  35%  { transform: translate(120px, 108px); }
+  45%  { transform: translate(120px, 108px) scale(.8); }
+  55%  { transform: translate(120px, 108px) scale(1); }
+  100% { transform: translate(260px, 130px); }
+}
+
+.tt-t3 .o2, .tt-t5 .o2 { animation: tt3-opt 6s infinite; }
+
+@keyframes tt3-opt { 0%,44% { background: #f3e6c4; } 50%,100% { background: #ffd86b; } }
+
+/* 4. Padanan: klik kad 1 -> klik pasangannya -> hijau */
+.tt-t4 .tt-hand { animation: tt4-hand 7s infinite; }
+
+@keyframes tt4-hand {
+  0%   { transform: translate(250px, 130px); }
+  15%  { transform: translate(60px, 24px); }
+  22%  { transform: translate(60px, 24px) scale(.8); }
+  28%  { transform: translate(60px, 24px) scale(1); }
+  55%  { transform: translate(230px, 24px); }
+  62%  { transform: translate(230px, 24px) scale(.8); }
+  68%  { transform: translate(230px, 24px) scale(1); }
+  100% { transform: translate(250px, 130px); }
+}
+
+.tt-t4 .m1 { animation: tt4-a 7s infinite; }
+
+.tt-t4 .m2 { animation: tt4-b 7s infinite; }
+
+@keyframes tt4-a { 0%,20% { background: #f3e6c4; } 25%,60% { background: #ffd86b; } 66%,100% { background: #7ed67f; } }
+
+@keyframes tt4-b { 0%,64% { background: #f3e6c4; } 68%,100% { background: #7ed67f; } }
+
+/* nota senget tidak lagi mencetuskan palang skrol mendatar */
+/* kotak "Baru dikatakan" kosong disembunyikan (cth. babak yang dialognya selepas misi) */
+.bt-last:empty { display: none; }

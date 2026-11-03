@@ -261,7 +261,7 @@ class StoryBoard {
   /** Tetingkap: tiga ayat yang disebut oleh watak peranan */
   async editRoleLines() {
     if (!this.role.npcID) { this.app.toast('Pilih watak peranan dahulu.', 'error'); return; }
-    if (!this.entityMod) this.entityMod = await import('./game/entityLines.js');
+    if (!this.entityMod) this.entityMod = await import('../game/npc/entityLines.js');
     const mod = this.entityMod;
     const state = { intro: this.role.introLine || '', badge: this.role.badgeLine || '', moral: this.role.moralLine || '' };
     const initial = JSON.stringify(state);

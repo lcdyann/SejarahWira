@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat rest</title></head>
+<body>
+<!--
+  ============================================================================
+  rest/rest.html  -  game boxes (templates) of the "rest" module
+  Templates here: tpl-rehat
+  How it works: core/core.js tpl('name') copies a <template id="tpl-name">, fills
+  [data-text] and exposes [data-ref] as element.refs.name. The colours / sizes
+  live in the css file next to this one (rest.css).
+  ============================================================================
+-->
+
+  <!-- 5d. LOMPONG MASA (tempat rehat) ----------------------------------------
+       Ruang kosong di antara zaman. Dibuka di sempadan tahap, bila murid menyambung era,
+       DAN bila murid menekan Jeda (Esc). Semuanya muat dalam satu skrin (tanpa skrol):
+         atas   : tajuk + pedagang (Pendekar Bayang menyamar) bercakap
+         tengah : CAROUSEL tahap. Setiap tahap = jubin babak (latar babak itu).
+                  hijau = sudah selesai, bercahaya = seterusnya, kelabu = belum
+         bawah  : tiga mini game (butang besar) + Teruskan cerita
+       Mini game dibuka di tempat carousel (bukan di bawahnya) supaya tidak perlu skrol.
+       JavaScript: rehat.js (RehatPage.show) -->
+<template id="tpl-rehat">
+    <div class="rh-root">
+      <div class="rh-drift" data-ref="drift"></div>               <!-- helaian & bintang melayang di kekosongan -->
+      <div class="rh-card px parchment">
+
+        <header class="rh-head">
+          <div class="rh-judul">                                    <!-- kiri: kicker kecil di atas, tajuk besar di bawah -->
+            <span class="rh-kicker" data-text="kicker"></span>
+            <h2 class="rh-title" data-text="title"></h2>
+          </div>
+          <button type="button" class="btn-px small danger rh-leave hidden" data-ref="btnLeave"><i class="fas fa-right-from-bracket"></i> Keluar ke peta</button>   <!-- kanan: merah + ikon Font Awesome, hanya semasa Jeda -->
+        </header>
+
+        <div class="rh-host">                                      <!-- pedagang + ucapannya -->
+          <div class="rh-merchant" data-ref="merchant"></div>
+          <p class="rh-say" data-ref="say"></p>
+        </div>
+
+        <!-- CAROUSEL TAHAP -->
+        <section class="rh-main" data-ref="main">
+          <div class="rh-carousel">
+            <button type="button" class="rh-arrow" data-ref="prev" title="Tahap sebelumnya">&#9664;</button>
+            <div class="rh-viewport">
+              <div class="rh-track" data-ref="track"></div>      <!-- satu .rh-panel bagi setiap tahap -->
+            </div>
+            <button type="button" class="rh-arrow" data-ref="next" title="Tahap seterusnya">&#9654;</button>
+          </div>
+          <div class="rh-dots" data-ref="dots"></div>
+        </section>
+
+        <!-- MINI GAME (dibuka di tempat carousel) -->
+        <section class="rh-arena hidden" data-ref="arena">
+          <div class="rh-arena-bar">
+            <span data-ref="gameName"></span>
+            <button type="button" class="btn-px small" data-ref="btnBack">Selesai, kembali</button>
+          </div>
+          <div class="rh-play" data-ref="play"></div>
+        </section>
+
+        <!-- BUTANG BAWAH: tiga mini game + teruskan -->
+        <footer class="rh-actions" data-ref="actions">
+          <button type="button" class="rh-game" data-ref="btnMemory">
+            <img src="../assets/gameAsset/hub/diari.png" alt=""><b>Padan Kad</b><small>Cari pasangan gambar</small>
+          </button>
+          <button type="button" class="rh-game" data-ref="btnBubble">
+            <img src="../assets/gameAsset/hub/moon.png" alt=""><b>Pecah Gelembung</b><small>Santai, tiada markah</small>
+          </button>
+          <button type="button" class="rh-game" data-ref="btnSeek">
+            <img src="../assets/gameAsset/hub/pintu.png" alt=""><b>Cari Pendekar</b><small>Dia bersembunyi!</small>
+          </button>
+          <!-- butang main: sama saiz dengan tiga mini game supaya sejajar -->
+          <button type="button" class="rh-game rh-play-btn" data-ref="btnGo" title="Teruskan cerita">
+            <i class="rh-play-ico"></i><b>Main</b><small>Teruskan cerita</small>
+          </button>
+        </footer>
+
+      </div>
+    </div>
+  </template>
+</body>
+</html>

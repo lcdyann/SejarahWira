@@ -1,0 +1,293 @@
+/* ============================================================================
+   assets/game/collection/collection.css  -  Trophy room: badges + artifacts shelf
+   USE CASE: UC-07, UC-08   CLASS DIAGRAM: Badge, StudentArtifact
+   Markup: collection/collection.html (if any)   Logic: the .js files in this folder.
+   ============================================================================ */
+
+.trophy-bg {
+  position: absolute;
+  inset: 0;
+  background: #1a0f07 url('../../gameAsset/collection/collection_shelf.jpg') center / 100% 100% no-repeat;
+}
+
+.back-hub {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  z-index: 5;
+}
+
+.shelf-full {
+  position: absolute;
+  inset: 0;
+}
+
+.shelf-nav {
+  position: absolute;
+  top: 9%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20%;
+  z-index: 4;
+}
+
+.btn-wood {
+  width: 40px;
+  height: 32px;
+  background: #d49547;
+  border: 2px solid #5c3510;
+  border-radius: 6px;
+  color: #2b1402;
+  font-size: 14px;
+  box-shadow: 0 3px 0 #0008;
+}
+
+.btn-wood:disabled {
+  opacity: 0.4;
+}
+
+.shelf-rows {
+  position: absolute;
+  top: 22%;
+  left: 8%;
+  width: 84%;
+  height: 72%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.shelf-row {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.shelf-row.artifacts { height: 47%; }
+
+.shelf-row.badges    { height: 59%; }
+
+.shelf-label {
+  position: absolute;
+  top: 30%;
+  padding: 5px 12px;
+  background: #f0e2c8;
+  border: 2px solid #8c5d31;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  color: #a36118;
+  box-shadow: 2px 3px 0 #0007;
+  z-index: 3;
+}
+
+.artifacts .shelf-label { left: 8%; }
+
+.badges .shelf-label    { right: 12%; }
+
+.shelf-track {
+  position: absolute;
+  height: 100%;
+  width: 57%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.artifacts .shelf-track {
+  left: 36%;
+}
+
+.badges .shelf-track {
+  right: 36%;
+  padding-bottom: 5%;
+}
+
+.reward-card {
+  position: relative;
+  width: 130px;
+  height: 115px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  cursor: pointer;
+}
+
+.reward-card:focus {
+  outline: 2px solid var(--gold-light);
+}
+
+.reward-card.no-art {
+  background: radial-gradient(ellipse at 50% 90%, #ffffff22, transparent 60%);
+  border-bottom: 6px solid #8c5d31;
+}
+
+.place-holder-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.artifact-sprite {
+  position: absolute;
+  top: 32px;
+  width: 36px;
+  height: 42px;
+  object-fit: contain;
+  animation: artifact-pulse 2.5s infinite ease-in-out;
+}
+
+.badge-sprite {
+  position: absolute;
+  top: 18px;
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  animation: badge-float 2.8s infinite ease-in-out;
+}
+
+.badge-sprite.silhuet,
+.artifact-sprite.silhuet {
+  filter: brightness(0) opacity(0.5);     /* siluet gelap: teaser lencana / artifak yang belum dibuka */
+  animation: none;                         /* tanpa kilauan: kilauan menimpa siluet dan menampakkan warna asal */
+}
+
+.locked-mark {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-pixel);
+  font-size: 22px;
+  color: #e2a120;
+  text-shadow: 0 0 6px #000;
+}
+
+@keyframes artifact-pulse {
+  0%, 100% { filter: drop-shadow(0 0 5px #ffd70099); }
+  50% {
+    transform: scale(1.08);
+    filter: drop-shadow(0 0 12px #ffd700);
+  }
+}
+
+@keyframes badge-float {
+  50% { transform: translateY(-7px); }
+}
+
+.shelf-empty {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  top: 45%;
+  padding: 10px;
+  text-align: center;
+  background: #000a;
+}
+
+/* big version, used by the reveal */
+.reward-card.big {
+  width: 300px;
+  height: 280px;
+}
+
+.reward-card.big .artifact-sprite {
+  top: 78px;
+  width: 100px;
+  height: 112px;
+}
+
+.reward-card.big .badge-sprite {
+  top: 50px;
+  width: 100px;
+  height: 100px;
+}
+
+.shelf-slots {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---- "you unlocked it" reveal ---- */
+.shelf-reveal {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: radial-gradient(circle at 50% 50%, #3a2a0a, #050302 80%);
+  opacity: 0;
+  transition: opacity 0.4s;
+  cursor: pointer;
+}
+
+.shelf-reveal.in {
+  opacity: 1;
+}
+
+.rv-rays {
+  position: absolute;
+  inset: -50%;
+  background: repeating-conic-gradient(from 0deg, #ffd35a22 0 8deg, transparent 8deg 24deg);
+  animation: spin 18s linear infinite;
+}
+
+.rv-title {
+  position: relative;
+  font-family: var(--font-pixel);
+  font-size: 18px;
+  color: var(--gold-light);
+  text-shadow:
+    0 3px 0 #000,
+    0 0 18px #ffd35a;
+}
+
+.rv-stage {
+  position: relative;
+  transform: scale(0.4);
+  opacity: 0;
+  animation: reveal-in 1s 0.3s ease-out forwards;
+}
+
+@keyframes reveal-in {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.rv-name {
+  position: relative;
+  font-size: 28px;
+  color: #fff3c9;
+}
+
+.rv-hint {
+  position: relative;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+/* butang "Halaman seterusnya" (menggantikan "Tekan Enter" apabila ditetapkan) */
+.rv-next {
+  position: relative;
+  margin-top: 6px;
+}
+
+/* trophy room: picture + details of a badge / artifact */
+.trophy-detail { display: flex; align-items: center; gap: 16px; }
+
+.trophy-detail-pic { flex: none; width: 120px; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 64px; }
+
+.trophy-detail-pic img { max-width: 100%; max-height: 100%; image-rendering: auto; filter: drop-shadow(0 4px 6px #0006); }
+
+.trophy-detail-info p { margin: 0 0 6px; }

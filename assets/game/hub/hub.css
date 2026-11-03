@@ -1,0 +1,457 @@
+/* ============================================================================
+   assets/game/hub/hub.css  -  Study desk (home), prologue, epilogue, credits, sound settings
+   USE CASE: UC-01, UC-02, UC-07, UC-08, UC-09 (entry point)   CLASS DIAGRAM: Student
+   Markup: hub/hub.html (if any)   Logic: the .js files in this folder.
+   ============================================================================ */
+
+.hub-room {
+  background: linear-gradient(180deg, #0b0716 0%, #1a1030 55%, #25160c 55%);
+}
+
+/* the drawn picture (hub.jpg) replaces the painted room below */
+.hub-room.has-picture {
+  background-size: cover;
+  background-position: center;
+}
+
+.hub-room.has-picture .hub-window,
+.hub-room.has-picture .hub-desk,
+.hub-room.has-picture .hub-lamp {
+  display: none;
+}
+
+/* ---- painted room (only used when hub.jpg is missing) ---- */
+.hub-window {
+  position: absolute;
+  left: 330px;
+  top: 24px;
+  width: 300px;
+  height: 190px;
+  border: 8px solid #3a2410;
+  background: linear-gradient(180deg, #0a1030, #1b2a5e);
+  box-shadow: inset 0 0 40px #000a;
+}
+
+.hub-window::before,
+.hub-window::after {
+  content: '';
+  position: absolute;
+  background: #3a2410;
+}
+
+.hub-window::before {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+}
+
+.hub-window::after {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 6px;
+}
+
+.hub-window .moon {
+  position: absolute;
+  right: 40px;
+  top: 24px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff6d6;
+  box-shadow: 0 0 30px #fff6d6aa;
+}
+
+.hub-lamp {
+  position: absolute;
+  left: 60px;
+  top: 260px;
+  width: 340px;
+  height: 260px;
+  background: radial-gradient(ellipse at 40% 20%, #ffb94d66, transparent 70%);
+  pointer-events: none;
+}
+
+.hub-desk {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 215px;
+  background: linear-gradient(180deg, #6b4423, #4a2d14 18%, #3b2310);
+  border-top: 8px solid #8a5a2b;
+}
+
+/* ---- the student's own avatar standing in the room ---- */
+.hub-student {
+  position: absolute;
+  left: 24px;
+  bottom: 100px;
+  width: 120px;
+  height: 170px;
+  opacity: 0.9;
+}
+
+.hub-student img {
+  height: 100%;
+  max-width: 100%;
+}
+
+/* ---- the clickable items: door, mirror, notebook, book, trophy ---- */
+.hub-items {
+  position: absolute;
+  inset: 0;
+}
+
+.hub-item {
+  position: absolute;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: 8px;
+  background: radial-gradient(circle, #ffffff12, transparent 70%);
+  transition: transform 0.15s;
+}
+
+/* emoji shown until the drawn picture loads */
+.hub-item-icon {
+  font-size: 54px;
+  filter: drop-shadow(0 4px 0 #0008);
+}
+
+.hub-item.item-book .hub-item-icon {
+  font-size: 96px;
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
+/* selected with the arrow keys or the mouse */
+.hub-item.is-selected {
+  border-color: var(--gold-light);
+  background: radial-gradient(circle, #f3c76b30, transparent 70%);
+  transform: scale(1.1);
+}
+
+/* the drawn picture is loaded */
+.hub-item.has-picture {
+  border-color: transparent;
+  border-radius: 0;
+  background: none;
+}
+
+.hub-item.has-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 0 #0008);
+  pointer-events: none;
+  transition: filter 0.15s;
+}
+
+.hub-item.has-picture.is-selected {
+  background: none;
+  transform: scale(1.08);
+}
+
+.hub-item.has-picture.is-selected img {
+  filter:
+    drop-shadow(0 0 14px #ffd35a)
+    drop-shadow(0 0 4px #fff6d6)
+    drop-shadow(0 4px 0 #0008);
+}
+
+.hub-item.item-book.has-picture img {
+  animation: glow-pulse 2.4s ease-in-out infinite;
+}
+
+/* name shown under the selected item */
+.hub-item-label {
+  position: absolute;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  background: #000c;
+  border: 2px solid var(--gold);
+  color: var(--gold-light);
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---- Pendekar Bayang in the hub ----
+   his height comes from hubConfig.js (HUB_PENDEKAR.h); the width follows it */
+.hub-pendekar {
+  position: absolute;
+  aspect-ratio: 4 / 5;
+  pointer-events: none;
+}
+
+.hub-pendekar .entity-portrait {
+  width: 100%;
+  height: 100%;
+  opacity: 0.92;
+}
+
+.hub-pendekar .entity-portrait img {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: bottom;
+}
+
+.hub-pendekar-bubble {
+  left: 420px;
+  top: 150px;
+}
+
+/* ---- key hint at the bottom ---- */
+.hub-keys-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  transform: translateX(-50%);
+  padding: 5px 10px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+  opacity: 0.85;
+}
+
+/* ---- editor (?hubedit=1) ---- */
+.hub-room.is-editing .hub-item {
+  outline: 2px dashed #f3c76b;
+}
+
+.hub-room.is-editing .hub-student,
+.hub-room.is-editing .hub-pendekar,
+.hub-room.is-editing .hub-pendekar-bubble {
+  outline: 2px dashed #8a5cff;
+}
+
+.hub-editor {
+  position: absolute;
+  left: 10px;
+  bottom: 34px;
+  width: 430px;
+  padding: 8px;
+  z-index: 20;
+}
+
+.hub-editor textarea {
+  width: 100%;
+  height: 130px;
+  font: 11px/1.3 monospace;
+  background: #000b;
+  color: #f3c76b;
+  border: 2px solid #7a5a30;
+  resize: none;
+}
+
+.hub-editor .btn-px {
+  margin-top: 6px;
+}
+
+/* ---- prologue (the soul is taken) ---- */
+.prologue-book {
+  position: absolute;      /* left, top, width come from prologueConfig.js */
+  font-size: 110px;
+  line-height: 1;
+  transition: filter 1s;
+}
+
+.prologue-book img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* the hand that comes out of the book (core.js, Transition.bookGrab) */
+.bookgrab {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-hand {
+  position: absolute;
+  left: var(--ox);
+  top: var(--oy);
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.1);
+  filter: drop-shadow(0 0 22px #ffd35a);
+}
+
+.bg-flash {
+  position: absolute;
+  left: var(--ox);
+  top: var(--oy);
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(circle, #fff 0%, #fff4c9 40%, rgba(255, 211, 90, 0) 72%);
+}
+
+.prologue-book.glow {
+  filter: drop-shadow(0 0 40px #ffd35a);
+  animation: glow-pulse 0.8s ease-in-out infinite;
+}
+
+.prologue-pendekar {
+  position: absolute;
+  left: 380px;
+  top: 130px;
+}
+
+.prologue-skip {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  padding: 6px 10px;
+  font-family: var(--font-pixel);
+  font-size: 8px;
+}
+
+.prologue.quake {
+  animation: shake 0.5s infinite;
+}
+
+.scene-dim {
+  position: absolute;
+  inset: 0;
+  background: #04020a;
+}
+
+/* tetapan bunyi dalam kotak Pintu (hab): <template id="tpl-sound"> */
+.set-sound {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.set-mute { align-self: center; }
+
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 17px;
+}
+
+/* gelangsar: tombol emas */
+.set-row input[type="range"] {
+  width: 180px;
+  accent-color: #c9891a;
+  cursor: pointer;
+}
+
+.epi-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 60%, #3a2a5e, #07040d 75%);
+}
+
+.epi-title {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-pixel);
+  font-size: 40px;
+  color: var(--gold-light);
+}
+
+/* ---------- credits ---------- */
+.credits .cr-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, #2a1d4a, #06030c 78%); }
+
+.cr-window { position: absolute; inset: 0; overflow: hidden; }
+
+.cr-roll { position: absolute; left: 0; right: 0; top: 0; text-align: center; padding: 0 60px; will-change: transform; }
+
+.cr-title { margin: 0 0 8px; font-family: var(--font-pixel); font-size: 36px; color: var(--gold-light); text-shadow: 0 0 18px #8a5cff; }
+
+.cr-tagline { margin: 0 0 70px; font-size: 20px; color: #cdbff3; }
+
+.cr-block { margin-bottom: 56px; }
+
+.cr-heading { margin: 0 0 14px; font-family: var(--font-pixel); font-size: 14px; letter-spacing: 1px; color: var(--gold); }
+
+.cr-line { margin: 0 0 8px; font-size: 24px; color: #f2e0b8; }
+
+.cr-thanks { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 0 70px; }
+
+.cr-thanks p { margin: 0; font-size: 28px; line-height: 1.35; color: #f2e0b8; text-shadow: 0 0 14px #8a5cff; }
+
+.cr-thanks .cr-back { margin-top: 26px; padding: 12px 26px; }
+
+.cr-skip { position: absolute; right: 16px; bottom: 12px; padding: 6px 10px; font-size: 10px; opacity: .8; }
+
+/* ---- hub: day / night switch (sits where the moon is) ---- */
+.hub-theme-btn {
+  position: absolute;
+  z-index: 6;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  line-height: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 0 10px rgba(255, 246, 214, 0.55));
+  transition: transform 0.15s ease, filter 0.2s ease;
+}
+
+.hub-theme-btn img { display: block; width: 100%; height: auto; pointer-events: none; }
+
+.hub-theme-btn:hover,
+.hub-theme-btn:focus-visible { transform: scale(1.08); outline: none; filter: drop-shadow(0 0 14px rgba(255, 246, 214, 0.9)); }
+
+.hub-theme-btn.is-sun { filter: drop-shadow(0 0 12px rgba(255, 190, 60, 0.7)); }
+
+.hub-theme-icon { display: block; font-size: 2.4rem; line-height: 1.1; color: #fff6d6; text-align: center; }
+
+.hub-room.is-day:not(.has-picture) { background: linear-gradient(#9fd3f0, #f5e6c0); }
+
+.hub-room.is-day .hub-lamp { opacity: 0; }
+
+.hub-room.is-switching { opacity: 0.88; transition: opacity 0.2s ease; }
+
+/* day / night tint: the switch is always visible, even while day_hub.jpg and hub.jpg look alike */
+.hub-room::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: rgba(10, 14, 48, 0.38);
+  transition: background 0.35s ease;
+}
+
+.hub-room.is-day::before { background: rgba(255, 226, 150, 0.22); }
+
+/* ---------- butang bunyi (penjuru kanan atas pentas) ---------- */
+.sound-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 60;
+  width: 34px;
+  height: 34px;
+  font-size: 18px;
+  line-height: 1;
+  color: #fff;
+  background: rgba(20, 12, 6, 0.65);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sound-btn:hover {
+  background: rgba(20, 12, 6, 0.9);
+}

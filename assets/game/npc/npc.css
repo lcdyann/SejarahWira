@@ -1,0 +1,163 @@
+/* ============================================================================
+   assets/game/npc/npc.css  -  Pendekar Bayang + NPC portraits and their lines
+   USE CASE: UC-03   CLASS DIAGRAM: NPC
+   Markup: npc/npc.html (if any)   Logic: the .js files in this folder.
+   ============================================================================ */
+
+.entity-portrait {
+  position: relative;
+  width: 120px;
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.entity-portrait img {
+  max-width: 100%;
+  max-height: 100%;
+  filter: drop-shadow(0 0 14px #8a5cff99);
+}
+
+.entity-portrait.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+.entity-portrait.small {
+  width: 84px;
+  height: 105px;
+}
+
+.entity-portrait.rise {
+  width: 190px;
+  height: 240px;
+  animation: rise 1.4s ease-out both;
+}
+
+/* the drawn silhouette used while a pose picture is missing */
+.shadow-figure {
+  position: relative;
+  width: 78%;
+  height: 94%;
+  background: radial-gradient(ellipse at 50% 30%, #3b2166, #12091f 70%);
+  clip-path: polygon(50% 0, 82% 14%, 92% 54%, 100% 100%, 0 100%, 8% 54%, 18% 14%);
+  filter: drop-shadow(0 0 12px #8a5cff);
+}
+
+.shadow-figure .eye {
+  position: absolute;
+  top: 24%;
+  width: 15%;
+  height: 8%;
+  background: #ffe9a8;
+  box-shadow: 0 0 10px #ffd35a;
+  border-radius: 50%;
+}
+
+.shadow-figure .eye.l { left: 28%; }
+
+.shadow-figure .eye.r { right: 28%; }
+
+.shadow-figure .mouth {
+  position: absolute;
+  left: 36%;
+  right: 36%;
+  top: 44%;
+  height: 4%;
+  background: #ffe9a8;
+  border-radius: 0 0 8px 8px;
+}
+
+.shadow-figure[data-pose="angry"] .eye {
+  background: #ff5a3c;
+  box-shadow: 0 0 12px #ff2a00;
+  transform: skewY(14deg);
+}
+
+.shadow-figure[data-pose="angry"] .eye.r {
+  transform: skewY(-14deg);
+}
+
+.shadow-figure[data-pose="laughing"] .mouth {
+  height: 12%;
+  border-radius: 0 0 20px 20px;
+  background: #fff;
+}
+
+.shadow-figure[data-pose="surprised"] .eye {
+  height: 14%;
+}
+
+.shadow-figure[data-pose="surprised"] .mouth {
+  left: 42%;
+  right: 42%;
+  height: 10%;
+  border-radius: 50%;
+}
+
+.shadow-figure[data-pose="whispering"] .eye {
+  height: 4%;
+}
+
+.shadow-figure[data-pose="whispering"] .mouth {
+  left: 44%;
+  right: 44%;
+}
+
+.shadow-figure[data-pose="impressed"] .eye {
+  top: 22%;
+}
+
+/* ---- other character pictures ---- */
+.npc-portrait {
+  width: 120px;
+  height: 150px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.npc-portrait img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.npc-big {
+  width: 130px;
+  height: 160px;
+  margin: 0 auto 8px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.npc-big img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.sprite-fallback {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 3px solid var(--gold);
+  background: var(--wood-light);
+  color: var(--gold-light);
+  font-family: var(--font-pixel);
+  font-size: 20px;
+}
+
+/* ---- speech bubble (hub and map) ---- */
+.speech-bubble {
+  position: absolute;
+  max-width: 330px;
+  padding: 8px 12px;
+  background: #1a1030e8;
+  color: #e9dcff;
+  border: 3px solid #8a5cff;
+  font-size: 17px;
+  line-height: 1.2;
+}

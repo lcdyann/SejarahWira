@@ -2,7 +2,7 @@
  * ============================================================================
  * contentEntity.js  -  tab "Suara Pendekar Bayang" (UC-10 Manage Learning Content)
  * Uses: h(), setChildren(), chip() (contentManagerEngine.js), uiButton() (contentUi.js).
- * Shares assets/js/game/entityLines.js with the game, so the categories, the markers and the
+ * Shares assets/game/npc/entityLines.js with the game, so the categories, the markers and the
  * 255-character rule are the same here and in the game.
  *
  *   EntityVoice   the 20 moments Pendekar Bayang speaks. Nothing written = the built-in line
@@ -35,7 +35,7 @@ class EntityVoice {
   async open() {
     this.app.loadingBox('Memuatkan suara Pendekar Bayang...');
     try {
-      if (!this.mod) this.mod = await import('./game/entityLines.js');
+      if (!this.mod) this.mod = await import('../game/npc/entityLines.js');
       await this.load();
     } catch (err) {
       if (err.status === 401) return;

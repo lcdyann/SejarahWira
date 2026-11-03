@@ -2,7 +2,7 @@
  * ============================================================================
  * entityLines.js  -  Pendekar Bayang's voice (shared data + pure functions)
  *
- *   assets/js/game/entityLines.js    (game + content manager)
+ *   assets/game/npc/entityLines.js    (game + content manager)
  *   backend/utils/entityLines.js     (validation in the controller)
  * Keep the two files IDENTICAL. No DOM and no Node modules in here.
  *
