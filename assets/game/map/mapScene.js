@@ -11,7 +11,7 @@
  *   Node states: locked / unlocked / in progress / completed.
  * ============================================================================
  */
-import { el, esc } from '../core/core.js';
+import { el, esc, labelStatus } from '../core/core.js';
 import { GameScene } from '../core/scene.js';
 import { LANE_RADIUS, NODE_RADIUS, START, TALK_RADIUS, WORLD, WORLD_IMAGE, WORLD_MASK, nodeFor } from './mapConfig.js';
 import { entityPortrait } from '../npc/entity.js';
@@ -199,7 +199,7 @@ export class MapScene extends GameScene {
       this.near = n;
       const pr = this.root.querySelector('.map-prompt');
       if (n) {
-        pr.innerHTML = `<b>E</b> ${esc(n.era.eraName)} <span class="tag ${esc(n.era.status.replace(' ', '-'))}">${esc(n.era.status)}</span>`;
+        pr.innerHTML = `<b>E</b> ${esc(n.era.eraName)} <span class="tag ${esc(n.era.status.replace(' ', '-'))}">${esc(labelStatus(n.era.status))}</span>`;
         pr.classList.remove('hidden');
       } else pr.classList.add('hidden');
     }

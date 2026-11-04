@@ -3,7 +3,7 @@
  * MODULE: hub  (Study desk (home), prologue, epilogue, credits, sound settings)
  * USE CASE: UC-01, UC-02, UC-07, UC-08, UC-09 (entry point)   CLASS DIAGRAM: Student
  */
-import { el, esc, tpl } from '../core/core.js';
+import { el, esc, tpl, labelStatus } from '../core/core.js';
 import { GameScene } from '../core/scene.js';
 import { sound } from '../core/sound.js';
 import { HUB_BG, HUB_BG_DAY, HUB_BUBBLE, HUB_OBJECTS, HUB_PENDEKAR, HUB_STUDENT, HUB_THEME } from './hubConfig.js';
@@ -395,7 +395,7 @@ export class HubScene extends GameScene {
       const eras = (data.eras || [])
         .map((e) => {
           const status = esc((e.eraStatus || '').replace(' ', '-'));
-          return `<li><b>${esc(e.eraName)}</b> <span class="tag ${status}">${esc(e.eraStatus)}</span></li>`;
+          return `<li><b>${esc(e.eraName)}</b> <span class="tag ${status}">${esc(labelStatus(e.eraStatus))}</span></li>`;
         })
         .join('');
 

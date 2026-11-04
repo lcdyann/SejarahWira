@@ -3,14 +3,13 @@
  * MODULE: student  (Student pages: avatar, profile, learning progress (diary))
  * USE CASE: UC-02, UC-09   CLASS DIAGRAM: Avatar, LearningProgression, EraProgression
  */
-import { el, esc } from '../core/core.js';
+import { el, esc, labelStatus } from '../core/core.js';
 import { GameScene } from '../core/scene.js';
 import { fmtDate, wireBack } from './studentHelpers.js';
 
 /* ========================================================================== */
 /* ProgressScene  -  UC-09                                                    */
 /* ========================================================================== */
-const STATUS_LABEL = { locked: 'Terkunci', unlocked: 'Dibuka', 'in progress': 'Sedang berjalan', completed: 'Selesai' };
 
 
 // Lencana dan artifak dipaparkan di Bilik Piala (rak), jadi tidak diulang di sini; hanya jumlahnya dalam ringkasan.
@@ -90,7 +89,7 @@ export class ProgressScene extends GameScene {
       return `<div class="pg-row"><b class="pg-num">${esc(e.eraID)}</b>
         <div class="pg-main"><div class="pg-rname">${esc(e.eraName)}</div>
         <div class="pg-chips"><span>${e.narrativeDone ? 'Kisah selesai' : 'Kisah belum selesai'}</span><span>${esc(siege)}</span></div></div>
-        <span class="tag ${esc(String(e.eraStatus).replace(/\s+/g, '-'))}">${esc(STATUS_LABEL[e.eraStatus] || e.eraStatus)}</span></div>`;
+        <span class="tag ${esc(String(e.eraStatus).trim().toLowerCase().replace(/[\s_]+/g, '-'))}">${esc(labelStatus(e.eraStatus))}</span></div>`;
     }).join('');
   }
 

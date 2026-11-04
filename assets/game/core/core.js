@@ -163,3 +163,13 @@ export class Input {
 
   isDown(...keys) { return keys.some((k) => this.down.has(k)); }
 }
+
+/**
+ * Label status era dalam Bahasa Melayu (nilai asal pangkalan data ialah Inggeris:
+ * locked, unlocked, in progress, completed). Dipakai oleh peta, Diari dan halaman kemajuan.
+ */
+const STATUS_ERA_BM = { locked: 'Terkunci', unlocked: 'Dibuka', 'in progress': 'Sedang berjalan', completed: 'Selesai' };
+export function labelStatus(status) {
+  const key = String(status ?? '').trim().toLowerCase().replace(/[_-]+/g, ' ');
+  return STATUS_ERA_BM[key] || 'Belum diketahui';
+}
