@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 
 /**
@@ -64,13 +63,4 @@ export const detectImage = (buf) => {
   if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return { ext: 'jpg' };
   if (buf.subarray(0, 4).toString('ascii') === 'RIFF' && buf.subarray(8, 12).toString('ascii') === 'WEBP') return { ext: 'webp' };
   return null;
-};
-
-/** Writes the image under a random name and returns that file name. */
-export const saveUpload = (type, buf, ext) => {
-  const dir = folderOf(type);
-  fs.mkdirSync(dir, { recursive: true });
-  const name = `${type === 'npc' ? 'npc' : 'bg'}_${crypto.randomBytes(6).toString('hex')}.${ext}`;
-  fs.writeFileSync(path.join(dir, name), buf, { flag: 'wx' });
-  return name;
 };

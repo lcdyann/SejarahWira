@@ -18,4 +18,8 @@ export const adminForWrites = (req, res, next) => {
   if (!contentLocked()) return next();
   return req.method === 'GET' || req.method === 'HEAD' ? next() : requireAdmin(req, res, next);
 };
-export const canEditContent = (teacher) => !contentLocked() || Boolean(teacher && teacher.isAdmin);
+/**
+ * Boleh ubah SEMUA kandungan cerita/soalan: admin, ATAU guru yang suisnya dibuka admin (Teacher.canEditFixed).
+ * (NPC, gambar dan suara Pendekar Bayang kekal admin sahaja.)
+ */
+export const canEditContent = (teacher) => !contentLocked() || Boolean(teacher && (teacher.isAdmin || teacher.canEditFixed));

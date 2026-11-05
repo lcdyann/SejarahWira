@@ -5,15 +5,13 @@
  *
  *   Library.pickAsset()   a picker that shows every image with its NAME and a preview.
  *                         Teachers choose by name + picture; the database stores the file name.
- *                         The same window can upload a new picture (name is required).
+ *                         Images are fixed (put in assets/gameAsset by the admin); teachers can only choose, not upload.
  *   Library.manageNpcs()  list of NPCs on the left, form on the right (name, picture, biography,
  *                         contribution). An NPC that still speaks in a scene cannot be deleted.
  * ============================================================================
  */
 
 const PLAYER_AVATAR = '../assets/gameAsset/avatar/avatar_melayu_lelaki.png';   // the student's own avatar speaks the "Pemain" lines
-const UPLOAD_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
-const UPLOAD_MAX = 2 * 1024 * 1024;
 
 class Library {
   constructor(app) {
@@ -73,14 +71,12 @@ class Library {
     return new Promise((resolve) => {
       let selected = list.find((a) => a.file === currentFile) || null;
       let query = '';
-      let previewUrl = null;
       let settled = false;
 
       const dlg = new Dialog({ title, size: 'wide', app: this.app });
       const finish = (value) => {
         if (settled) return;
         settled = true;
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
         dlg.close();
         resolve(value);
       };
@@ -94,7 +90,7 @@ class Library {
         const needle = query.trim().toLowerCase();
         const shown = needle ? list.filter((a) => a.displayName.toLowerCase().includes(needle)) : list;
         if (shown.length === 0) {
-          setChildren(grid, h('p', { class: 'cm-empty', text: list.length ? 'Tiada gambar sepadan dengan carian.' : 'Belum ada gambar. Muat naik gambar pertama di bawah.' }));
+          setChildren(grid, h('p', { class: 'cm-empty', text: list.length ? 'Tiada gambar sepadan dengan carian.' : 'Belum ada gambar dalam pustaka.' }));
           return;
         }
         setChildren(grid, shown.map((a) => h('div', { class: 'cm-asset-wrap' },
@@ -105,68 +101,8 @@ class Library {
             'aria-selected': selected && selected.file === a.file ? 'true' : 'false',
             onclick: () => { selected = a; renderGrid(); refreshFooter(); },
             ondblclick: () => finish(a)
-          }, thumb(a.url, a.displayName, type === 'npc' ? 'cm-asset-img is-npc' : 'cm-asset-img'), h('span', { class: 'cm-asset-name', text: a.displayName })),
-          h('button', {
-            type: 'button', class: 'cm-asset-rename', title: 'Namakan semula', 'aria-label': `Namakan semula ${a.displayName}`,
-            onclick: () => this.renameAsset(a, () => renderGrid())
-          }, h('i', { class: 'fas fa-pen' })))));
+          }, thumb(a.url, a.displayName, type === 'npc' ? 'cm-asset-img is-npc' : 'cm-asset-img'), h('span', { class: 'cm-asset-name', text: a.displayName })))));
       };
-
-      /* upload form */
-      const fileInput = h('input', { type: 'file', accept: UPLOAD_TYPES.join(',') });
-      const nameInput = h('input', { type: 'text', maxlength: '100', placeholder: 'Contoh: Padang Kota Kuching' });
-      const nameErr = errSpan();
-      const fileErr = errSpan();
-      const preview = h('img', { class: 'cm-upload-preview is-hidden', alt: 'Pratonton gambar baharu' });
-      const uploadBtn = uiButton('Muat Naik', 'cm-btn-ghost', null, 'fa-cloud-arrow-up');
-
-      const resetUpload = () => {
-        fileInput.value = '';
-        nameInput.value = '';
-        preview.classList.add('is-hidden');
-        if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
-      };
-
-      fileInput.addEventListener('change', () => {
-        setErr(fileErr, '');
-        const file = fileInput.files && fileInput.files[0];
-        if (!file) return;
-        if (!UPLOAD_TYPES.includes(file.type)) { setErr(fileErr, 'Format tidak disokong. Gunakan PNG, JPG atau WEBP.'); fileInput.value = ''; return; }
-        if (file.size > UPLOAD_MAX) { setErr(fileErr, 'Fail terlalu besar (maksimum 2 MB).'); fileInput.value = ''; return; }
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = URL.createObjectURL(file);
-        preview.setAttribute('src', previewUrl);
-        preview.classList.remove('is-hidden');
-        if (!nameInput.value.trim()) nameInput.value = file.name.replace(/\.[^.]+$/, '').replace(/[_\-.]+/g, ' ').trim().slice(0, 100);
-      });
-
-      uploadBtn.addEventListener('click', async () => {
-        setErr(fileErr, ''); setErr(nameErr, '');
-        const file = fileInput.files && fileInput.files[0];
-        const name = nameInput.value.trim();
-        if (!file) { setErr(fileErr, 'Sila pilih fail gambar.'); return; }
-        if (!name) { setErr(nameErr, 'Nama gambar wajib diisi supaya mudah dikenali.'); nameInput.focus(); return; }
-        if (/[<>]/.test(name)) { setErr(nameErr, 'Aksara < dan > tidak dibenarkan.'); return; }
-
-        uploadBtn.disabled = true;
-        try {
-          const res = await this.app.api(`/assets/upload?type=${type}&name=${encodeURIComponent(name)}`,
-            { method: 'POST', raw: { type: file.type, body: file } });
-          list = await this.assets(type, true);
-          selected = list.find((a) => a.file === res.asset.file) || null;
-          resetUpload();
-          renderGrid();
-          refreshFooter();
-          this.app.toast('Gambar berjaya dimuat naik.');
-        } catch (err) {
-          if (err.status === 401) return;
-          const msg = (err.data && err.data.message) || 'Gambar gagal dimuat naik. Sila cuba lagi.';
-          if (err.status === 422) setErr(nameErr, msg); else setErr(fileErr, msg);
-          if (err.status !== 422) this.app.reportError('Memuat naik gambar', err, { where: `${this.app.where()} > Pustaka gambar` });
-        } finally {
-          uploadBtn.disabled = false;
-        }
-      });
 
       const search = h('input', {
         type: 'search', class: 'cm-input', placeholder: 'Cari gambar mengikut nama...', 'aria-label': 'Cari gambar',
@@ -175,47 +111,12 @@ class Library {
 
       dlg.setBody(
         search,
-        grid,
-        h('section', { class: 'cm-upload' },
-          h('h4', {}, h('i', { class: 'fas fa-cloud-arrow-up' }), ' Muat naik gambar baharu'),
-          h('p', { class: 'cm-hint', text: 'PNG, JPG atau WEBP, maksimum 2 MB. Beri nama supaya mudah dikenali.' }),
-          h('div', { class: 'cm-upload-row' },
-            h('div', { class: 'cm-upload-fields' },
-              formField('Fail gambar', fileInput, { error: fileErr }),
-              formField('Nama gambar', nameInput, { required: true, error: nameErr }),
-              uploadBtn),
-            preview)));
+        grid);
       dlg.setFooter(uiButton('Batal', 'cm-btn-ghost', () => dlg.requestClose()), useBtn);
 
       renderGrid();
       refreshFooter();
     });
-  }
-
-  renameAsset(asset, onDone) {
-    const dlg = new Dialog({ title: 'Namakan Semula Gambar', size: 'small', app: this.app });
-    const input = h('input', { type: 'text', maxlength: '100', value: asset.displayName });
-    const err = errSpan();
-    const save = uiButton('Simpan', 'cm-btn-primary', async () => {
-      const name = input.value.trim();
-      if (!name) { setErr(err, 'Nama gambar wajib diisi.'); return; }
-      if (/[<>]/.test(name)) { setErr(err, 'Aksara < dan > tidak dibenarkan.'); return; }
-      save.disabled = true;
-      try {
-        await this.app.api(`/assets/${asset.assetID}`, { method: 'PUT', body: { displayName: name } });
-        asset.displayName = name;
-        dlg.close();
-        onDone();
-        this.app.toast('Nama gambar dikemas kini.');
-      } catch (e) {
-        if (e.status !== 401) { setErr(err, (e.data && e.data.message) || 'Nama gagal disimpan.'); this.app.reportError('Menukar nama gambar', e, { where: `${this.app.where()} > Pustaka gambar > ${asset.displayName}` }); }
-      } finally {
-        save.disabled = false;
-      }
-    });
-    dlg.setBody(thumb(asset.url, asset.displayName, 'cm-rename-img'), formField('Nama gambar', input, { required: true, error: err }));
-    dlg.setFooter(uiButton('Batal', 'cm-btn-ghost', () => dlg.close()), save);
-    input.focus();
   }
 
   /* ----- NPC library ----- */
@@ -284,7 +185,7 @@ class Library {
 
         const portrait = h('div', { class: 'cm-portrait-pick' },
           form.url ? thumb(form.url, form.name, 'cm-portrait-img') : h('div', { class: 'cm-portrait-empty', text: 'Belum ada gambar' }),
-          uiButton(form.url ? 'Tukar Gambar' : 'Pilih / Muat Naik Gambar', 'cm-btn-ghost cm-btn-sm', async () => {
+          uiButton(form.url ? 'Tukar Gambar' : 'Pilih Gambar', 'cm-btn-ghost cm-btn-sm', async () => {
             const picked = await this.pickAsset({ type: 'npc', title: 'Pilih Gambar NPC', currentFile: form.asset });
             if (picked) { form.asset = picked.file; form.url = picked.url; renderForm({}); }
           }, 'fa-image'));

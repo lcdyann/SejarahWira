@@ -6,7 +6,7 @@
 import { el, sleep } from '../core/core.js';
 import { GameScene } from '../core/scene.js';
 import { EPILOGUE_POSES, EPILOGUE_TWIST, EPILOGUE_WORDS, HOME_LINES } from './creditsConfig.js';
-import { applyHubPicture, placeStudent, probeImage } from './hubHelpers.js';
+import { applyHubPicture, placeStudent, probeImage, markEpilogueSeen } from './hubHelpers.js';
 import { PROLOGUE_BG, PROLOGUE_BOOK } from './prologueConfig.js';
 import { entityPortrait, spriteEl } from '../npc/entity.js';
 
@@ -25,10 +25,12 @@ export class EpilogueScene extends GameScene {
    * 4. Dia masuk semula ke dalam buku, murid berkata apa yang dipelajari (HOME_LINES), lalu kredit
    * Ayat-ayatnya ditulis dalam creditsConfig.js (dan entityLines.js untuk bahagian 1).
    *
-   * params: { replay: true bila dimainkan semula untuk menonton; selepas itu kembali ke meja, tiada kredit }
+   * params: { replay: true bila dimainkan semula untuk menonton }. Kredit dimainkan selepas epilog, sama ada kali pertama atau ulang;
+   * kemudian murid kembali ke meja.
    */
   async enter({ replay = false } = {}) {
     this.replay = replay;
+    if (!replay) markEpilogueSeen(this.student.studentID);        // epilog automatik tidak diulang lagi (guna butang Ulang Epilog)
     this.root.classList.add('epilogue');
     this.root.innerHTML = '<div class="epi-bg"></div><div class="epi-pendekar"></div>';
     await this.entity.load(0);
@@ -79,7 +81,7 @@ export class EpilogueScene extends GameScene {
     this.dialog.hide();
 
     await this.game.transition.fadeOut(900);
-    await this.game.go(this.replay ? 'HubScene' : 'CreditsScene');
+    await this.game.go('CreditsScene');            // kredit juga dimainkan semasa ulang epilog
     await this.game.transition.fadeIn(900);
   }
 

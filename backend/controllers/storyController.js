@@ -30,6 +30,8 @@
  */
 
 import db from '../config/db.js';
+import { PUBLIC_CLASS_ID } from '../models/Class.js';
+import { teacherOfStudent } from '../utils/studentTeacher.js';
 import { EraProgressionModel } from '../models/ProgressModels.js';
 import { AssessmentModel } from '../models/AssessmentModels.js';
 
@@ -130,20 +132,26 @@ export const updateStatus = async (studentID, eraID, newStatus) => {
  * narrative is excluded so the student always gets a different one
  * (falls back to any narrative if the era only has one).
  */
-const loadRandomNarrative = async (eraID, excludeNarrativeID) => {
+/**
+ * Guru kelas pelajar (Student -> Class -> teacherID), atau null untuk pelajar awam (kelas PUBLIC).
+ * Pelajar melihat naratif TETAP + naratif milik guru ini sahaja; naratif guru lain tidak pernah muncul.
+ */
+const OWNED = 'AND (ownerTeacherID IS NULL OR ownerTeacherID = ?)';
+
+const loadRandomNarrative = async (eraID, excludeNarrativeID, teacherID = null) => {
   if (excludeNarrativeID) {
     const [rows] = await db.query(
       `SELECT narrativeID, narrativeTitle, eraID, summary
-       FROM Narrative WHERE eraID = ? AND narrativeID <> ?
+       FROM Narrative WHERE eraID = ? AND narrativeID <> ? ${OWNED}
        ORDER BY RAND() LIMIT 1`,
-      [eraID, excludeNarrativeID]
+      [eraID, excludeNarrativeID, teacherID]
     );
     if (rows.length > 0) return rows[0];
   }
   const [rows] = await db.query(
     `SELECT narrativeID, narrativeTitle, eraID, summary
-     FROM Narrative WHERE eraID = ? ORDER BY RAND() LIMIT 1`,
-    [eraID]
+     FROM Narrative WHERE eraID = ? ${OWNED} ORDER BY RAND() LIMIT 1`,
+    [eraID, teacherID]
   );
   return rows[0] || null;
 };
@@ -193,6 +201,31 @@ const loadScene = async (scene) => {
 };
 
 /**
+ * NOTA GURU: tambah nota guru kepada setiap baris dialog (d.teacherNote, kosong jika tiada).
+ * Nota dipilih mengikut GURU kepada kelas pelajar (Student -> Class -> teacherID), bukan mengikut kelas,
+ * jadi pelajar semua kelas guru yang sama melihat nota yang sama. Pelajar awam (kelas PUBLIC)
+ * tidak mempunyai guru sebenar, maka tiada nota. Dialog tetap itu sendiri tidak berubah.
+ */
+const attachTeacherNotes = async (studentID, scenes) => {
+  try {
+    const ids = scenes.flatMap((s) => s.dialogues.map((d) => d.dialogueID));
+    scenes.forEach((s) => s.dialogues.forEach((d) => { d.teacherNote = ''; }));
+    if (ids.length === 0) return;
+    const [rows] = await db.query(
+      `SELECT t.dialogueID, t.noteText
+       FROM TeacherNote t
+       JOIN Class c ON c.teacherID = t.teacherID
+       JOIN Student st ON st.classID = c.classID
+       WHERE st.studentID = ? AND c.classID <> ? AND t.dialogueID IN (?)`,
+      [studentID, PUBLIC_CLASS_ID, ids]);
+    const byLine = new Map(rows.map((r) => [Number(r.dialogueID), r.noteText]));
+    scenes.forEach((s) => s.dialogues.forEach((d) => { d.teacherNote = byLine.get(Number(d.dialogueID)) || ''; }));
+  } catch (err) {
+    console.error('attachTeacherNotes (cerita tetap diteruskan tanpa nota):', err.message);   // nota tidak penting: jangan hentikan cerita
+  }
+};
+
+/**
  * Shared check used by verifyCompletion / evaluateBadgeUnlock /
  * evaluateUnlockAssessment: are ALL assigned quests of this narrative done?
  * Also guards against client-sent quest IDs that do not belong to the narrative.
@@ -233,16 +266,17 @@ export const loadNarrative = async (req, res) => {
   try {
     const { eraID = 1, studentID = 'S1001', narrativeID, excludeNarrativeID } = req.query;
 
+    const teacherID = await teacherOfStudent(studentID);
     let narrative = null;
     if (narrativeID) {
       const [rows] = await db.query(
         `SELECT narrativeID, narrativeTitle, eraID, summary
-         FROM Narrative WHERE narrativeID = ? AND eraID = ? LIMIT 1`,
-        [narrativeID, eraID]
+         FROM Narrative WHERE narrativeID = ? AND eraID = ? ${OWNED} LIMIT 1`,
+        [narrativeID, eraID, teacherID]
       );
       narrative = rows[0] || null;
     }
-    if (!narrative) narrative = await loadRandomNarrative(eraID, excludeNarrativeID);
+    if (!narrative) narrative = await loadRandomNarrative(eraID, excludeNarrativeID, teacherID);
 
     if (!narrative) {
       return res.status(404).json({ success: false, message: 'Narrative tidak dijumpai.' });
@@ -254,6 +288,7 @@ export const loadNarrative = async (req, res) => {
       [narrative.narrativeID]
     );
     const fullScenes = await Promise.all(scenes.map(loadScene));
+    await attachTeacherNotes(studentID, fullScenes);
 
     await updateStatus(studentID, eraID, 'in progress');
 

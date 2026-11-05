@@ -379,9 +379,11 @@ class ContentManagerEngine {
         this.api('/changes?limit=8').catch((err) => { if (err.status === 401) throw err; return null; })
       ]);
       this.eras = erasData.eras;
+      this.isAdmin = Boolean(erasData.isAdmin);      // NPC dikongsi semua kelas: hanya admin boleh mengurusnya
       this.setCanEdit(erasData.canEdit);
       this.renderEraGrid();
       this.renderRecentChanges(changes ? changes.changes : null);
+      if (erasData.isAdmin && window.TeacherPermissions) new TeacherPermissions(this).mount();   // suis kebenaran guru (admin sahaja)
       this.showView('eras');
     } catch (err) {
       if (err.status === 401) return;
@@ -602,18 +604,24 @@ class ContentManagerEngine {
 
     setChildren(this.qListBox, ...shown.map((q) => {
       const number = this.questions.indexOf(q) + 1;
-      return h('article', { class: 'cm-q-item' },
+      const locked = q.editable === false;           // soalan tetap: kelabu + butang dimatikan (pelayan menolak juga)
+      const lockTip = 'Soalan tetap: tidak boleh diubah. Tambah soalan sendiri dengan butang Tambah Soalan.';
+      return h('article', { class: `cm-q-item${locked ? ' is-fixed' : ''}` },
         h('div', { class: 'cm-q-num', text: String(number) }),
         h('div', { class: 'cm-q-body' },
           h('div', { class: 'cm-q-text', text: q.questionText }),
           h('div', { class: 'cm-q-chips' },
+            locked ? chip('Tetap', 'warn', 'fa-lock') : (q.owned ? chip('Soalan saya', 'ok', 'fa-pen') : null),
             chip(`Jawapan: ${q.correctAnswer}`, 'ok'),
             chip(q.hint ? 'Ada petunjuk' : 'Tiada petunjuk', q.hint ? 'ok' : ''),
             chip(q.explanation ? 'Ada penerangan' : 'Tiada penerangan', q.explanation ? 'ok' : ''))),
         h('div', { class: 'cm-q-actions' },
-          h('button', { type: 'button', class: 'cm-btn cm-btn-ghost cm-btn-sm', 'aria-label': `Edit soalan ${number}`, onclick: () => this.openQuestionEditor(q) },
-            h('i', { class: 'fas fa-pen' }), 'Edit'),
-          h('button', { type: 'button', class: 'cm-btn cm-btn-danger cm-btn-sm', 'aria-label': `Padam soalan ${number}`, onclick: () => this.removeQuestion(q) },
+          locked
+            ? h('button', { type: 'button', class: 'cm-btn cm-btn-ghost cm-btn-sm', 'aria-label': `Lihat soalan ${number}`, onclick: () => this.openQuestionEditor(q, true) },
+              h('i', { class: 'fas fa-eye' }), 'Lihat')
+            : h('button', { type: 'button', class: 'cm-btn cm-btn-ghost cm-btn-sm', 'aria-label': `Edit soalan ${number}`, onclick: () => this.openQuestionEditor(q) },
+              h('i', { class: 'fas fa-pen' }), 'Edit'),
+          h('button', { type: 'button', class: `cm-btn cm-btn-danger cm-btn-sm${locked ? ' is-fixed-locked' : ''}`, disabled: locked ? '' : null, title: locked ? lockTip : null, 'aria-label': `Padam soalan ${number}`, onclick: () => this.removeQuestion(q) },
             h('i', { class: 'fas fa-trash' }), 'Padam')));
     }));
   }
@@ -637,17 +645,20 @@ class ContentManagerEngine {
   isDirty() { return this.snapshot !== null && JSON.stringify(this.readForm()) !== this.snapshot; }
 
   /** Step 8-9 */
-  openQuestionEditor(question) {
+  /** readOnly = true: soalan tetap dibuka untuk DILIHAT sahaja (semua ruangan dikunci, tiada butang simpan). */
+  openQuestionEditor(question, readOnly = false) {
     this.editing = question || null;
-    this.$('q-modal-title').textContent = question ? 'Edit Soalan' : 'Tambah Soalan';
+    this.$('q-modal-title').textContent = readOnly ? 'Lihat Soalan (tetap)' : (question ? 'Edit Soalan' : 'Tambah Soalan');
     this.fillForm(question);
     this.showFieldErrors({});
-    this.setBanner('');
+    this.setBanner(readOnly ? 'Soalan tetap: anda boleh membacanya sahaja. Tambah soalan sendiri dengan butang "Tambah Soalan".' : '');
+    this.$('q-form').querySelectorAll('input, textarea').forEach((el) => { el.disabled = readOnly; });
+    this.$('btn-q-save').classList.toggle('is-hidden', readOnly);
     this.setSaving(false);
     this.snapshot = JSON.stringify(this.readForm());
     this.renderPreview();
     this.$('q-modal').classList.remove('is-hidden');
-    this.$('f-questionText').focus();
+    if (!readOnly) this.$('f-questionText').focus();
   }
 
   closeEditor() {

@@ -190,10 +190,11 @@ export class NPC {
 
 /* ---------------------------------------------------------- DialogueLine */
 export class DialogueLine {
-  #dialogueID; #sequenceOrder; #dialogueLine; #speaker;
+  #dialogueID; #sequenceOrder; #dialogueLine; #speaker; #teacherNote;
   constructor(d = {}) {
     this.#dialogueID = d.dialogueID; this.#sequenceOrder = d.sequenceOrder;
     this.#dialogueLine = d.dialogueLine || '';
+    this.#teacherNote = d.teacherNote || '';          // nota guru (tambahan, tidak mengubah dialog tetap)
     this.#speaker = new NPC(d.speaker || {});
   }
   get dialogueID() { return this.#dialogueID; }
@@ -203,7 +204,7 @@ export class DialogueLine {
   /** DialogueLine.displayLine(): what the dialogue box needs. */
   displayLine(playerName = 'Pemain') {
     const s = this.#speaker;
-    return { name: s.isPlayer ? playerName : s.name, text: this.#dialogueLine, isPlayer: s.isPlayer, npc: s };
+    return { name: s.isPlayer ? playerName : s.name, text: this.#dialogueLine, isPlayer: s.isPlayer, npc: s, note: this.#teacherNote };
   }
 }
 

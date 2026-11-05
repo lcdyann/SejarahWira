@@ -1,10 +1,7 @@
 import { failServer } from '../utils/dbError.js';
-import fs from 'fs';
-import path from 'path';
 import db from '../config/db.js';
 import {
-  FOLDERS, MAX_UPLOAD_BYTES, folderOf, isAssetType, listFiles, assetExists,
-  urlOf, prettifyName, detectImage, saveUpload, fileOf
+  isAssetType, listFiles, assetExists, urlOf, prettifyName, fileOf
 } from '../utils/assetStore.js';
 import { saveChanges } from './contentController.js';
 
@@ -13,14 +10,12 @@ import { saveChanges } from './contentController.js';
  * contentAssetController.js  (Application tier - BCE)          UC-10 (images + NPCs)
  *
  *   ContentManager   listAssets()     GET  /api/content/assets?type=background|npc
- *   ContentManager   uploadAsset()    POST /api/content/assets/upload?type=&name=   (raw image bytes)
- *   ContentManager   renameAsset()    PUT  /api/content/assets/:assetID
  *   NPC              listNpcs(), addNpc(), editNpc(), removeNpc()
  *
  * Teachers pick images by NAME + preview; the database stores the plain file name.
  * Files already in the folders are listed automatically (name made from the file name,
- * renameable). Uploads: PNG / JPG / WEBP, max 2 MB, the real file type is checked from the
- * first bytes, and the file is saved under a random name. SVG is refused.
+ * Teachers can NOT upload or rename images: the picture library is fixed and only the admin
+ * adds files to assets/gameAsset (this keeps the hosted server free of user-written files).
  * ============================================================================
  */
 
@@ -78,65 +73,6 @@ export const listAssets = async (req, res) => {
   } catch (err) {
     console.error('listAssets error:', err);
     return failServer(res, err, 'Senarai gambar tidak dapat dimuatkan.');
-  }
-};
-
-/** Body = the raw image bytes (route uses express.raw). Name comes in the query string. */
-export const uploadAsset = async (req, res) => {
-  try {
-    const type = req.query.type;
-    if (!isAssetType(type)) return fail(res, 400, 'Jenis gambar tidak sah.');
-
-    const name = validName(req.query.name, 'Nama gambar');
-    if (name.error) return fail(res, 422, name.error, { errors: { name: name.error } });
-
-    const buf = req.body;
-    if (!Buffer.isBuffer(buf) || buf.length === 0) {
-      return fail(res, 415, 'Fail gambar tidak diterima. Gunakan PNG, JPG atau WEBP.');
-    }
-    if (buf.length > MAX_UPLOAD_BYTES) return fail(res, 413, 'Fail terlalu besar (maksimum 2 MB).');
-
-    const image = detectImage(buf);
-    if (!image) return fail(res, 415, 'Format fail tidak disokong. Gunakan PNG, JPG atau WEBP.');
-
-    const file = saveUpload(type, buf, image.ext);
-    try {
-      const [ins] = await db.query(
-        `INSERT INTO MediaAsset (assetType, displayName, filePath, uploadedBy) VALUES (?, ?, ?, ?)`,
-        [type, name.value, file, req.teacher.teacherID]);
-      await saveChanges(req.teacher, null, 'Muat naik gambar',
-        `${type === 'npc' ? 'Gambar NPC' : 'Gambar latar'} baharu: "${name.value}"`);
-      return res.status(201).json({
-        success: true,
-        message: 'Gambar berjaya dimuat naik.',
-        asset: { assetID: ins.insertId, displayName: name.value, file, url: urlOf(type, file) }
-      });
-    } catch (dbErr) {
-      fs.rmSync(path.join(folderOf(type), file), { force: true });   // no orphan file when the record fails
-      throw dbErr;
-    }
-  } catch (err) {
-    console.error('uploadAsset error:', err);
-    return failServer(res, err, 'Gambar gagal dimuat naik. Sila cuba lagi.');
-  }
-};
-
-export const renameAsset = async (req, res) => {
-  try {
-    const assetID = toID(req.params.assetID);
-    if (!assetID) return fail(res, 400, 'Gambar tidak sah.');
-    const [rows] = await db.query(`SELECT assetID, displayName FROM MediaAsset WHERE assetID = ?`, [assetID]);
-    if (rows.length === 0) return fail(res, 404, 'Gambar tidak dijumpai.');
-
-    const name = validName(req.body.displayName, 'Nama gambar');
-    if (name.error) return fail(res, 422, name.error, { errors: { displayName: name.error } });
-
-    await db.query(`UPDATE MediaAsset SET displayName = ? WHERE assetID = ?`, [name.value, assetID]);
-    await saveChanges(req.teacher, null, 'Namakan semula gambar', `"${rows[0].displayName}" \u2192 "${name.value}"`);
-    return res.status(200).json({ success: true, message: 'Nama gambar dikemas kini.' });
-  } catch (err) {
-    console.error('renameAsset error:', err);
-    return failServer(res, err, 'Nama gambar gagal disimpan.');
   }
 };
 

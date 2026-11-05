@@ -6,6 +6,7 @@ import { assetExists, urlOf, prettifyName, fileOf } from '../utils/assetStore.js
 import '../utils/questRules.js';
 import { saveChanges } from './contentController.js';
 import { ContentManager } from '../models/ContentManager.js';
+import { canEditContent } from '../middleware/requireAdmin.js';
 
 /**
  * ============================================================================
@@ -55,13 +56,24 @@ const effectiveType = (quest) => {
 /* ------------------------------------------------------------------------ */
 
 const getNarrative = (id, conn = db) =>
-  first(conn, `SELECT narrativeID, eraID, narrativeTitle, summary FROM Narrative WHERE narrativeID = ?`, [id]);
+  first(conn, `SELECT narrativeID, eraID, narrativeTitle, summary, ownerTeacherID FROM Narrative WHERE narrativeID = ?`, [id]);
 
 /** a narrative must keep this many scenes that have a quest (the quest IS the gameplay of a scene) */
 const MIN_QUEST_SCENES = 3;
 const questSceneCount = async (narrativeID) => Number((await first(db,
   `SELECT COUNT(DISTINCT q.sceneID) AS c FROM Quest q INNER JOIN Scene s ON q.sceneID = s.sceneID WHERE s.narrativeID = ?`, [narrativeID])).c);
 const QUEST_MIN_MSG = `Naratif mesti mempunyai sekurang-kurangnya ${MIN_QUEST_SCENES} babak yang ada misi. Tambah misi pada babak lain dahulu.`;
+
+/**
+ * Naratif mana yang boleh dilihat guru: yang tetap (ownerTeacherID kosong) + miliknya sendiri.
+ * Admin melihat semuanya. Naratif guru lain tidak kelihatan.
+ */
+const VISIBLE = (alias) => `(? = 1 OR ${alias}.ownerTeacherID IS NULL OR ${alias}.ownerTeacherID = ?)`;
+const visibleParams = (req) => [req.teacher.isAdmin ? 1 : 0, req.teacher.teacherID];
+/** Boleh diubah penuh? Admin, atau pemilik naratif. Naratif tetap = hanya lihat + Nota Guru. */
+const editableBy = (req, n) => canEditContent(req.teacher) || Boolean(n.ownerTeacherID && n.ownerTeacherID === req.teacher.teacherID);
+const flags = (req, n) => ({ owned: Boolean(n.ownerTeacherID), editable: editableBy(req, n) });
+const canSee = (req, n) => req.teacher.isAdmin || !n.ownerTeacherID || n.ownerTeacherID === req.teacher.teacherID;
 
 const getScene = (sceneID, conn = db) =>
   first(conn,
@@ -131,16 +143,16 @@ export const viewNarratives = async (req, res) => {
     if (!eraID) return fail(res, 400, 'Era tidak sah.');
 
     const [rows] = await db.query(
-      `SELECT n.narrativeID, n.narrativeTitle, n.summary,
+      `SELECT n.narrativeID, n.narrativeTitle, n.summary, n.ownerTeacherID,
               (SELECT COUNT(*) FROM Scene s WHERE s.narrativeID = n.narrativeID) AS sceneCount,
               (SELECT COUNT(DISTINCT q.sceneID) FROM Quest q
                  INNER JOIN Scene s ON q.sceneID = s.sceneID WHERE s.narrativeID = n.narrativeID) AS questSceneCount
-       FROM Narrative n WHERE n.eraID = ? ORDER BY n.narrativeID ASC`,
-      [eraID]
+       FROM Narrative n WHERE n.eraID = ? AND ${VISIBLE('n')} ORDER BY n.narrativeID ASC`,
+      [eraID, ...visibleParams(req)]
     );
     return res.status(200).json({
       success: true,
-      narratives: rows.map((r) => ({ ...r, sceneCount: Number(r.sceneCount), questSceneCount: Number(r.questSceneCount) }))
+      narratives: rows.map(({ ownerTeacherID, ...r }) => ({ ...r, ...flags(req, { ownerTeacherID }), sceneCount: Number(r.sceneCount), questSceneCount: Number(r.questSceneCount) }))
     });
   } catch (err) {
     console.error('viewNarratives error:', err);
@@ -155,7 +167,7 @@ export const viewNarrative = async (req, res) => {
     if (!narrativeID) return fail(res, 400, 'Naratif tidak sah.');
 
     const narrative = await getNarrative(narrativeID);
-    if (!narrative) return fail(res, 404, 'Naratif tidak dijumpai.');
+    if (!narrative || !canSee(req, narrative)) return fail(res, 404, 'Naratif tidak dijumpai.');
 
     const [scenes] = await db.query(
       `SELECT sceneID, sceneStoryline, sceneOrder, asset FROM Scene
@@ -194,7 +206,7 @@ export const viewNarrative = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      narrative,
+      narrative: { narrativeID: narrative.narrativeID, eraID: narrative.eraID, narrativeTitle: narrative.narrativeTitle, summary: narrative.summary, ...flags(req, narrative) },
       scenes: scenes.map((s) => ({
         sceneID: s.sceneID,
         order: s.sceneOrder,
@@ -262,8 +274,8 @@ export const addNarrative = async (req, res) => {
     if (!(await first(db, `SELECT eraID FROM HistoricalEra WHERE eraID = ?`, [eraID]))) return fail(res, 404, 'Era tidak dijumpai.');
 
     const [result] = await db.query(
-      `INSERT INTO Narrative (narrativeTitle, eraID, summary) VALUES (?, ?, ?)`,
-      [value.narrativeTitle, eraID, value.summary]);
+      `INSERT INTO Narrative (narrativeTitle, eraID, summary, ownerTeacherID) VALUES (?, ?, ?, ?)`,
+      [value.narrativeTitle, eraID, value.summary, req.teacher.isAdmin ? null : req.teacher.teacherID]);   // admin = kandungan tetap; guru = naratif milik guru itu
 
     await saveChanges(req.teacher, eraID, 'Tambah naratif', `Naratif baharu: "${clip(value.narrativeTitle, 100)}"`);
     return res.status(201).json({ success: true, message: 'Naratif berjaya ditambah.', narrativeID: result.insertId });

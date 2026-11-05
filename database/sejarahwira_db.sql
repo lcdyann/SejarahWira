@@ -203,6 +203,28 @@ INSERT INTO `class` (`classID`, `className`, `batchYear`, `teacherID`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `teachernote`
+-- NOTA GURU: lapisan tambahan guru di atas dialog tetap. Satu guru = satu nota bagi satu baris dialog.
+-- Pelajar melihat nota guru kelas mereka (merentas SEMUA kelas guru itu). Dialog tetap tidak pernah diubah.
+--
+
+DROP TABLE IF EXISTS `teachernote`;
+CREATE TABLE `teachernote` (
+  `noteID` bigint(20) NOT NULL AUTO_INCREMENT,
+  `teacherID` varchar(20) NOT NULL,
+  `dialogueID` bigint(20) NOT NULL,
+  `noteText` varchar(500) NOT NULL,
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`noteID`),
+  UNIQUE KEY `uq_note_teacher_line` (`teacherID`,`dialogueID`),
+  KEY `dialogueID` (`dialogueID`),
+  CONSTRAINT `teachernote_ibfk_1` FOREIGN KEY (`teacherID`) REFERENCES `teacher` (`teacherID`) ON DELETE CASCADE,
+  CONSTRAINT `teachernote_ibfk_2` FOREIGN KEY (`dialogueID`) REFERENCES `dialogueline` (`dialogueID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `contentmanager`
 --
 
@@ -3073,7 +3095,8 @@ CREATE TABLE `narrative` (
   `narrativeID` bigint(20) NOT NULL,
   `narrativeTitle` varchar(100) NOT NULL,
   `eraID` bigint(20) NOT NULL,
-  `summary` text NOT NULL
+  `summary` text NOT NULL,
+  `ownerTeacherID` varchar(20) DEFAULT NULL COMMENT 'NULL = kandungan tetap; ID guru = naratif milik guru itu'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -3637,7 +3660,8 @@ CREATE TABLE `question` (
   `option_d` varchar(255) NOT NULL,
   `correctAnswer` char(1) NOT NULL,
   `hint` varchar(255) DEFAULT NULL,
-  `explanation` text DEFAULT NULL
+  `explanation` text DEFAULT NULL,
+  `ownerTeacherID` varchar(20) DEFAULT NULL COMMENT 'NULL = soalan tetap; ID guru = soalan milik guru itu'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -4513,7 +4537,8 @@ DROP TABLE IF EXISTS `teacher`;
 CREATE TABLE `teacher` (
   `teacherID` varchar(20) NOT NULL,
   `teacherName` varchar(100) NOT NULL,
-  `userID` bigint(20) NOT NULL
+  `userID` bigint(20) NOT NULL,
+  `canEditFixed` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'SUIS ADMIN: 1 = guru boleh menyalin & mengubah kandungan tetap untuk kelasnya sendiri'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -4546,7 +4571,7 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`userID`, `username`, `role`, `password`) VALUES
 (1, 'student', 'Student', '123456'),
 (2, 'teacher', 'Teacher', 'scrypt$16384$FdVjPmmjcQJLeFWxiiHLqw$oKhySAMTy75Jm8LXs2dX8O2ZVZ4G4sCQj3e2oYWLs-A'),
-(3, 'diyananadra', 'Teacher', 'scrypt$16384$EgnhECKWq9u9sZyjaOYcrQ$MFgjy2JKpoNdUeXlP8QRU5WrrxrsrBvItulmXU001q0'),
+(3, 'diyananadra', 'Teacher', 'scrypt$16384$zwAF8ET9m5BzjvPK5rbLew$EYTQ-80bh5UpGKV-8W4LrhNtUislyO-b_OXqh4O36zE'),
 (4, '__public__', 'Teacher', '3e82490f37a6d2045028c273f076e860ed20fb0cce004ca99e627af669dc43a4');
 
 --
@@ -4661,7 +4686,8 @@ ALTER TABLE `monitoranalytics`
 --
 ALTER TABLE `narrative`
   ADD PRIMARY KEY (`narrativeID`),
-  ADD KEY `eraID` (`eraID`);
+  ADD KEY `eraID` (`eraID`),
+  ADD KEY `ownerTeacherID` (`ownerTeacherID`);
 
 --
 -- Indexes for table `npc`
@@ -4688,7 +4714,8 @@ ALTER TABLE `questcompletion`
 --
 ALTER TABLE `question`
   ADD PRIMARY KEY (`questionID`),
-  ADD KEY `bankID` (`bankID`);
+  ADD KEY `bankID` (`bankID`),
+  ADD KEY `ownerTeacherID` (`ownerTeacherID`);
 
 --
 -- Indexes for table `questionbank`
@@ -4934,7 +4961,8 @@ ALTER TABLE `monitoranalytics`
 -- Constraints for table `narrative`
 --
 ALTER TABLE `narrative`
-  ADD CONSTRAINT `narrative_ibfk_1` FOREIGN KEY (`eraID`) REFERENCES `historicalera` (`eraID`) ON DELETE CASCADE;
+  ADD CONSTRAINT `narrative_ibfk_1` FOREIGN KEY (`eraID`) REFERENCES `historicalera` (`eraID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `narrative_ibfk_2` FOREIGN KEY (`ownerTeacherID`) REFERENCES `teacher` (`teacherID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `quest`
@@ -4953,7 +4981,8 @@ ALTER TABLE `questcompletion`
 -- Constraints for table `question`
 --
 ALTER TABLE `question`
-  ADD CONSTRAINT `question_ibfk_1` FOREIGN KEY (`bankID`) REFERENCES `questionbank` (`bankID`) ON DELETE CASCADE;
+  ADD CONSTRAINT `question_ibfk_1` FOREIGN KEY (`bankID`) REFERENCES `questionbank` (`bankID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `question_ibfk_2` FOREIGN KEY (`ownerTeacherID`) REFERENCES `teacher` (`teacherID`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `questionbank`

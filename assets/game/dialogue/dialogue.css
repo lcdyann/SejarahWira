@@ -155,3 +155,50 @@
     0 0 24px #8a5cff55,
     0 4px 0 rgba(0, 0, 0, 0.55);
 }
+
+/* NOTA GURU: ikon buku di luar kotak dialog, sudut kanan atas (di atas panel). Aset: gameAsset/hub/buku.png + diari.png */
+.dlg-note-btn {
+  position: absolute;
+  right: 40px;
+  bottom: calc(22px + 124px + 14px);      /* tepat di atas kotak dialog */
+  width: 56px; height: 56px;
+  padding: 0; background: none; border: 0; cursor: pointer;
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.55));
+  animation: dlgNoteBob 1.6s ease-in-out infinite;
+}
+.dlg-note-btn:hover { transform: scale(1.08); }
+.dlg-note-ico { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; pointer-events: none; }
+.dlg-note-card {
+  position: absolute;
+  right: 40px;
+  bottom: calc(22px + 124px + 14px + 62px);
+  width: min(360px, 80vw);
+  padding: 12px 14px;
+  background: #fff8e1; color: #111; border: 3px solid #3a2a14;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.55);
+  font-size: 14px; line-height: 1.5; white-space: pre-wrap;
+}
+.dlg-note-card::before { content: 'Nota guru'; display: block; font-family: var(--font-pixel); font-size: 9px; margin-bottom: 6px; color: #7a5a1c; }
+.dlg-note-btn.hidden, .dlg-note-card.hidden { display: none; }
+@keyframes dlgNoteBob { 50% { transform: translateY(-3px); } }
+
+/* Cahaya emas berdenyut pada buku sehingga murid membukanya; petua kali pertama di sebelah kiri buku */
+.dlg-note-btn.is-new { animation: dlgNoteBob 1.6s ease-in-out infinite, dlgNoteGlow 1.4s ease-in-out infinite; }
+@keyframes dlgNoteGlow {
+  0%, 100% { filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.55)) drop-shadow(0 0 4px rgba(252, 211, 77, 0.6)); }
+  50%      { filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.55)) drop-shadow(0 0 16px rgba(252, 211, 77, 1)); }
+}
+.dlg-note-hint {
+  position: absolute;
+  right: calc(40px + 56px + 12px);
+  bottom: calc(22px + 124px + 14px + 4px);
+  padding: 8px 12px;
+  background: #fcd34d; color: #111; border: 3px solid #3a2a14;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.55);
+  font-size: 13px; font-weight: bold; line-height: 1.35; text-align: center;
+  animation: dlgNoteBob 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+.dlg-note-hint::after { content: ''; position: absolute; right: -12px; top: 50%; margin-top: -7px; border: 7px solid transparent; border-left: 7px solid #3a2a14; }
+.dlg-note-hint.hidden { display: none; }
+@media (prefers-reduced-motion: reduce) { .dlg-note-btn.is-new, .dlg-note-hint { animation: none; } }

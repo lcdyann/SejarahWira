@@ -3,6 +3,7 @@ import {
   AssessmentModel,
   AssessmentAttemptModel
 } from '../models/AssessmentModels.js';
+import { teacherOfStudent } from '../utils/studentTeacher.js';
 import { updateProgress } from './storyController.js';
 import { EraProgressionModel } from '../models/ProgressModels.js';
 import { createTicket, getTicket, answerTicket, closeTicket } from '../utils/siegeTickets.js';
@@ -28,7 +29,7 @@ export const retrieveRandomQuestions = async (req, res) => {
   try {
     const { eraID, limit = 10 } = req.query;
 
-    const questions = await QuestionBankModel.retrieveRandomQuestions(eraID, limit);
+    const questions = await QuestionBankModel.retrieveRandomQuestions(eraID, limit, await teacherOfStudent(req.student.studentID));
 
     if (!questions || questions.length === 0) {
       return res.status(404).json({
@@ -66,7 +67,7 @@ export const startAssessment = async (req, res) => {
     }
 
     const assessment = await AssessmentModel.getByEraAndType(eraID, 'Summative');
-    const questions = await QuestionBankModel.retrieveRandomQuestions(eraID, limit);
+    const questions = await QuestionBankModel.retrieveRandomQuestions(eraID, limit, await teacherOfStudent(req.student.studentID));
 
     if (!assessment) {
       return res.status(404).json({ success: false, message: 'Tiada Pentaksiran Sumatif (The Great Siege) untuk era ini.' });

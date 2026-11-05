@@ -116,9 +116,12 @@ const getOrCreateBank = async (eraID) => {
 };
 
 /** A question together with the era of its bank (null when it does not exist). */
+/** Soalan tetap (ownerTeacherID kosong) + soalan milik guru ini; admin melihat semua. */
+const QVISIBLE = '(? = 1 OR q.ownerTeacherID IS NULL OR q.ownerTeacherID = ?)';
+
 const findQuestion = async (questionID) => {
   const [rows] = await db.query(
-    `SELECT q.questionID, q.bankID, q.questionText, qb.eraID
+    `SELECT q.questionID, q.bankID, q.questionText, q.ownerTeacherID, qb.eraID
      FROM Question q INNER JOIN QuestionBank qb ON q.bankID = qb.bankID
      WHERE q.questionID = ? LIMIT 1`,
     [questionID]
@@ -151,7 +154,7 @@ const parseJsonSafe = (v) => {
   try { return JSON.parse(v); } catch { return null; }
 };
 
-const buildEraSummaries = async () => {
+const buildEraSummaries = async (teacher) => {
   const [eras] = await db.query(`SELECT eraID, eraName, description FROM HistoricalEra ORDER BY eraID ASC`);
 
   const [narratives] = await db.query(
@@ -164,13 +167,16 @@ const buildEraSummaries = async () => {
             (SELECT COUNT(DISTINCT q.sceneID) FROM Quest q
                INNER JOIN Scene s ON q.sceneID = s.sceneID
               WHERE s.narrativeID = n.narrativeID) AS scenesWithQuest
-     FROM Narrative n ORDER BY n.narrativeID ASC`
+     FROM Narrative n WHERE (? = 1 OR n.ownerTeacherID IS NULL OR n.ownerTeacherID = ?)   -- naratif tetap + milik guru ini (admin: semua)
+     ORDER BY n.narrativeID ASC`,
+    [teacher.isAdmin ? 1 : 0, teacher.teacherID]
   );
 
   const [questionCounts] = await db.query(
     `SELECT qb.eraID, COUNT(q.questionID) AS total
-     FROM QuestionBank qb LEFT JOIN Question q ON q.bankID = qb.bankID
-     GROUP BY qb.eraID`
+     FROM QuestionBank qb LEFT JOIN Question q ON q.bankID = qb.bankID AND ${QVISIBLE}
+     GROUP BY qb.eraID`,
+    [teacher.isAdmin ? 1 : 0, teacher.teacherID]
   );
   const [badgeCounts] = await db.query(`SELECT eraID, COUNT(*) AS total FROM Badge GROUP BY eraID`);
   const [summatives] = await db.query(
@@ -297,8 +303,8 @@ const buildEraSummaries = async () => {
 /** Teacher.manageLearningContent()  - step 2: list of historical eras, with readiness. */
 export const manageLearningContent = async (req, res) => {
   try {
-    const eras = await buildEraSummaries();
-    return res.status(200).json({ success: true, eras, canEdit: canEditContent(req.teacher) });
+    const eras = await buildEraSummaries(req.teacher);
+    return res.status(200).json({ success: true, eras, canEdit: true, isAdmin: Boolean(req.teacher.isAdmin) });
   } catch (err) {
     console.error('manageLearningContent error:', err);
     return failServer(res, err, 'Senarai era tidak dapat dimuatkan.');
@@ -311,10 +317,10 @@ export const viewEraContent = async (req, res) => {
     const eraID = toEraID(req.query.eraID);
     if (!eraID) return res.status(400).json({ success: false, message: 'Era tidak sah.' });
 
-    const era = (await buildEraSummaries()).find((e) => e.eraID === eraID);
+    const era = (await buildEraSummaries(req.teacher)).find((e) => e.eraID === eraID);
     if (!era) return res.status(404).json({ success: false, message: 'Era tidak dijumpai.' });
 
-    return res.status(200).json({ success: true, era, canEdit: canEditContent(req.teacher) });
+    return res.status(200).json({ success: true, era, canEdit: true });
   } catch (err) {
     console.error('viewEraContent error:', err);
     return failServer(res, err, 'Kandungan era tidak dapat dimuatkan.');
@@ -331,14 +337,20 @@ export const listQuestions = async (req, res) => {
     const [rows] = await db.query(
       `SELECT q.questionID, q.questionText,
               q.option_a AS optionA, q.option_b AS optionB, q.option_c AS optionC, q.option_d AS optionD,
-              q.correctAnswer, q.hint, q.explanation
+              q.correctAnswer, q.hint, q.explanation, q.ownerTeacherID
        FROM Question q INNER JOIN QuestionBank qb ON q.bankID = qb.bankID
-       WHERE qb.eraID = ?
+       WHERE qb.eraID = ? AND ${QVISIBLE}
        ORDER BY q.questionID ASC`,
-      [eraID]
+      [eraID, req.teacher.isAdmin ? 1 : 0, req.teacher.teacherID]
     );
 
-    return res.status(200).json({ success: true, eraID, questions: rows });
+    // owned = soalan tambahan guru; editable = boleh diubah oleh pengguna ini (admin, atau guru pemilik soalan)
+    const questions = rows.map(({ ownerTeacherID, ...q }) => ({
+      ...q,
+      owned: Boolean(ownerTeacherID),
+      editable: canEditContent(req.teacher) || ownerTeacherID === req.teacher.teacherID
+    }));
+    return res.status(200).json({ success: true, eraID, questions });
   } catch (err) {
     console.error('listQuestions error:', err);
     return failServer(res, err, 'Senarai soalan tidak dapat dimuatkan.');
@@ -360,10 +372,11 @@ export const addQuestion = async (req, res) => {
     const bankID = await getOrCreateBank(eraID);
     const [result] = await db.query(
       `INSERT INTO Question
-         (bankID, questionText, option_a, option_b, option_c, option_d, correctAnswer, hint, explanation)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (bankID, questionText, option_a, option_b, option_c, option_d, correctAnswer, hint, explanation, ownerTeacherID)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [bankID, value.questionText, value.optionA, value.optionB, value.optionC, value.optionD,
-       value.correctAnswer, value.hint || null, value.explanation || null]
+       value.correctAnswer, value.hint || null, value.explanation || null,
+       req.teacher.isAdmin ? null : req.teacher.teacherID]      // admin = soalan tetap; guru = soalan milik guru itu
     );
 
     await saveChanges(req.teacher, eraID, 'Tambah soalan', `Soalan baharu: "${clip(value.questionText, 120)}"`);
@@ -444,8 +457,13 @@ export const viewChanges = async (req, res) => {
     if (req.query.eraID && !eraID) return res.status(400).json({ success: false, message: 'Era tidak sah.' });
 
     const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 30, 1), 100);
-    const where = eraID ? 'WHERE c.eraID = ?' : '';
-    const params = eraID ? [eraID, limit] : [limit];
+    // REKOD PERIBADI: guru hanya melihat perubahan yang dibuatnya sendiri; admin melihat semua.
+    const conds = [];
+    const params = [];
+    if (eraID) { conds.push('c.eraID = ?'); params.push(eraID); }
+    if (!req.teacher.isAdmin) { conds.push('c.teacherID = ?'); params.push(req.teacher.teacherID); }
+    const where = conds.length ? `WHERE ${conds.join(' AND ')}` : '';
+    params.push(limit);
 
     const [rows] = await db.query(
       `SELECT c.changesID, c.changesName, c.changesDescription, c.updated_at, c.eraID,

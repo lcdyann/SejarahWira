@@ -5,6 +5,7 @@
 -- Disable foreign key checks for clean table drops
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS TeacherNote;
 DROP TABLE IF EXISTS StudentArtifact;
 DROP TABLE IF EXISTS StudentBadge;
 DROP TABLE IF EXISTS QuestCompletion;
@@ -51,6 +52,7 @@ CREATE TABLE Teacher (
   teacherID VARCHAR(20) PRIMARY KEY,
   teacherName VARCHAR(100) NOT NULL,
   userID BIGINT NOT NULL,
+  canEditFixed TINYINT(1) NOT NULL DEFAULT 0,   -- SUIS ADMIN: 1 = guru boleh menyalin & mengubah kandungan tetap untuk kelasnya
   FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE
 );
 
@@ -136,7 +138,9 @@ CREATE TABLE Narrative (
   narrativeTitle VARCHAR(100) NOT NULL,
   eraID BIGINT NOT NULL,
   summary TEXT NOT NULL,
-  FOREIGN KEY (eraID) REFERENCES HistoricalEra(eraID) ON DELETE CASCADE
+  ownerTeacherID VARCHAR(20) NULL,      -- NULL = kandungan tetap; ID guru = naratif milik guru itu
+  FOREIGN KEY (eraID) REFERENCES HistoricalEra(eraID) ON DELETE CASCADE,
+  FOREIGN KEY (ownerTeacherID) REFERENCES Teacher(teacherID) ON DELETE CASCADE
 );
 
 -- Table 4.5.11: Scene
@@ -256,7 +260,9 @@ CREATE TABLE Question (
   correctAnswer CHAR(1) NOT NULL,
   hint VARCHAR(255) NULL,
   explanation TEXT NULL,
-  FOREIGN KEY (bankID) REFERENCES QuestionBank(bankID) ON DELETE CASCADE
+  ownerTeacherID VARCHAR(20) NULL,      -- NULL = soalan tetap; ID guru = soalan milik guru itu
+  FOREIGN KEY (bankID) REFERENCES QuestionBank(bankID) ON DELETE CASCADE,
+  FOREIGN KEY (ownerTeacherID) REFERENCES Teacher(teacherID) ON DELETE CASCADE
 );
 
 -- ====================================================================
@@ -327,6 +333,18 @@ CREATE TABLE MediaAsset (
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   UNIQUE KEY uq_asset_file (assetType, filePath),
   FOREIGN KEY (uploadedBy) REFERENCES Teacher(teacherID) ON DELETE SET NULL
+);
+
+-- Table: TeacherNote  (nota guru di atas dialog tetap; satu guru = satu nota bagi satu baris dialog)
+CREATE TABLE TeacherNote (
+  noteID BIGINT AUTO_INCREMENT PRIMARY KEY,
+  teacherID VARCHAR(20) NOT NULL,
+  dialogueID BIGINT NOT NULL,
+  noteText VARCHAR(500) NOT NULL,
+  updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+  UNIQUE KEY uq_note_teacher_line (teacherID, dialogueID),
+  FOREIGN KEY (teacherID) REFERENCES Teacher(teacherID) ON DELETE CASCADE,
+  FOREIGN KEY (dialogueID) REFERENCES DialogueLine(dialogueID) ON DELETE CASCADE
 );
 
 -- Table 4.5.22: MonitorAnalytics

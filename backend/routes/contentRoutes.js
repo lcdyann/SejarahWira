@@ -1,6 +1,7 @@
 import express from 'express';
 import { protectParams } from '../utils/inputGuard.js';
 import { adminForWrites } from '../middleware/requireAdmin.js';
+import { guardContentWrites } from '../middleware/requireContentOwner.js';
 import { requireTeacher } from '../middleware/requireTeacher.js';
 import {
   manageLearningContent,
@@ -18,8 +19,10 @@ import {
   saveDialogue,
   addQuest, editQuest, removeQuest
 } from '../controllers/contentStoryController.js';
+import { listPermissions, setPermission } from '../controllers/teacherPermissionController.js';
+import { listNotes, saveNote } from '../controllers/teacherNoteController.js';
 import {
-  listAssets, uploadAsset, renameAsset,
+  listAssets,
   listNpcs, addNpc, editNpc, removeNpc
 } from '../controllers/contentAssetController.js';
 import {
@@ -32,7 +35,7 @@ protectParams(router);      // ID dalam alamat mesti nombor / bentuk ID yang sah
 // Every content route needs a logged-in teacher (signed token)
 router.use(requireTeacher);
 // Reading and playing the content is for every teacher; changing it is for the admin only
-router.use(adminForWrites);
+router.use(guardContentWrites);   // admin: semua; guru: hanya naratif miliknya (middleware/requireContentOwner.js)
 
 // Teacher.manageLearningContent()
 router.get('/eras', manageLearningContent);
@@ -62,16 +65,20 @@ router.post('/quests', addQuest);
 router.put('/quests/:questID', editQuest);
 router.delete('/quests/:questID', removeQuest);
 
-// Image library + NPC library
+// Image library (read-only: teachers pick, they cannot upload) + NPC library
 router.get('/assets', listAssets);
-router.post('/assets/upload',
-  express.raw({ type: ['image/png', 'image/jpeg', 'image/webp'], limit: '2mb' }),   // raw bytes, no multer needed
-  uploadAsset);
-router.put('/assets/:assetID', renameAsset);
 router.get('/npcs', listNpcs);
 router.post('/npcs', addNpc);
 router.put('/npcs/:npcID', editNpc);
 router.delete('/npcs/:npcID', removeNpc);
+
+// Suis kebenaran guru (admin sahaja)
+router.get('/teacher-permissions', listPermissions);
+router.put('/teacher-permissions/:teacherID', setPermission);
+
+// Nota Guru (lapisan tambahan guru pada dialog tetap; setiap guru hanya nota miliknya)
+router.get('/notes', listNotes);
+router.put('/notes/:dialogueID', saveNote);
 
 // ContentManager change log (visible to all teachers)
 router.get('/changes', viewChanges);

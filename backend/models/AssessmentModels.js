@@ -19,7 +19,8 @@ import db from '../config/db.js';
  */
 export class QuestionBankModel {
   /** Assessment.retrieveRandomQuestions() */
-  static async retrieveRandomQuestions(eraID, limit = 10) {
+  /** teacherID: soalan tetap + soalan tambahan guru itu sahaja (null = soalan tetap sahaja). */
+  static async retrieveRandomQuestions(eraID, limit = 10, teacherID = null) {
     try {
       let query = `
         SELECT 
@@ -35,10 +36,11 @@ export class QuestionBankModel {
         FROM Question q
         INNER JOIN QuestionBank qb ON q.bankID = qb.bankID
       `;
-      const queryParams = [];
+      const queryParams = [teacherID];
+      query += ` WHERE (q.ownerTeacherID IS NULL OR q.ownerTeacherID = ?)`;
 
       if (eraID && eraID !== 'all') {
-        query += ` WHERE qb.eraID = ?`;
+        query += ` AND qb.eraID = ?`;
         queryParams.push(parseInt(eraID, 10));
       }
 
@@ -107,7 +109,7 @@ export class AssessmentModel {
   unlockAssessment(narrativeComplete) { return AssessmentModel.unlockAssessment(this.eraID, narrativeComplete); }
 
   /** Assessment.retrieveRandomQuestions() */
-  retrieveRandomQuestions(limit = 10) { return QuestionBankModel.retrieveRandomQuestions(this.eraID, limit); }
+  retrieveRandomQuestions(limit = 10, teacherID = null) { return QuestionBankModel.retrieveRandomQuestions(this.eraID, limit, teacherID); }
 
   /** Assessment.startAssessment(): the question set for one sitting */
   async startAssessment(limit = 10) {

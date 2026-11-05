@@ -459,7 +459,7 @@ export class MissionScene extends GameScene {
       if (turn && !d.isPlayer) {
         await this.playTurn(turn, { name: shownName, text: d.text, portrait, side });
       } else {
-        await this.gate(this.dialog.say({ name: shownName, text: d.text, portrait: portrait(), side, tone: d.isPlayer ? 'me' : '' }));
+        await this.gate(this.dialog.say({ name: shownName, text: d.text, portrait: portrait(), side, tone: d.isPlayer ? 'me' : '', note: d.note }));
       }
       // catat dalam log SELEPAS baris dibaca (jawapan Giliran Anda sengaja tidak dicatat)
       this.log.push({ name: shownName, text: d.text, src, me: d.isPlayer });

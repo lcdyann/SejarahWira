@@ -17,6 +17,7 @@ import teacherProgressRoutes from './routes/teacherProgressRoutes.js';
 import teacherProfileRoutes from './routes/teacherProfileRoutes.js';
 import classRoutes from './routes/classRoutes.js';
 import avatarRoutes from './routes/avatarRoutes.js';
+import teacherNoteRoutes from './routes/teacherNoteRoutes.js';   // nota guru (lapisan tambahan guru)
 import entityRoutes from './routes/entityRoutes.js';       // Pendekar Bayang lines (student, read only)
 
 import db from './config/db.js';
@@ -105,6 +106,7 @@ app.use('/api/teacher-profile', teacherProfileRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/avatar', avatarRoutes);
 app.use('/api/entity', entityRoutes);
+app.use('/api/teacher-notes', teacherNoteRoutes);
 
 // Unknown /api URLs answer with JSON, never an HTML page
 app.use('/api', (req, res) => {

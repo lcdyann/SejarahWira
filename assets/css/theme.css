@@ -109,3 +109,32 @@
 /* quest editor in light mode: readable selected type + completion note */
 :root[data-theme="light"] .qe-type.is-selected { background: #e3f5e6; }
 :root[data-theme="light"] .qe-done { color: #15803d; }
+
+
+/* ============================================================================
+   MOD CERAH: kandungan tetap, Nota Guru dan warna yang dibetulkan supaya jelas dibaca
+   ============================================================================ */
+:root[data-theme="light"] .story-board.is-fixed { background: #eceff4; border-color: #8a94a6; }
+:root[data-theme="light"] .story-board.is-fixed .story-pane,
+:root[data-theme="light"] .story-board.is-fixed .story-card { background: #f6f7fa; border-color: #b4bccb; }
+:root[data-theme="light"] .story-board.is-fixed .story-pane-narratives::before { background: #5b6475; color: #ffffff; }
+:root[data-theme="light"] .is-fixed-locked,
+:root[data-theme="light"] .is-fixed-locked:hover { background: #d5d9e0 !important; color: #565f70 !important; border-color: #aab2c0 !important; }
+:root[data-theme="light"] .cm-q-item.is-fixed { background: #eceff4; border-color: #b4bccb; }
+:root[data-theme="light"] .cm-q-item.is-fixed .cm-q-num { background: #5b6475; color: #ffffff; }
+:root[data-theme="light"] .story-note { background: #fff8e1; border-color: #c9a24a; }
+:root[data-theme="light"] .story-note label { color: #7a5a1c; }
+:root[data-theme="light"] .story-note-input { background: #ffffff; color: #2b2118; border-color: #c4ad7c; }
+
+/* teks yang terlalu cerah / pudar pada latar cerah */
+:root[data-theme="light"] .sd-clue { color: #6d28d9; }
+:root[data-theme="light"] .sd-add-turn,
+:root[data-theme="light"] .story-role-label { color: #0b6e8e; }
+:root[data-theme="light"] .story-role-empty { color: #a85a06; }
+:root[data-theme="light"] .qe-errors { color: #991b1b; background: rgba(239, 68, 68, 0.10); }
+:root[data-theme="light"] .ev-preview { color: #5b3fb0; }
+
+/* butang putih di atas warna sederhana: gelapkan sedikit supaya kontras >= 4.5 : 1 */
+.cm-btn-play { background: #15803d; border-color: #15803d; }
+.sd-turn-head, .sd-letter, .te-step-no { background-color: #1f7a99; }
+.is-right .sd-badge { background: #15803d; }

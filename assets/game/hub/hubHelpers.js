@@ -5,6 +5,15 @@
  */
 import { HUB_BG, HUB_STUDENT } from './hubConfig.js';
 
+/**
+ * Epilog automatik hanya SEKALI: apabila murid benar-benar menamatkan era terakhir buat kali pertama.
+ * Ingatan ini disimpan dalam pelayar (tanpanya permainan tetap berfungsi). Selepas itu murid menontonnya
+ * semula dengan butang "Ulang Epilog" di meja, bukan dengan mengulang Kepungan Agung.
+ */
+const epilogueKey = (studentID) => `sw_epilogue_seen_${studentID}`;
+export const epilogueSeen = (studentID) => { try { return localStorage.getItem(epilogueKey(studentID)) === '1'; } catch { return false; } };
+export const markEpilogueSeen = (studentID) => { try { localStorage.setItem(epilogueKey(studentID), '1'); } catch { /* tidak mengapa */ } };
+
 /** resolves true when the picture loads (the hub works without it) */
 export const probeImage = (src) => new Promise((resolve) => {
   const image = new Image();

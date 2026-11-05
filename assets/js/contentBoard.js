@@ -46,7 +46,15 @@ class StoryBoard {
     this.sceneListEl = null;
     this.role = { npcID: null };     // peranan pelajar bagi naratif yang dibuka
     this.entityMod = null;           // entityLines.js (dimuat apabila perlu)
+    this.notes = {};                 // Nota Guru: { dialogueID: teks } bagi naratif tetap yang dibuka
   }
+
+  /**
+   * Naratif TETAP (cipta sistem): guru hanya boleh melihat, bermain dan menulis Nota Guru.
+   * Naratif ciptaan guru sendiri: boleh diubah sepenuhnya. Pelayan menyemak perkara yang sama (editable).
+   */
+  get readOnly() { return Boolean(this.data && this.data.narrative.editable === false); }
+  get isFixed() { return Boolean(this.data && !this.data.narrative.owned); }
 
   get eraID() { return this.app.era.eraID; }
   get scenes() { return this.data ? this.data.scenes : []; }
@@ -89,10 +97,24 @@ class StoryBoard {
   async loadNarrative() {
     this.data = await this.app.api(`/narrative?narrativeID=${this.narrativeID}`);
     this.role = await this.loadRole();
+    await this.loadNotes();
     if (!this.scenes.some((s) => s.sceneID === this.selectedSceneID)) {
       this.selectedSceneID = this.scenes.length ? this.scenes[0].sceneID : null;
     }
     this.render();
+  }
+
+  /** Nota Guru milik guru ini bagi naratif tetap (kosong untuk naratif sendiri). */
+  async loadNotes() {
+    this.notes = {};
+    if (!this.isFixed) return;
+    try {
+      const d = await this.app.api(`/notes?narrativeID=${this.narrativeID}`);
+      d.lines.forEach((l) => { if (l.note) this.notes[l.dialogueID] = l.note; });
+      this.noteMax = d.maxLength;
+    } catch (err) {
+      if (err.status !== 401) this.app.reportError('Memuatkan Nota Guru', err);
+    }
   }
 
   /** Peranan pelajar bagi naratif ini: { npcID, badgeLine, moralLine, introLine } (npcID null = belum dipilih) */
@@ -155,6 +177,7 @@ class StoryBoard {
         this.detailPane())));
 
     if (this.sceneListEl) this.sceneListEl.scrollTop = keepScroll;
+    this.lockIfReadOnly();
   }
 
   /** the title bar of a layer: "1  Naratif" and its buttons */
@@ -181,7 +204,7 @@ class StoryBoard {
         onclick: () => this.switchNarrative(n.narrativeID)
       },
       h('strong', { text: n.narrativeTitle }),
-      h('small', { text: `${n.sceneCount} babak` }));
+      h('small', { text: `${n.sceneCount} babak \u00B7 ${n.owned ? 'Milik saya' : (n.editable ? '' : 'Tetap')}` }));
     });
 
     const info = h('div', { class: 'story-info' },
@@ -189,6 +212,7 @@ class StoryBoard {
         h('strong', { class: 'story-info-title', text: narrative.narrativeTitle }),
         h('p', { class: 'story-info-summary', text: narrative.summary }),
         h('div', { class: 'story-chips' },
+          this.readOnly ? chip('Kandungan tetap: lihat + Nota Guru', 'warn', 'fa-lock') : chip(narrative.owned ? 'Naratif saya' : 'Boleh diubah', 'ok', 'fa-pen'),
           chip(`${this.scenes.length} babak`),
           chip(`${questScenes} babak bermisi`,
             questScenes >= 3 ? 'ok' : (questScenes === 0 ? 'bad' : 'warn'),
@@ -202,7 +226,7 @@ class StoryBoard {
     return h('section', { class: 'story-pane story-pane-narratives', 'aria-label': 'Naratif' },
       this.paneHead(1, 'Naratif',
         uiButton('Naratif Baharu', 'cm-btn-ghost cm-btn-sm', () => this.editNarrative(null), 'fa-plus'),
-        uiButton('Urus NPC', 'cm-btn-ghost cm-btn-sm', () => this.manageNpcs(), 'fa-users')),
+        this.app.isAdmin ? uiButton('Urus NPC', 'cm-btn-ghost cm-btn-sm', () => this.manageNpcs(), 'fa-users') : null),
       h('p', { class: 'cm-hint story-pane-hint', text: 'Satu cerita penuh bagi era ini. Setiap kali pelajar bermain, satu naratif dipilih secara rawak (versi berbeza, fakta sejarah sama).' }),
       h('div', { class: 'story-narr-row', role: 'listbox', 'aria-label': 'Senarai naratif' }, cards),
       info,
@@ -483,7 +507,8 @@ class StoryBoard {
           h('div', { class: 'sd-bubble' },
             h('b', { text: isMe ? 'Kau (baris tetap, pelajar hanya membaca)' : speaker.name }),
             h('p', { text: l.text }))),
-        found ? turnBlock(found) : (!isMe && canAddTurn ? addTurnSlot(n) : null));
+        found ? turnBlock(found) : (!isMe && canAddTurn ? addTurnSlot(n) : null),
+        this.isFixed ? this.noteBox(l) : null);
     };
 
     const dialogueSub = hasTurns
@@ -524,6 +549,56 @@ class StoryBoard {
         h('span', { class: 'story-flow-step', text: '2 Dialog + Giliran Anda' }), h('i', { class: 'fas fa-arrow-right' }),
         h('span', { class: 'story-flow-step', text: '3 Misi' })),
       h('div', { class: 'sd-rows' }, row1, dialogue, quests));
+  }
+
+  /** Kotak Nota Guru di bawah satu baris dialog tetap. Pelajar kelas guru ini melihat ikon buku pada baris ini. */
+  noteBox(line) {
+    const area = h('textarea', {
+      class: 'story-note-input', rows: '2', maxlength: String(this.noteMax || 500),
+      placeholder: 'Tulis nota untuk murid anda di sini. Contoh: Ingat tarikh ini, ia selalu keluar dalam peperiksaan.'
+    });
+    area.value = this.notes[line.dialogueID] || '';
+    const save = uiButton('Simpan nota', 'cm-btn-ghost cm-btn-sm', async () => {
+      save.disabled = true;
+      try {
+        const r = await this.app.api(`/notes/${line.dialogueID}`, { method: 'PUT', body: { noteText: area.value } });
+        this.notes[line.dialogueID] = r.note;
+        this.app.toast(r.message);
+      } catch (err) {
+        if (err.status !== 401) this.app.toast((err.data && err.data.message) || 'Nota gagal disimpan.', 'error');
+      } finally {
+        save.disabled = false;
+      }
+    }, 'fa-book-open');
+    return h('div', { class: 'story-note' },
+      h('label', {}, h('i', { class: 'fas fa-book-open' }), ' Nota Guru'),
+      area, save);
+  }
+
+  /** Naratif tetap: butang ubah dikelabukan (pelayan menolak juga). Main, Nota Guru dan Naratif Baharu kekal aktif. */
+  lockIfReadOnly() {
+    if (!this.readOnly) return;
+    const root = this.app.$('tab-content');
+    const WRITE = ['fa-plus', 'fa-trash', 'fa-pen', 'fa-floppy-disk', 'fa-image', 'fa-arrow-up', 'fa-arrow-down', 'fa-grip-vertical'];
+    root.querySelectorAll('button').forEach((b) => {
+      const t = b.textContent.trim();
+      if (/^Naratif Baharu|^Simpan nota/.test(t) || b.closest('.story-note')) return;
+      if (WRITE.some((i) => b.querySelector(`.${i}`)) || /^Urus NPC/.test(t) || b.classList.contains('story-quest-main')
+        || b.classList.contains('sd-add-turn')) {
+        b.disabled = true;                                   // nampak tetapi kelabu: jelas ini kandungan tetap
+        b.classList.add('is-fixed-locked');
+        b.title = 'Kandungan tetap: tidak boleh diubah. Tulis Nota Guru atau cipta naratif sendiri.';
+      }
+    });
+    const board = root.querySelector('.story-board');
+    if (board) board.classList.add('is-fixed');              // warna lain untuk seluruh papan (lihat contentBoard.css)
+    root.querySelectorAll('[draggable="true"]').forEach((n) => n.setAttribute('draggable', 'false'));
+    const pane = root.querySelector('.story-pane-narratives');
+    if (pane && !pane.querySelector('.cm-readonly-note')) {
+      pane.querySelector('.story-narr-row').insertAdjacentElement('beforebegin', h('div', { class: 'cm-readonly-note', role: 'note' },
+        h('i', { class: 'fas fa-lock' }),
+        h('span', {}, h('b', { text: 'Naratif tetap. ' }), 'Anda boleh melihat dan bermain, serta menulis Nota Guru di bawah setiap baris dialog. Mahu cerita sendiri? Tekan "Naratif Baharu".')));
+    }
   }
 
   selectScene(id) {
@@ -614,7 +689,7 @@ class StoryBoard {
       state.assetUrl ? thumb(state.assetUrl, state.assetName, 'cm-bg-img') : h('div', { class: 'cm-portrait-empty', text: 'Belum memilih gambar' }),
       h('div', { class: 'cm-bg-side' },
         state.assetName ? h('strong', { text: state.assetName }) : null,
-        uiButton(state.asset ? 'Tukar Gambar' : 'Pilih / Muat Naik Gambar', 'cm-btn-ghost cm-btn-sm', async () => {
+        uiButton(state.asset ? 'Tukar Gambar' : 'Pilih Gambar', 'cm-btn-ghost cm-btn-sm', async () => {
           const picked = await this.library.pickAsset({ type: 'background', title: 'Pilih Gambar Latar Babak', currentFile: state.asset });
           if (picked) { state.asset = picked.file; state.assetUrl = picked.url; state.assetName = picked.displayName; setErr(err.asset, ''); renderBg(); }
         }, 'fa-image')));
@@ -804,7 +879,7 @@ class StoryBoard {
         rowsEl,
         h('div', { class: 'dl-add' },
           uiButton('Tambah Baris', 'cm-btn-ghost cm-btn-sm', addRow, 'fa-plus'),
-          uiButton('Urus NPC', 'cm-btn-ghost cm-btn-sm', async () => { if (await this.library.manageNpcs()) renderRows(); }, 'fa-users'))),
+          this.app.isAdmin ? uiButton('Urus NPC', 'cm-btn-ghost cm-btn-sm', async () => { if (await this.library.manageNpcs()) renderRows(); }, 'fa-users') : null)),
       stageEl));
     dlg.setFooter(uiButton('Batal', 'cm-btn-ghost', () => dlg.requestClose()), save);
     renderRows();

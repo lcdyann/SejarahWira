@@ -43,6 +43,11 @@ export function paginateText(text, max = DIALOG_PAGE_CHARS) {
 }
 
 
+/* Petua kali pertama: "Guru anda tinggalkan nota!" muncul sehingga murid menekan buku sekali (diingat dalam pelayar; tanpanya permainan tetap berfungsi). */
+const NOTE_HINT_KEY = 'sw_note_hint_seen';
+const noteHintSeen = () => { try { return localStorage.getItem(NOTE_HINT_KEY) === '1'; } catch { return false; } };
+const markNoteHintSeen = () => { try { localStorage.setItem(NOTE_HINT_KEY, '1'); } catch { /* tidak mengapa */ } };
+
 export class DialogueBox {
   /**
    * @param {Stage} stage
@@ -55,7 +60,11 @@ export class DialogueBox {
     // Susun atur kotak dialog: lihat <template id="tpl-dialogue"> dalam assets/game/dialogue/dialogue.html
     this.root = tpl('dialogue');
     ({ portrait: this.portrait, mePortrait: this.mePortrait, panel: this.panel,
-       name: this.name, text: this.text, more: this.more, choices: this.choices } = this.root.refs);
+       name: this.name, text: this.text, more: this.more, choices: this.choices,
+       noteBtn: this.noteBtn, noteIco: this.noteIco, noteCard: this.noteCard, noteHint: this.noteHint } = this.root.refs);
+    // klik ikon buku: buka / tutup nota guru (tidak memajukan dialog)
+    this.noteBtn.addEventListener('click', (e) => { e.stopPropagation(); this._toggleNote(); });
+    this.noteCard.addEventListener('click', (e) => e.stopPropagation());
     stage.dialogLayer.appendChild(this.root);
     this._current = null;
   }
@@ -73,8 +82,29 @@ export class DialogueBox {
     }
   }
 
-  _sayPage({ name = '', text, portrait = null, side = 'left', tone = '' }, pageNote = '') {
+  /** Tunjuk / sembunyi ikon buku nota guru (note kosong = tiada ikon). */
+  _setNote(note = '') {
+    this._note = String(note || '');
+    this.noteCard.textContent = this._note;
+    this.noteCard.classList.add('hidden');
+    this.noteIco.src = '../assets/gameAsset/hub/buku.png';
+    this.noteBtn.classList.toggle('hidden', !this._note);
+    // bercahaya sehingga murid membukanya; petua "tekan buku ini" hanya sehingga murid pernah membuka nota sekali
+    this.noteBtn.classList.toggle('is-new', Boolean(this._note));
+    this.noteHint.classList.toggle('hidden', !(this._note && !noteHintSeen()));
+  }
+
+  _toggleNote() {
+    const open = this.noteCard.classList.toggle('hidden') === false;
+    this.noteBtn.classList.remove('is-new');             // sudah dibuka: cahaya berhenti
+    this.noteHint.classList.add('hidden');
+    markNoteHintSeen();
+    this.noteIco.src = open ? '../assets/gameAsset/hub/diari.png' : '../assets/gameAsset/hub/buku.png';
+  }
+
+  _sayPage({ name = '', text, portrait = null, side = 'left', tone = '', note = '' }, pageNote = '') {
     return new Promise((resolve) => {
+      this._setNote(note);
       this.root.classList.remove('hidden');
       this.root.dataset.side = side;
       this.root.dataset.tone = tone;
@@ -143,6 +173,7 @@ export class DialogueBox {
       this.root.classList.remove('hidden');
       this.root.dataset.side = side;
       this.root.dataset.tone = '';
+      this._setNote('');
       this.mePortrait.innerHTML = '';
       if (mePortrait) { this.root.dataset.turn = '1'; this.mePortrait.appendChild(mePortrait); } else delete this.root.dataset.turn;
       this.name.textContent = name;
@@ -195,6 +226,7 @@ export class DialogueBox {
     this._kitaSorok = false;
     sound.talkStop();
     if (this._current) this._current.skip();
+    this._setNote('');
     this.root.classList.add('hidden');
     delete this.root.dataset.turn;
     this.mePortrait.innerHTML = '';

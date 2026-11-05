@@ -260,7 +260,7 @@ class QuestEditor {
         return [
           h('p', { class: 'cm-hint', text: 'Pilih gambar, kemudian KLIK pada gambar di tempat bahan bukti tersembunyi. Pelajar perlu menemui semua titik.' }),
           h('div', { class: 'qe-bg-row' }, bgLabel,
-            uiButton('Pilih / Muat Naik Gambar', 'cm-btn-ghost cm-btn-sm', async () => {
+            uiButton('Pilih Gambar', 'cm-btn-ghost cm-btn-sm', async () => {
               const picked = await this.library.pickAsset({ type: 'background', title: 'Pilih Gambar Latar Misi', currentFile: f.bgImage ? f.bgImage.split('/').pop() : null });
               if (picked) { f.bgImage = `${QUEST_BG_DIR}${picked.file}`; renderAll(); touch(); }
             }, 'fa-image'),

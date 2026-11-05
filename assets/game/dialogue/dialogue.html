@@ -24,6 +24,12 @@
         <div class="dlg-text" data-ref="text"></div>             <!-- ayat (ditaip satu-satu) -->
         <div class="dlg-more" data-ref="more">▼</div>           <!-- tanda "tekan Enter" -->
       </div>
+      <!-- NOTA GURU: ikon buku di LUAR kotak, kanan atas. Hanya muncul jika guru menulis nota untuk baris ini. -->
+      <button type="button" class="dlg-note-btn hidden" data-ref="noteBtn" aria-label="Nota guru" title="Nota guru">
+        <img class="dlg-note-ico" data-ref="noteIco" src="../assets/gameAsset/hub/buku.png" alt="">
+      </button>
+      <div class="dlg-note-hint hidden" data-ref="noteHint">Guru anda tinggalkan nota!<br>Tekan buku ini.</div>   <!-- petua kali pertama sahaja -->
+      <div class="dlg-note-card hidden" data-ref="noteCard" role="note"></div>
       <div class="dlg-choices" data-ref="choices"></div>         <!-- butang pilihan jawapan -->
     </div>
   </template>

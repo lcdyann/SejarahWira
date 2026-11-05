@@ -17,9 +17,76 @@ class ContentGuide {
   constructor(app) {
     this.app = app;
     this.index = 0;
-    this.steps = this.buildSteps();
+    this.steps = this.buildQuickSteps();      // panduan ringkas untuk guru baharu
   }
 
+  /**
+   * PANDUAN RINGKAS (dibuka dahulu): bahasa mudah, satu idea setiap langkah.
+   * Panduan terperinci (cara menulis dialog, misi, Giliran Anda dan lain-lain) ada pada butang
+   * "Panduan terperinci" di langkah terakhir; isinya ialah buildSteps() di bawah.
+   */
+  buildQuickSteps() {
+    const li = (strong, text) => h('li', {}, h('strong', { text: `${strong} ` }), text);
+    const tag = (text) => h('span', { class: 'story-flow-step', text });
+    const arrow = () => h('i', { class: 'fas fa-arrow-right' });
+    const flow = (...labels) => h('div', { class: 'story-flow guide-flow' }, labels.flatMap((l, i) => (i ? [arrow(), tag(l)] : [tag(l)])));
+    return [
+      {
+        title: 'Dua jenis cerita',
+        body: [
+          h('ul', { class: 'guide-list' },
+            li('🔒 Tetap:', 'cerita rasmi untuk semua murid. Anda boleh melihat, memainkannya dan menulis Nota Guru. Anda tidak boleh mengubahnya.'),
+            li('✏️ Milik saya:', 'cerita yang anda cipta sendiri. Anda boleh mengubah semuanya.')),
+          h('p', { class: 'cm-muted', text: 'Murid di semua kelas anda nampak kedua-duanya. Murid guru lain tidak nampak cerita dan soalan anda.' })
+        ]
+      },
+      {
+        title: 'Cara mencari cerita',
+        body: [
+          flow('Pilih era', 'Pilih naratif', 'Pilih babak'),
+          h('p', { text: 'Setiap kad naratif ada tanda "Tetap" atau "Milik saya". Klik kad itu, kemudian klik satu babak untuk melihat isinya.' })
+        ]
+      },
+      {
+        title: 'Tulis Nota Guru pada cerita tetap',
+        body: [
+          h('p', { text: 'Mahu menambah penerangan pada cerita tetap? Tulis nota.' }),
+          h('ol', { class: 'guide-list' },
+            li('1.', 'Buka naratif bertanda "Tetap", pilih satu babak.'),
+            li('2.', 'Di bawah setiap baris dialog ada kotak "Nota Guru". Tulis nota anda.'),
+            li('3.', 'Tekan "Simpan nota". Siap.')),
+          h('p', { class: 'cm-muted', text: 'Murid anda akan nampak buku kecil bercahaya di atas kotak dialog pada baris itu. Mereka tekan buku itu untuk membaca nota anda. Contoh nota: "Ingat tarikh ini, ia selalu keluar dalam peperiksaan."' })
+        ]
+      },
+      {
+        title: 'Cipta cerita sendiri',
+        body: [
+          h('ol', { class: 'guide-list' },
+            li('1.', 'Tekan "Naratif Baharu" dan isi tajuk serta ringkasan.'),
+            li('2.', 'Tambah babak: pilih gambar latar dan tulis apa yang berlaku.'),
+            li('3.', 'Tulis dialog, kemudian tambah misi (permainan) pada babak.'),
+            li('4.', 'Tekan "Main Naratif" untuk mencuba. Tiada apa yang disimpan semasa anda main.')),
+          h('p', { class: 'cm-muted', text: 'Satu naratif perlu sekurang-kurangnya 3 babak yang ada misi. Cerita anda akan muncul secara rawak bersama cerita tetap apabila murid anda bermain era itu.' })
+        ]
+      },
+      {
+        title: 'Tambah soalan sendiri',
+        body: [
+          h('p', { text: 'Buka tab "Soalan" dan tekan "Tambah Soalan". Soalan anda dicampur dengan soalan tetap dalam latihan dan ujian murid anda sahaja.' }),
+          h('p', { class: 'cm-muted', text: 'Soalan tetap berwarna kelabu dan tidak boleh diubah. Soalan yang anda tambah ditanda "Soalan saya" dan boleh diubah atau dipadam.' })
+        ]
+      },
+      {
+        title: 'Rekod anda',
+        body: [
+          h('p', { text: 'Bahagian "Perubahan Terkini" menunjukkan perubahan yang anda buat sendiri. Guru lain tidak nampaknya.' }),
+          h('p', { class: 'cm-muted', text: 'Panduan ini boleh dibuka semula bila-bila masa dengan butang "Cara ia berfungsi" di atas halaman.' })
+        ]
+      }
+    ];
+  }
+
+  /** PANDUAN TERPERINCI: cara menulis dialog, misi, Giliran Anda dan lain-lain (untuk yang mencipta cerita sendiri). */
   buildSteps() {
     const tag = (text) => h('span', { class: 'story-flow-step', text });
     const arrow = () => h('i', { class: 'fas fa-arrow-right' });
@@ -134,7 +201,7 @@ class ContentGuide {
             li('Main:', '"Main Naratif" dan "Main Babak Ini" menjalankan permainan sebenar yang dimainkan pelajar: kad garis masa, cerita dengan Giliran Anda, taklimat Pendekar Bayang, misi dan catatan diari. Klik pada permainan, tekan Enter untuk mula. Tiada apa disimpan. Misi yang belum lengkap dilangkau dan diberi amaran.'),
             li('Sekurang-kurangnya 3 babak bermisi:', 'sistem tidak membenarkan memadam misi atau babak jika baki babak bermisi kurang daripada 3.'),
             li('Padam:', 'memadam babak turut memadam dialog, misi dan Giliran Anda di dalamnya. Sistem akan bertanya dahulu.'),
-            li('Rekod perubahan:', 'semua guru berkongsi kandungan yang sama, dan setiap perubahan direkodkan dengan nama guru.'))
+            li('Rekod perubahan:', 'senarai Perubahan Terkini ialah rekod peribadi anda sendiri.'))
         ]
       },
       {
@@ -152,6 +219,8 @@ class ContentGuide {
 
   open() {
     this.index = 0;
+    this.detail = false;
+    this.steps = this.buildQuickSteps();
     this.dlg = new Dialog({ title: 'Cara ia berfungsi', size: 'wide', app: this.app });
     this.dlg.onClose = () => markGuideSeen();
     this.draw();
@@ -165,11 +234,13 @@ class ContentGuide {
 
     this.dlg.setTitle(`Cara ia berfungsi (${this.index + 1}/${this.steps.length})`);
     this.dlg.setBody(h('div', { class: 'guide-step' }, h('h4', { text: step.title }), step.body, dots));
+    const quick = !this.detail;
     this.dlg.setFooter(
       uiButton('Langkau', 'cm-btn-ghost', () => this.dlg.close()),
       this.index > 0 ? uiButton('Sebelumnya', 'cm-btn-ghost', () => { this.index -= 1; this.draw(); }, 'fa-arrow-left') : null,
       last
-        ? uiButton('Faham, mula', 'cm-btn-primary', () => this.dlg.close(), 'fa-check')
+        ? [quick ? uiButton('Panduan terperinci', 'cm-btn-ghost', () => { this.detail = true; this.steps = this.buildSteps(); this.index = 0; this.draw(); }, 'fa-book') : null,
+          uiButton('Faham, mula', 'cm-btn-primary', () => this.dlg.close(), 'fa-check')]
         : uiButton('Seterusnya', 'cm-btn-primary', () => { this.index += 1; this.draw(); }, 'fa-arrow-right'));
   }
 }

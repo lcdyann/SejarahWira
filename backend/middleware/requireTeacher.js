@@ -27,7 +27,7 @@ export const requireTeacher = async (req, res, next) => {
     }
 
     const [rows] = await db.query(
-      `SELECT t.teacherID, t.teacherName, t.userID, u.username
+      `SELECT t.teacherID, t.teacherName, t.userID, t.canEditFixed, u.username
          FROM Teacher t JOIN User u ON u.userID = t.userID WHERE t.teacherID = ? LIMIT 1`,
       [payload.teacherID]
     );
@@ -36,6 +36,7 @@ export const requireTeacher = async (req, res, next) => {
     }
 
     const teacher = rows[0];
+    teacher.canEditFixed = Boolean(teacher.canEditFixed);          // suis admin: boleh salin & ubah kandungan tetap untuk kelasnya
     teacher.isAdmin = isAdminUsername(teacher.username);          // from the server setting, not from the token
     // whose students this teacher may SEE: their own, and (admin only) the public students too
     teacher.scopeIDs = teacher.isAdmin ? [teacher.teacherID, SYSTEM_TEACHER_ID] : [teacher.teacherID];

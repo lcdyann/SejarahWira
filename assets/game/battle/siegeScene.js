@@ -9,6 +9,7 @@ import { sleep, tpl } from '../core/core.js';
 import { SummativeAssessment, resolveAsset } from '../core/domain.js';
 import { SceneGone } from '../core/scene.js';
 import { sound } from '../core/sound.js';
+import { epilogueSeen } from '../hub/hubHelpers.js';
 
 /* ========================================================================== */
 /* The Great Siege                                                            */
@@ -304,8 +305,11 @@ export class SiegeScene extends BattleScene {
       // the role the student played gives the moral lesson (the avatar when there is no role)
       await this.gate(this.game.roleSpeak(this.game.runStore.role(this.student.studentID, this.eraID), 2, art.moralLesson || ''));
     }
+    // Epilog hanya apabila kemenangan INI yang menamatkan era terakhir buat kali pertama.
+    // Mengulang Kepungan Agung bagi era yang sudah selesai TIDAK memaparkan epilog (guna butang "Ulang Epilog").
+    const wasAllDone = this.game.progression.allCompleted;
     const eras = await this.game.refreshEras();
-    if (this.game.progression.allCompleted) return this.game.go('EpilogueScene');
+    if (this.game.progression.allCompleted && !wasAllDone && !epilogueSeen(this.student.studentID)) return this.game.go('EpilogueScene');
     const next = this.game.progression.nextEra(this.eraID);
     if (next && next.status !== 'locked') return this.game.timeTravel(this.eraID, next.eraID);
     return this.game.go('MapScene', { focusEra: this.eraID, eras });
