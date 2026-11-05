@@ -92,6 +92,17 @@ export const HUB_OBJECTS = [
     w: 7
   },
   {
+    // watch the ending again. It only shows AFTER the student has completed ALL the eras (onlyAfterAll)
+    id: 'replayEnd',
+    label: 'Ulang Epilog',
+    icon: '\u23EA',
+    img: '../assets/gameAsset/hub/replay.png',      // same picture as 'Ulang Prolog'
+    onlyAfterAll: true,
+    x: 60,
+    y: 70,
+    w: 7
+  },
+  {
     // the trophy room is the glass-dome pedestal from the collection
     id: 'trophy',
     label: 'Bilik Trofi',

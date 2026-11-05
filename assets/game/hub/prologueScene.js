@@ -7,7 +7,7 @@ import { sleep } from '../core/core.js';
 import { GameScene } from '../core/scene.js';
 import { HUB_BG } from './hubConfig.js';
 import { applyHubPicture, placeStudent, probeImage } from './hubHelpers.js';
-import { PROLOGUE_BG, PROLOGUE_BOOK, PROLOGUE_HAND_WIDTH } from './prologueConfig.js';
+import { PROLOGUE_BG, PROLOGUE_BOOK, PROLOGUE_CAPTION, PROLOGUE_HAND_WIDTH, PROLOGUE_STUDENT_LINES } from './prologueConfig.js';
 import { entityPortrait, spriteEl } from '../npc/entity.js';
 
 /* ========================================================================== */
@@ -33,6 +33,7 @@ export class PrologueScene extends GameScene {
       <div class="hub-desk"></div>
       <div class="prologue-book"><span class="prologue-book-icon">\u{1F4D6}</span></div>
       <div class="prologue-pendekar"></div>
+      <div class="prologue-caption px"></div>
       <div class="prologue-skip ${replay ? '' : 'hidden'} px">Esc: langkau</div>`;
 
     const student = spriteEl(this.student.avatar.assetPath, this.student.studentName, 'hub-student');
@@ -77,14 +78,31 @@ export class PrologueScene extends GameScene {
       side: 'right'
     });
 
+    // 1. tajuk malam: murid menghadap buku Sejarah sebelum ujian (supaya pemain faham keadaannya)
+    const caption = this.root.querySelector('.prologue-caption');
     await sleep(900);
-    if (!skipped) await studentSays('Ugh... kenapa perlu belajar Sejarah? Tak penting pun!');
+    if (!skipped && PROLOGUE_CAPTION) {
+      caption.textContent = PROLOGUE_CAPTION;
+      caption.classList.add('on');
+      await sleep(2600);
+      caption.classList.remove('on');
+      await sleep(700);
+    }
+
+    // 2. murid meluahkan rasa bosan dan tertekan (PROLOGUE_STUDENT_LINES); ayat terakhir menggerakkan buku
+    for (let i = 0; i < PROLOGUE_STUDENT_LINES.length; i += 1) {
+      if (skipped) break;
+      if (i === PROLOGUE_STUDENT_LINES.length - 1) this.root.classList.add('flicker');   // lampu berkelip sebelum buku bergerak
+      await studentSays(PROLOGUE_STUDENT_LINES[i].text);
+      if (!skipped) await sleep(PROLOGUE_STUDENT_LINES[i].pause || 0);
+    }
 
     if (!skipped) {
+      this.dialog.hide();
       this.root.querySelector('.prologue-book').classList.add('glow');
       this.root.classList.add('quake');
-      await sleep(1600);
-      this.root.classList.remove('quake');
+      await sleep(1900);
+      this.root.classList.remove('quake', 'flicker');
 
       const holder = this.root.querySelector('.prologue-pendekar');
       holder.appendChild(entityPortrait('whispering', 'rise'));

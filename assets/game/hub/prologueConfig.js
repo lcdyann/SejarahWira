@@ -33,3 +33,18 @@ export const PROLOGUE_BOOK = {
 
 /** size of the hand that comes out of the book (px on the 960 x 540 stage) */
 export const PROLOGUE_HAND_WIDTH = 230;
+
+/**
+ * The opening scene, in the student's own voice. The student is tired, frustrated, and does not
+ * see why History matters (like many real students). Each item = one box; `pause` = ms to wait AFTER it.
+ * The LAST line is the one that wakes the book. Change, add or remove lines freely.
+ */
+export const PROLOGUE_CAPTION = 'Malam sebelum ujian Sejarah...';
+
+export const PROLOGUE_STUDENT_LINES = [
+  { text: 'Haih... esok ada ujian Sejarah. Aku belum hafal satu bab pun.', pause: 700 },
+  { text: 'Tahun, nama, tarikh... semuanya nampak sama. Kenapa aku kena hafal benda yang berlaku berpuluh-puluh tahun dahulu?', pause: 800 },
+  { text: 'Cikgu kata Sejarah itu penting. Penting untuk siapa? Bukan ada kena-mengena dengan hidup aku pun.', pause: 700 },
+  { text: 'Bosannya... Mata pun dah berat. Baik main telefon sahaja.', pause: 1100 },
+  { text: 'Ugh... kenapa perlu belajar Sejarah? Tak penting pun!', pause: 400 }
+];

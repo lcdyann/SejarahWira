@@ -203,6 +203,74 @@ export class Transition {
   }
 
   /**
+   * Book release (the epilogue): the opposite of bookGrab. The student is brought OUT of the book.
+   *   1. a flash grows out of the book
+   *   2. an open hand reaches out of the book towards the screen
+   *   3. the things in `release` fly out of the book, from tiny to full size, to their real place
+   *   4. the hand sinks back into the book
+   * @param book     the book element (everything starts and ends there)
+   * @param release  elements to bring out (the student). Give them style.opacity = '0' BEFORE calling,
+   *                 so they do not show at their real place before they come out of the book.
+   * Pictures: assets/gameAsset/transition/open_hand.png
+   */
+  async bookRelease({ book, release = [], ms = 3600, handWidth = 230 } = {}) {
+    sound.sfx('tarikJiwa');
+    const box = this.layer.getBoundingClientRect();
+    const spot = (node) => {
+      const r = node.getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    };
+    const from = book ? spot(book) : { x: box.left + box.width / 2, y: box.top + box.height * 0.7 };
+    const ox = ((from.x - box.left) / box.width) * 100;
+    const oy = ((from.y - box.top) / box.height) * 100;
+    const k = box.width / (this.layer.offsetWidth || box.width);          // stage zoom
+
+    const wrap = el('div', 'bookgrab');                                   // same layer style as bookGrab
+    wrap.style.setProperty('--ox', `${ox}%`);
+    wrap.style.setProperty('--oy', `${oy}%`);
+    const flash = el('div', 'bg-flash');
+    const hand = el('div', 'bg-hand');
+    hand.style.width = `${handWidth}px`;
+    hand.appendChild(TransitionArt.make(`${TRANSITION_DIR}/open_hand.png`, '\u{270B}'));
+    wrap.append(hand, flash);
+    this.layer.appendChild(wrap);
+
+    const home = { left: `${ox}%`, top: `${oy}%` };
+    const centre = { left: '50%', top: '46%' };
+    const at = (pos, scale, extra = '') => ({ ...pos, transform: `translate(-50%, -50%) scale(${scale}) ${extra}` });
+    const run = (node, frames, duration, easing = 'ease-in-out') => node.animate(frames, { duration, easing, fill: 'forwards' });
+
+    // 1. a flash grows out of the book
+    run(flash, [{ transform: 'translate(-50%, -50%) scale(0.2)', opacity: 0 }, { transform: 'translate(-50%, -50%) scale(7)', opacity: 0.95 }], ms * 0.2, 'ease-out');
+    await sleep(ms * 0.2);
+
+    // 2. the open hand reaches out of the book
+    run(hand, [{ ...at(home, 0.1), opacity: 0 }, { ...at(home, 0.35), opacity: 1, offset: 0.25 }, { ...at(centre, 1.9), opacity: 1 }], ms * 0.3, 'ease-out');
+    await sleep(ms * 0.3);
+
+    // 3. the student comes out of the book: tiny at the book, full size at the real place
+    const out = ms * 0.3;
+    const flights = release.filter(Boolean).map((node) => {
+      const p = spot(node);
+      const dx = (from.x - p.x) / k;
+      const dy = (from.y - p.y) / k;
+      return run(node, [{ transform: `translate(${dx}px, ${dy}px) scale(0.04)`, opacity: 0 }, { transform: 'translate(0, 0) scale(1)', opacity: 1 }], out, 'cubic-bezier(.1,.6,.3,1)');
+    });
+    run(hand, [at(centre, 1.9), at(centre, 2.05, 'rotate(-3deg)'), at(centre, 1.9)], out, 'ease-in-out');
+    run(flash, [{ transform: 'translate(-50%, -50%) scale(7)', opacity: 0.95 }, { transform: 'translate(-50%, -50%) scale(7)', opacity: 0 }], out, 'ease-out');
+    await sleep(out);
+
+    // 4. the hand sinks back into the book
+    run(hand, [at(centre, 1.9), { ...at(home, 0.05, 'rotate(-160deg)'), opacity: 0.9 }], ms * 0.2, 'cubic-bezier(.6,.05,.9,.4)');
+    await sleep(ms * 0.2);
+
+    hand.remove();
+    wrap.remove();
+    release.filter(Boolean).forEach((node) => { node.style.opacity = ''; });   // the student stays visible
+    flights.forEach((a) => a.cancel());
+  }
+
+  /**
    * Time machine (between eras).
    * The pocket watch pulses in the middle, then it is sucked into the spiral
    * (it spins and shrinks to nothing). `middle` runs while the screen is covered.

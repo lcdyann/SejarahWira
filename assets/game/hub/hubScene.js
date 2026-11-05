@@ -26,6 +26,9 @@ export class HubScene extends GameScene {
 
     this.selectedIndex = 3;                                  // the book is selected first
 
+    // 'Ulang Epilog' (onlyAfterAll) hanya kelihatan selepas SEMUA era selesai (dalam mod suai ?hubedit=1 ia sentiasa kelihatan)
+    this.allDone = (this.game.eras.length > 0 && this.game.eras.every((e) => e.isCompleted)) || this.editing;
+
     const hint = this.editing
       ? 'Mod suai: seret, roda tetikus untuk saiz'
       : '← → pilih · Enter buka · T siang/malam · F skrin penuh';
@@ -145,6 +148,7 @@ export class HubScene extends GameScene {
         if (!this.editing) this.open(item.id);
       });
 
+      if (item.onlyAfterAll && !this.allDone) button.classList.add('hidden');
       holder.appendChild(button);
       this.itemEls.push(button);
     });
@@ -182,15 +186,21 @@ export class HubScene extends GameScene {
   /** ← → move the selection, Enter opens it */
   listenKeys() {
     const count = HUB_OBJECTS.length;
+    // langkah ke item seterusnya (+1) atau sebelumnya (-1), langkau item yang masih tersembunyi
+    const step = (dir) => {
+      let i = this.selectedIndex;
+      do { i = (i + dir + count) % count; } while (HUB_OBJECTS[i].onlyAfterAll && !this.allDone);
+      return i;
+    };
 
     this.keys({
       onKeyDown: (key) => {
         if (key === 'ArrowLeft') {
-          this.select((this.selectedIndex + count - 1) % count);
+          this.select(step(-1));
           return true;
         }
         if (key === 'ArrowRight') {
-          this.select((this.selectedIndex + 1) % count);
+          this.select(step(1));
           return true;
         }
         if ((key === 'Enter' || key === ' ') && !this.editing) {
@@ -375,6 +385,9 @@ export class HubScene extends GameScene {
 
       case 'replay':
         return this.game.go('PrologueScene', { full: true, replay: true, eraID: this.game.eras[0].eraID });
+
+      case 'replayEnd':
+        return this.game.go('EpilogueScene', { replay: true });
 
       case 'door':
         return this.doorMenu();
