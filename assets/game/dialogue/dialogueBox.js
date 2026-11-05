@@ -5,6 +5,7 @@
  */
 import { el, esc, tpl } from '../core/core.js';
 import { sound } from '../core/sound.js';
+import { speech } from '../core/speech.js';      // suara pembaca (hidup/mati di Pintu, hab)
 
 /* ========================================================================== */
 /* DialogueBox                                                                */
@@ -131,7 +132,9 @@ export class DialogueBox {
         this.text.textContent = full;
         this.more.style.visibility = 'visible';
       };
-      if (full) sound.talkStart();                         // dialog dibuka: bunyi bercakap bermula
+      // bunyi bercakap (gumam) hanya jika suara pembaca TIDAK bercakap, supaya tidak bertindih
+      if (full && !speech.willSpeak) sound.talkStart();
+      speech.speak(full);                                  // suara pembaca (senyap jika dimatikan di Pintu)
       timer = setInterval(() => {
         if (this._frozen) return;                          // Jeda: taipan berhenti di huruf semasa
         i += 1;
@@ -159,6 +162,7 @@ export class DialogueBox {
       const cleanup = () => {
         clearInterval(timer);
         sound.talkStop();
+        speech.stop();                                     // dialog dimajukan / ditutup: suara berhenti
         this.panel.removeEventListener('click', onClick);
         pop();
         this._current = null;
@@ -185,7 +189,8 @@ export class DialogueBox {
       this.more.style.visibility = 'hidden';
       this.choices.innerHTML = '';
       sound.talkStop();                                    // menunggu pilihan murid: TIADA bunyi bercakap
-      const choose = (idx) => { pop(); this.choices.innerHTML = ''; resolve(idx); };   // bunyi bercakap bermula hanya bila jawapan dipilih dan say() menaip teksnya
+      speech.speak(text);                                  // soalan / pilihan dibacakan sekali
+      const choose = (idx) => { speech.stop(); pop(); this.choices.innerHTML = ''; resolve(idx); };   // bunyi bercakap bermula hanya bila jawapan dipilih dan say() menaip teksnya
       options.forEach((label, idx) => {
         const b = el('button', 'btn-px small', `<span class="key">${idx + 1}</span> ${esc(label)}`);
         b.addEventListener('click', () => choose(idx));
@@ -208,6 +213,7 @@ export class DialogueBox {
   freeze(sembunyi = false) {
     this._frozen = true;
     sound.talkStop();
+    speech.stop();                                         // Jeda: suara berhenti (tidak disambung)
     // sembunyi: seluruh kotak (termasuk anak panah \u25BC) dilenyapkan; tanda _kitaSorok mengingatkan kotak ini
     // hanya dimunculkan semula jika KITA yang menyorokkannya (bukan jika dialog memang sudah ditutup)
     this._kitaSorok = sembunyi && !this.root.classList.contains('hidden');
@@ -218,13 +224,14 @@ export class DialogueBox {
   thaw() {
     this._frozen = false;
     if (this._kitaSorok) { this.root.classList.remove('hidden'); this._kitaSorok = false; }
-    if (this._current && this._current.isTyping && this._current.isTyping()) sound.talkStart();
+    if (this._current && this._current.isTyping && this._current.isTyping() && !speech.willSpeak) sound.talkStart();
   }
 
   hide() {
     this._frozen = false;
     this._kitaSorok = false;
     sound.talkStop();
+    speech.stop();
     if (this._current) this._current.skip();
     this._setNote('');
     this.root.classList.add('hidden');

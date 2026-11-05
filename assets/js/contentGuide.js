@@ -8,7 +8,7 @@
  * Plain words, no software terms. Uses the Dialog and h() helpers of the content manager.
  * ============================================================================
  */
-const GUIDE_FLAG = 'sejarahwira_cm_guide_seen';
+const GUIDE_FLAG = 'sejarahwira_cm_guide_seen_v2';
 
 const guideSeen = () => { try { return window.localStorage.getItem(GUIDE_FLAG) === '1'; } catch { return false; } };
 const markGuideSeen = () => { try { window.localStorage.setItem(GUIDE_FLAG, '1'); } catch { /* fine */ } };

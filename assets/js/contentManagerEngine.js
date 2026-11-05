@@ -495,7 +495,8 @@ class ContentManagerEngine {
   }
 
   renderTabs() {
-    const tabs = CONTENT_TYPES.map((def) =>
+    // Suara Pendekar Bayang dikongsi semua kelas: tab ini hanya untuk admin (guru tidak melihatnya)
+    const tabs = CONTENT_TYPES.filter((def) => def.type !== 'entity' || this.isAdmin).map((def) =>
       h('button', {
         type: 'button',
         role: 'tab',

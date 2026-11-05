@@ -60,7 +60,7 @@ app.use('/api', guardRequest);
 // the .sql files, so those must never be downloadable.
 // ---------------------------------------------------------------------------
 const PROJECT_ROOT = path.join(__dirname, '../');
-const BLOCKED = /^\/+(backend|node_modules|\.git)(\/|$)|\.(sql|env|log)$/i;
+const BLOCKED = /^\/+(backend|database|node_modules|\.git)(\/|$)|^\/+(Dockerfile|DEPLOY\.md|\.dockerignore|\.gitignore)$|\.(sql|env|log)$/i;
  
 const isBlockedPath = (rawPath) => {
   let decoded;

@@ -6,6 +6,7 @@
 import { el, esc, tpl, labelStatus } from '../core/core.js';
 import { GameScene } from '../core/scene.js';
 import { sound } from '../core/sound.js';
+import { speech } from '../core/speech.js';
 import { HUB_BG, HUB_BG_DAY, HUB_BUBBLE, HUB_OBJECTS, HUB_PENDEKAR, HUB_STUDENT, HUB_THEME } from './hubConfig.js';
 import { applyHubPicture, getHubTheme, placeStudent, saveHubTheme } from './hubHelpers.js';
 import { entityPortrait, spriteEl } from '../npc/entity.js';
@@ -469,6 +470,27 @@ export class HubScene extends GameScene {
     panel.refs.sfx.addEventListener('input', () => sound.setSfxLevel(panel.refs.sfx.value / 100));
     panel.refs.sfx.addEventListener('change', () => sound.sfx('betul'));         // bunyi contoh
 
+    // suara pembaca: hidup / mati, kelajuan, dan nota jika peranti tiada suara yang sesuai
+    const paintTts = () => {
+      // butang: terang menyatakan apa yang dihidupkan / dimatikan
+      panel.refs.tts.textContent = speech.enabled ? (speech.available ? '🗣️ Bacaan cerita: HIDUP' : '🎮 Bunyi permainan biasa') : '🤐 Bacaan cerita: MATI';
+      // nota di bawah: terangkan fungsi, dan suara yang digunakan
+      let note;
+      if (!speech.enabled) note = 'Bacaan dimatikan. Hanya bunyi permainan kedengaran.';
+      else if (!speech.available) note = 'Tiada suara Melayu di pelayar ini. Buka dalam Microsoft Edge untuk bacaan bersuara.';
+      else note = `Suara: ${speech.voiceName}`;
+      panel.refs.ttsNote.textContent = note;
+    };
+    paintTts();
+    panel.refs.ttsRate.value = Math.round(speech.rate * 100);
+    panel.refs.tts.addEventListener('click', () => {
+      speech.setEnabled(!speech.enabled);
+      paintTts();
+      if (speech.enabled) speech.preview();                                      // bunyi contoh
+    });
+    panel.refs.ttsRate.addEventListener('input', () => speech.setRate(panel.refs.ttsRate.value / 100));
+    panel.refs.ttsRate.addEventListener('change', () => speech.preview());
+
     await this.game.openModal({
       title: 'Pintu',
       body: panel,
@@ -479,5 +501,6 @@ export class HubScene extends GameScene {
       ]
     });
     document.removeEventListener('sw-mute', onMute);
+    speech.stop();
   }
 }

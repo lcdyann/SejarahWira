@@ -124,6 +124,7 @@ class Sound {
   talkStart() {
     this.talkStop();
     if (this.muted) return;
+    if (this.talkSuppressed && this.talkSuppressed()) return;   // suara pembaca (speech.js) sedang bercakap: tiada gumam
     this.talk = this.#make(SFX.bercakap, VOLUME.sfx);
     if (this.talk) { this.talk.loop = true; this.talk.play().catch(() => {}); }
   }

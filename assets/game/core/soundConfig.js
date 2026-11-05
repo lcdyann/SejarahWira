@@ -91,3 +91,17 @@ export const SCENE_MUSIC = {
   EpilogueScene: 'trofi',
   CreditsScene:  'trofi'
 };
+
+/**
+ * SUARA PEMBACA (text to speech): tetapan lalai. Murid boleh menukar hidup/mati dan kelajuan di Pintu (hab).
+ * Suara datang dari pelayar murid (percuma). Hanya suara Bahasa Melayu digunakan; jika peranti tiada, tiada bacaan.
+ */
+export const TTS = {
+  defaultOn: false,              // false = senyap sehingga murid menghidupkannya di Pintu
+  lang: 'ms-MY',                 // bahasa pilihan utama
+  fallbackLangs: [],             // Melayu sahaja. Peranti tanpa suara Melayu (cth. Chrome) guna bunyi permainan biasa. Mahu Indonesia? tambah 'id-ID' di sini
+  rate: 0.95,                    // kelajuan lalai: 1 = biasa, kurang = perlahan
+  rateMin: 0.7,
+  rateMax: 1.2,
+  maxChunk: 160                  // teks panjang dipotong ikut ayat supaya tidak terhenti di pertengahan
+};

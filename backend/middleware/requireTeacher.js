@@ -36,7 +36,7 @@ export const requireTeacher = async (req, res, next) => {
     }
 
     const teacher = rows[0];
-    teacher.canEditFixed = Boolean(teacher.canEditFixed);          // suis admin: boleh salin & ubah kandungan tetap untuk kelasnya
+    teacher.canEditFixed = Boolean(teacher.canEditFixed);          // suis admin: boleh ubah semua naratif + soalan seperti admin
     teacher.isAdmin = isAdminUsername(teacher.username);          // from the server setting, not from the token
     // whose students this teacher may SEE: their own, and (admin only) the public students too
     teacher.scopeIDs = teacher.isAdmin ? [teacher.teacherID, SYSTEM_TEACHER_ID] : [teacher.teacherID];

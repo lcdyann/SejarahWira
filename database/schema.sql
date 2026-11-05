@@ -52,7 +52,7 @@ CREATE TABLE Teacher (
   teacherID VARCHAR(20) PRIMARY KEY,
   teacherName VARCHAR(100) NOT NULL,
   userID BIGINT NOT NULL,
-  canEditFixed TINYINT(1) NOT NULL DEFAULT 0,   -- SUIS ADMIN: 1 = guru boleh menyalin & mengubah kandungan tetap untuk kelasnya
+  canEditFixed TINYINT(1) NOT NULL DEFAULT 0,   -- SUIS ADMIN: 1 = guru ini boleh mengubah semua naratif + soalan seperti admin
   FOREIGN KEY (userID) REFERENCES User(userID) ON DELETE CASCADE
 );
 

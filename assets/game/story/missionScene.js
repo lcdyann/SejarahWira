@@ -40,6 +40,7 @@ import { el, esc, sleep, tpl } from '../core/core.js';
 import { DialogueReader, LearningSupport, Narrative, Quest, QuestCompletion } from '../core/domain.js';
 import { GameScene, SceneGone } from '../core/scene.js';
 import { sound } from '../core/sound.js';
+import { speech } from '../core/speech.js';      // suara pembaca
 import { entityPortrait, spriteEl } from '../npc/entity.js';
 import { ENTITY_NAME, ROLE_LINES, fillMarkers } from '../npc/entityLines.js';
 import { QuestMechanic } from '../quests/index.js';
@@ -122,7 +123,10 @@ export class MissionScene extends GameScene {
       // A saved run can go stale when the content changed (re-seeded, or a teacher edited / deleted
       // scenes or quests). Then it would skip scenes or finish with quests undone, so start fresh.
       const found = new Set(quests.map((q) => q.questID));
-      const stale = !quests.length || run.questIDs.some((id) => !found.has(id));
+      // Semua misi sudah ditanda siap tetapi permainan belum tamat (cth. data ujian uji_epilog.sql, atau main di peranti lain):
+      // tiada misi lagi untuk dimainkan, jadi tiada "Giliran Anda" dan tiada misi. Mulakan semula dengan bersih.
+      const allDone = quests.length > 0 && quests.every((q) => q.isCompleted);
+      const stale = !quests.length || allDone || run.questIDs.some((id) => !found.has(id));
       if (stale) {
         runStore.clear(sid, this.eraID);
         await QuestCompletion.resetReplay(api, { studentID: sid, eraID: this.eraID });
@@ -293,7 +297,12 @@ export class MissionScene extends GameScene {
         if (quest.explanation) {
           // Susun atur: <template id="tpl-diary"> dalam assets/game/story/story.html
           const page = tpl('diary', { tab: `Diari ${this.me().name}`, note: quest.explanation });
-          await this.gate(this.game.openModal({ title: 'Catatan Diari', body: page, buttons: [{ label: 'Teruskan', primary: true }] }));
+          speech.speak(quest.explanation);             // catatan diari dibacakan (jika dihidupkan di Pintu)
+          try {
+            await this.gate(this.game.openModal({ title: 'Catatan Diari', body: page, buttons: [{ label: 'Teruskan', primary: true }] }));
+          } finally {
+            speech.stop();
+          }
         }
         await this.showPieces();                       // halaman buku: satu kepingan lencana bertambah
         return;
@@ -370,9 +379,14 @@ export class MissionScene extends GameScene {
     });
     this.layer.appendChild(wrap);
     requestAnimationFrame(() => wrap.classList.add('in'));
+    speech.speak(text);                                  // kad cerita babak dibacakan (jika dihidupkan di Pintu)
     const done = this.waitEnter();
     wrap.querySelector('.tlc-go').addEventListener('click', () => this._cancelWait && this._cancelWait());
-    await this.gate(done);
+    try {
+      await this.gate(done);
+    } finally {
+      speech.stop();                                     // kad ditutup (atau babak ditinggalkan): suara berhenti
+    }
     wrap.classList.remove('in');
     await sleep(250);
     wrap.remove();

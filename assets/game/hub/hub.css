@@ -337,6 +337,14 @@
 
 .set-mute { align-self: center; }
 
+/* nota kecil di bawah tetapan suara pembaca (nama suara / amaran jika tiada suara Melayu) */
+.set-note {
+  font-size: 14px;
+  opacity: 0.8;
+  text-align: center;
+  line-height: 1.35;
+}
+
 .set-row {
   display: flex;
   align-items: center;

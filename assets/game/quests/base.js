@@ -5,6 +5,10 @@
  */
 import { el, esc, sleep } from '../core/core.js';
 import { sound } from '../core/sound.js';
+import { speech } from '../core/speech.js';      // suara pembaca (hidup/mati di Pintu)
+
+/** Kotak arahan pada skrin misi yang dibacakan: Cara bermain (cari bukti), arahan padanan, soalan pilihan, kata-kata watak. */
+const SPOKEN_SELECTORS = '.hs-note, .mt-help, .cq-prompt, .help-bubble-text';
 
 export class QuestMechanic {
   #quest;
@@ -57,7 +61,15 @@ export class QuestMechanic {
     this.root.append(top, this.field);
     this.renderInk();
     this.build();
+    this.readInstructions();
     return new Promise((resolve) => { this.#resolve = resolve; });
+  }
+
+  /** Bacakan arahan yang tertera pada skrin misi (jika suara pembaca hidup). Teks petunjuk / jawapan tidak dibacakan. */
+  readInstructions() {
+    const text = [...this.root.querySelectorAll(SPOKEN_SELECTORS)]
+      .map((n) => n.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean).join(' ');
+    if (text) speech.speak(text);
   }
 
   renderInk() {
@@ -90,6 +102,7 @@ export class QuestMechanic {
   async succeed() {
     if (this.#settled) return;
     this.#settled = true;
+    speech.stop();
     this.root.classList.add('done');
     await sleep(700);
     this.#resolve({ ok: true });
@@ -99,10 +112,11 @@ export class QuestMechanic {
   async fail(consequence = '') {
     if (this.#settled) return;
     this.#settled = true;
+    speech.stop();
     this.root.classList.add('ruined');
     await sleep(900);
     this.#resolve({ ok: false, aftermath: consequence || this.content.aftermath || '' });
   }
 
-  destroy() { this.root.remove(); }
+  destroy() { speech.stop(); this.root.remove(); }
 }
