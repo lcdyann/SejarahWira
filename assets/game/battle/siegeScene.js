@@ -108,7 +108,7 @@ export class SiegeScene extends BattleScene {
     this.locked = true;
     await this.showArtifactHint();                     // halaman teaser: artifak bayang + markah (satu perkara pada satu masa)
     await this.gate(this.entity.speak('taklimat', {
-      taklimat: `Ini ujian sebenar. Aku hanya boleh berbisik ${MAKS_BISIKAN} kali sepanjang kepungan ini, jadi gunakan dengan bijak. Hati di butang Bisikan menunjukkan baki. Jam bermula sebaik sahaja kita mulakan!`
+      taklimat: `Dengar tu! Gempita tabuh perang memecah buana! Pasukan meriam kita sudah mula memuntahkan peluru api! Uji sudutnya, isi ubat bedilnya! Benteng angkuh musuh sudah tersembang di depan mata. Ayuh, halakan muncung meriam bersamaku! Aku hanya boleh berbisik ${MAKS_BISIKAN} kali sepanjang kepungan ini, hati di butang Bisikan menunjukkan baki. Runtuhkan kota lawan dengan ketajaman akalmu, jam bermula sebaik sahaja kita mulakan!`
     }, { eraID: this.eraID }));
     this._briefing = false;
     this.assessment.startTimer((t) => this.tick(t), () => this.finish());
@@ -154,7 +154,7 @@ export class SiegeScene extends BattleScene {
     let habisSekarang = false;
     if (!this.hintsOpened.has(id)) {                       // bisikan baharu: ambil satu daripada baki
       if (this.hintsLeft <= 0) {                           // sudah habis: Pendekar Bayang memberitahu
-        await this.gate(this.dialog.say({ name: 'Pendekar Bayang', text: 'Bisikanku sudah habis. Ini ujian, percayalah pada ilmumu!', side: 'left' })).catch(() => {});
+        await this.gate(this.dialog.say({ name: 'Pendekar Bayang', text: 'Cukup! Habis sudah azimat petunjukku! Sekarang, laras muncung meriammu sendiri, hentam dan pecahkan benteng lawan dengan otakmu sendiri!', side: 'left' })).catch(() => {});
         return;
       }
       this.hintsLeft -= 1;
@@ -164,7 +164,7 @@ export class SiegeScene extends BattleScene {
     }
     await super.hint();                                    // membuka semula soalan yang sama tidak menolak baki
     if (habisSekarang) {                                   // itu bisikan terakhir
-      await this.gate(this.dialog.say({ name: 'Pendekar Bayang', text: 'Itu bisikanku yang terakhir. Selebihnya, bergantung pada ilmumu!', side: 'left' })).catch(() => {});
+      await this.gate(this.dialog.say({ name: 'Pendekar Bayang', text: 'Aduhai, tangkas sedikit akal tu! Jangan terpinga-pinga sewaktu membakar sumbu meriam, telingamu takkan mendengar lagi bisikanku!', side: 'left' })).catch(() => {});
     }
   }
 

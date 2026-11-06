@@ -35,29 +35,55 @@ const IKON = [
 ];
 const gambar = (ikon) => { const i = new Image(); i.src = ikon.src; i.alt = ikon.nama; i.draggable = false; return i; };
 
-/** Ucapan pedagang (sebenarnya Pendekar Bayang yang menyamar) */
+/**
+ * Ucapan Sang Penjaga Buku di Lompong Masa (nada: perlahan, santai, mengusik lembut; tiada desakan masa).
+ * Tukar ayat di sini sahaja. Setiap mini game ada tiga ayat: mula, tengah (galakan) dan tamat.
+ */
 const UCAPAN = {
+  // masuk ke Lompong Masa (sempadan tahap dan butang Jeda)
   tahap: [
-    'Selamat datang ke Lompong Masa! Aku hanya pedagang biasa. Bukan Pendekar Bayang. Jangan tanya.',
-    'Masa berhenti di sini. Duduklah. Cerita itu tidak ke mana-mana... buat masa ini.'
+    'Ahai... penat benar nampaknya otak siber kamu tu, ya? Sudah, jangan dikerutkan dahi itu lagi. Mari duduk bersila di sini sebentar. Kita berada di Lompong Masa, tempat waktu tidak bergerak dan dakwat sejarah berhenti mengalir. Ambil nafas dalam-dalam, mari rehatkan minda dengan permainan ringan sebelum kita sambung kembara.'
   ],
   jeda: [
-    'Masa sudah kubekukan. Rehatlah, aku pedagang biasa sahaja, bukan sesiapa yang kau fikirkan.'
+    'Ahai... penat benar nampaknya otak siber kamu tu, ya? Sudah, jangan dikerutkan dahi itu lagi. Mari duduk bersila di sini sebentar. Kita berada di Lompong Masa, tempat waktu tidak bergerak dan dakwat sejarah berhenti mengalir. Ambil nafas dalam-dalam, mari rehatkan minda dengan permainan ringan sebelum kita sambung kembara.'
   ],
-  main: 'Pilih satu. Aku tak ada kena-mengena dengan permainan ini.',
-  tamat: 'Hehe... eh, maksudku, bagus! Kisah ini belum selesai, ingat?'
+  sambung: [
+    'Ha, sudah kembali rupanya. Duduklah dahulu sebentar. Di Lompong Masa ini waktu tidak ke mana-mana, jadi tak perlu tergesa-gesa. Tarik nafas dalam-dalam, kemudian kita sambung kembara.'
+  ],
+  main: 'Pilih mana-mana satu yang kamu suka. Tiada markah, tiada pemasa, hanya santai.',
+  // gelembung
+  gelembung: {
+    mula: 'Tengok gelembung-gelembung sabun ni, terapung perlahan sahaja. Ha, sentuh dan pecahkan ia satu-persatu. Anggaplah setiap letupan kecil itu membuang segala stress di kepala kamu.',
+    tengah: 'Ha... macam tu. Tak perlu terkejar-kejar. Tenang sahaja. Pecah lagi satu...',
+    tamat: 'Amboi, lapang terus rasa pemandangan. Bagus, sekarang tarik nafas dalam-dalam. Dah sedia nak cuba yang lain?'
+  },
+  // padan kad
+  kad: {
+    mula: 'Mari kita uji ingatan manja kamu. Kad-kad ini tersenyum menanti untuk dipadankan. Buka satu-persatu perlahan-lahan, tak ada siapa yang mengejar.',
+    tengah: 'Eh, hampir tepat! Cuba ingat kembali kad yang di sudut sana tadi. Tenang, fikir masak-masak.',
+    tamat: 'Alhamdulillah, kemas tersusun semuanya. Minda yang tenang pasti akan menghasilkan ingatan yang tajam.'
+  },
+  // cari Pendekar Bayang
+  sorok: {
+    mula: 'Hambai... bosan pula hamba duduk diam. Mari main sorok-sorok! Hamba akan sembunyikan bayang hamba di sebalik barangan purba ini. Cuba cari di mana hamba menyorok, tapi jangan tergesa-gesa ya?',
+    tengah: 'Sejuk mata memandang... nampak hujung tanjak hamba tak? Cari perlahan-lahan di kawasan yang redup itu.',
+    tamat: 'Wah, tajam betul mata kamu ya! Dapat juga tangkap bayang hamba yang lincah ni.'
+  },
+  // tekan "Teruskan cerita"
+  pergi: 'Wah, nampaknya wajah kamu pun dah mula berseri-seri semula. Bahu pun dah tak tegang. Bagus! Jiwa yang tenang adalah senjata terbaik untuk menempuh sejarah. Ayuh, mari kita kembali ke alam realiti hikayat... bab seterusnya sudah menanti kita!'
 };
 
 /* ------------------------------------------------------------------------- */
 /* Mini game 1: Padan Kad  (6 pasang gambar hub, tiada had kesilapan)          */
 /* ------------------------------------------------------------------------- */
-function mainKad(play, tamat) {
+function mainKad(play, tamat, cakap) {
   play.innerHTML = '<div class="rh-grid"></div><p class="rh-note">Klik dua kad. Jika sama, ia kekal terbuka.</p>';
   const grid = play.querySelector('.rh-grid');
   const pilih = IKON.slice(0, 6);
   let buka = [];
   let siap = 0;
   let kunci = false;
+  let sudahGalak = false;
   shuffle([...pilih, ...pilih]).forEach((ikon) => {
     const k = el('button', 'rh-card-flip');
     k.type = 'button';
@@ -75,8 +101,9 @@ function mainKad(play, tamat) {
         a.classList.add('matched'); b.classList.add('matched');
         sound.sfx('betul');
         siap += 1;
-        if (siap === pilih.length) tamat('Cantik! Semua pasangan dijumpai.');
+        if (siap === pilih.length) tamat('Cantik! Semua pasangan dijumpai.', UCAPAN.kad.tamat);
       } else {
+        if (!sudahGalak) { sudahGalak = true; cakap(UCAPAN.kad.tengah); }   // galakan lembut, sekali sahaja
         await sleep(700);
         [a, b].forEach((x) => { x.classList.remove('open'); x.textContent = '?'; });
       }
@@ -90,7 +117,7 @@ function mainKad(play, tamat) {
 /* ------------------------------------------------------------------------- */
 /* Mini game 2: Pecah Gelembung  (gambar hub naik perlahan dalam gelembung)     */
 /* ------------------------------------------------------------------------- */
-function mainGelembung(play, tamat) {
+function mainGelembung(play, tamat, cakap) {
   play.innerHTML = '<div class="rh-sky"></div><p class="rh-note">Pecahkan gelembung yang naik. Tiada markah, hanya santai.</p>';
   const sky = play.querySelector('.rh-sky');
   let pecah = 0;
@@ -108,7 +135,8 @@ function mainGelembung(play, tamat) {
       sound.sfx('betul');
       setTimeout(() => b.remove(), 250);
       pecah += 1;
-      if (pecah === sasaran) tamat('Tenang dan menyegarkan!');
+      if (pecah === Math.floor(sasaran / 2)) cakap(UCAPAN.gelembung.tengah);   // separuh jalan
+      if (pecah === sasaran) tamat('Tenang dan menyegarkan!', UCAPAN.gelembung.tamat);
     });
     b.addEventListener('animationend', () => b.remove());
     sky.appendChild(b);
@@ -122,7 +150,7 @@ function mainGelembung(play, tamat) {
 /*   Pendekar Bayang bersembunyi di belakang satu daripada enam benda.         */
 /*   Klik benda itu: jika dia ada, dia terkejut; jika tiada, dia mengejek.     */
 /* ------------------------------------------------------------------------- */
-function mainSorok(play, tamat) {
+function mainSorok(play, tamat, cakap) {
   play.innerHTML = `
     <div class="rh-seek-say" data-ref="say"></div>
     <div class="rh-seek-row"></div>
@@ -132,12 +160,13 @@ function mainSorok(play, tamat) {
   const note = play.querySelector('.rh-note');
   const JUMLAH = 3;
   let pusingan = 0;
-  const EJEK = ['Kosong! Hehe.', 'Bukan di sini...', 'Sejuk, sejuk!', 'Aku tak pandai bersembunyi? Cuba lagi!'];
+  const EJEK = ['Kosong... hehe.', 'Bukan di sini, perlahan-lahan sahaja.', 'Sejuk, sejuk...', 'Belum lagi. Tak perlu tergesa-gesa.'];
+  let sudahGalak = false;
 
   const mula = () => {
     pusingan += 1;
     note.textContent = `Pusingan ${pusingan} daripada ${JUMLAH}`;
-    say.textContent = 'Aku sudah bersembunyi. Cari aku!';
+    say.textContent = 'Hamba sudah bersembunyi. Cari hamba perlahan-lahan ya.';
     row.innerHTML = '';
     const tempat = Math.floor(Math.random() * 6);       // di mana dia bersembunyi
     IKON.slice(0, 6).forEach((ikon, i) => {
@@ -150,15 +179,16 @@ function mainSorok(play, tamat) {
           t.classList.add('wiggle');
           setTimeout(() => t.classList.remove('wiggle'), 400);
           say.textContent = EJEK[Math.floor(Math.random() * EJEK.length)];
+          if (!sudahGalak) { sudahGalak = true; cakap(UCAPAN.sorok.tengah); }   // petunjuk lembut, sekali sahaja
           return;
         }
         t.classList.add('found');                        // betul: Pendekar muncul
         t.appendChild(entityPortrait('surprised', 'rh-seek-pendekar'));
         sound.sfx('betul');
-        say.textContent = 'Eh! Kau jumpa aku!';
+        say.textContent = 'Eh! Kamu jumpa hamba!';
         await sleep(1300);
         if (!row.isConnected) return;
-        if (pusingan >= JUMLAH) tamat('Kau memang pandai mencari. Aku tidak akan bersembunyi lagi... mungkin.');
+        if (pusingan >= JUMLAH) tamat('Kamu memang pandai mencari.', UCAPAN.sorok.tamat);
         else mula();
       });
       row.appendChild(t);
@@ -192,7 +222,7 @@ export class RehatPage {
 
       // pedagang = Pendekar Bayang menyamar (misai palsu dilukis oleh CSS)
       page.refs.merchant.appendChild(entityPortrait('smirk'));
-      const ucapan = jeda ? UCAPAN.jeda : UCAPAN.tahap;
+      const ucapan = jeda ? UCAPAN.jeda : o.mode === 'sambung' ? UCAPAN.sambung : UCAPAN.tahap;
       page.refs.say.textContent = ucapan[Math.floor(Math.random() * ucapan.length)];
 
       /* ---------------- CAROUSEL: satu panel bagi setiap tahap ---------------- */
@@ -243,20 +273,21 @@ export class RehatPage {
       }
 
       /* ---------------- mini game: ganti carousel + butang (tanpa skrol) ---------------- */
-      const buka = (nama, fn) => {
+      const buka = (nama, fn, kunciUcapan) => {
         page.refs.main.classList.add('hidden');
         page.refs.actions.classList.add('hidden');
         page.refs.arena.classList.remove('hidden');
         page.refs.gameName.textContent = nama;
-        page.refs.say.textContent = UCAPAN.main;
-        fn(page.refs.play, (mesej) => {
-          page.refs.say.textContent = UCAPAN.tamat;
+        page.refs.say.textContent = UCAPAN[kunciUcapan].mula;
+        const cakap = (teks) => { page.refs.say.textContent = teks; };
+        fn(page.refs.play, (mesej, ucapanTamat) => {
+          cakap(ucapanTamat);
           page.refs.play.appendChild(el('p', 'rh-done', esc(mesej)));
-        });
+        }, cakap);
       };
-      page.refs.btnMemory.addEventListener('click', () => buka('Padan Kad', mainKad));
-      page.refs.btnBubble.addEventListener('click', () => buka('Pecah Gelembung', mainGelembung));
-      page.refs.btnSeek.addEventListener('click', () => buka('Cari Pendekar', mainSorok));
+      page.refs.btnMemory.addEventListener('click', () => buka('Padan Kad', mainKad, 'kad'));
+      page.refs.btnBubble.addEventListener('click', () => buka('Pecah Gelembung', mainGelembung, 'gelembung'));
+      page.refs.btnSeek.addEventListener('click', () => buka('Cari Pendekar', mainSorok, 'sorok'));
       page.refs.btnBack.addEventListener('click', () => {
         page.refs.arena.classList.add('hidden');
         page.refs.play.innerHTML = '';
@@ -265,7 +296,13 @@ export class RehatPage {
         page.refs.say.textContent = UCAPAN.tahap[0];
       });
       const tutup = (hasil) => { page.remove(); resolve(hasil); };
-      page.refs.btnGo.addEventListener('click', () => tutup('terus'));
+      // tekan "Teruskan cerita": dia mengucapkan selamat jalan dahulu, kemudian halaman ditutup
+      page.refs.btnGo.addEventListener('click', async () => {
+        page.refs.btnGo.disabled = true;
+        page.refs.say.textContent = UCAPAN.pergi;
+        await sleep(3800);
+        tutup('terus');
+      });
       if (jeda) {
         page.refs.btnLeave.classList.remove('hidden');
         page.refs.btnLeave.addEventListener('click', () => tutup('keluar'));

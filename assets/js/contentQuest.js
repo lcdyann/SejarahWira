@@ -420,10 +420,11 @@ class QuestEditor {
           formField('Objektif pembelajaran', areaInput(() => state.description, (v) => { state.description = v; }, { rows: 2, placeholder: 'Apa yang pelajar akan faham selepas misi ini' }), { optional: true, error: fieldErr.description }),
           h('div', { class: 'cm-field' }, h('label', { text: 'Jenis misi' }), typeCards, fieldErr.questType),
           typePanel,
+          // Catatan Diari: nota lekat yang muncul selepas cerita babak, sebelum babak seterusnya (sengaja diletak di luar bahagian pilihan supaya mudah dilihat)
+          formField('Catatan Diari (nota selepas babak)', areaInput(() => state.explanation, (v) => { state.explanation = v; }, { rows: 3, placeholder: 'Contoh: Hari ini aku belajar bahawa... (satu ayat perasaan watak, kemudian satu ayat fakta utama)' }), { optional: true, hint: 'Muncul sebagai nota lekat pada halaman diari selepas cerita babak ini habis, sebelum babak seterusnya. Pendekar Bayang juga menyebutnya untuk membetulkan pelajar yang tersilap.', error: fieldErr.explanation }),
           h('details', { class: 'qe-extras' },
             h('summary', { text: 'Bantuan & mesej (pilihan)' }),
             formField('Petunjuk', textInput(() => state.hint, (v) => { state.hint = v; }, { max: 255, placeholder: 'Jangan tulis jawapan; tunjukkan di mana dalam cerita jawapan itu boleh dijumpai' }), { optional: true, hint: 'Dipaparkan apabila murid menekan butang Petunjuk (mentol), dan dibisikkan automatik selepas kegagalan kedua. Selepas kegagalan ketiga murid mendapat petunjuk yang lebih jelas (bukan jawapan).', error: fieldErr.hint }),
-            formField('Catatan diari dan pembetulan', areaInput(() => state.explanation, (v) => { state.explanation = v; }, { rows: 2 }), { optional: true, hint: 'Ditulis sebagai nota lekat dalam diari selepas berjaya, dan disebut oleh Pendekar Bayang apabila pelajar tersilap.', error: fieldErr.explanation }),
             formField('Pujian', areaInput(() => state.feedback, (v) => { state.feedback = v; }, { rows: 2, placeholder: 'Tepat sekali! Perpaduan menyelamatkan kota.' }), { optional: true, hint: 'Pendekar Bayang memuji selepas misi berjaya.', error: fieldErr.feedback }))),
         h('aside', { class: 'qe-preview' }, h('h4', {}, h('i', { class: 'fas fa-eye' }), ' Pratonton Pelajar'), previewHost)));
       dlg.setFooter(deleteBtn, h('span', { class: 'cm-spacer' }), uiButton('Batal', 'cm-btn-ghost', () => dlg.requestClose()), saveBtn);

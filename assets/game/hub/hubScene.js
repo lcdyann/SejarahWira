@@ -16,6 +16,17 @@ import { entityPortrait, spriteEl } from '../npc/entity.js';
 /*   sizes and positions: assets/js/game/hubConfig.js                         */
 /*   look:                assets/game/hub/hub.css                      */
 /* ========================================================================== */
+/**
+ * Ucapan Sang Penjaga Buku di bilik hub (gelembung ucapan). Tukar ayat di sini sahaja.
+ * Nada: santai dan mengusik lembut, tiada desakan masa.
+ */
+const HUB_UCAPAN = {
+  sapaan: 'Hah, sampai pun! Pekat benar bau debu zaman pada bajumu. Dah, mari letak tepi dulu beban sejarah tu. Di sini kita tak kejar markah ujian, jangan tegang-tegang urat leher!',
+  diam: 'Wahai budak bertuah, duduk tegak-tegak! Tak lari gunung dikejar, tak luput sejarah menanti. Rehatkan dulu silat mindamu sebelum kita menggempur semula.',
+  keMalam: 'Mahu hamba kelamkan pandangan dunia? Mari kita labuhkan tirai malam dan rehatkan jiwa perkasa kamu tu.',
+  keSiang: 'Mahu hamba terbitkan matahari semula? Mari kita selak tirai, biar cahaya siang mengusir penat di mata.'
+};
+
 export class HubScene extends GameScene {
   async enter(params = {}) {
     this.theme = getHubTheme();
@@ -56,9 +67,13 @@ export class HubScene extends GameScene {
     if (this.editing) this.startEditor();
 
     await this.entity.load(0);
-    this.say(this.entity.remark('hub'));
+    this.say(HUB_UCAPAN.sapaan);                       // sapaan masuk bilik
+    let kali = 0;
     this.every(() => {
-      if (!document.querySelector('.dlg:not(.hidden)')) this.say(this.entity.remark('hub'));
+      if (document.querySelector('.dlg:not(.hidden)')) return;
+      kali += 1;
+      // kali pertama (kira-kira 15 saat murid diam): usikan santai sekali sahaja; selepas itu kata-kata biasa di meja
+      this.say(kali === 1 ? HUB_UCAPAN.diam : this.entity.remark('hub'));
     }, 14000);
 
     if (params.afterEpilogue) {
@@ -83,7 +98,7 @@ export class HubScene extends GameScene {
     button.style.width = `${HUB_THEME.w}%`;
     this.themeBtn = button;
     this.paintThemeButton();
-    button.addEventListener('mouseenter', () => this.say(this.theme === 'day' ? 'Mahu kembali ke malam?' : 'Mahu melihat bilik di waktu siang?'));
+    button.addEventListener('mouseenter', () => this.say(this.theme === 'day' ? HUB_UCAPAN.keMalam : HUB_UCAPAN.keSiang));
     button.addEventListener('click', () => { if (!this.editing) this.toggleTheme(); });
   }
 
@@ -349,7 +364,7 @@ export class HubScene extends GameScene {
     bubble.classList.remove('hidden');
 
     clearTimeout(this._bubbleTimer);
-    this._bubbleTimer = setTimeout(() => bubble.classList.add('hidden'), 5200);
+    this._bubbleTimer = setTimeout(() => bubble.classList.add('hidden'), Math.max(5200, text.length * 60));   // ayat panjang = lebih lama
     this.own(() => clearTimeout(this._bubbleTimer));
   }
 

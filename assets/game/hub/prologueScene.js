@@ -105,18 +105,21 @@ export class PrologueScene extends GameScene {
       this.root.classList.remove('quake', 'flicker');
 
       const holder = this.root.querySelector('.prologue-pendekar');
-      holder.appendChild(entityPortrait('whispering', 'rise'));
+      holder.appendChild(entityPortrait('angry', 'rise'));   // dia bangkit dengan muka marah (penjahat yang suka bermain)
       await sleep(1200);
     }
 
     if (!skipped) {
-      for (const text of this.entity.lines('prolog', {}, 0)) {
+      // ayat terakhir: dia mengenyit mata (smirk), selebihnya marah-marah bergurau (angry)
+      const prologLines = this.entity.lines('prolog', {}, 0);
+      for (let i = 0; i < prologLines.length; i += 1) {
         if (skipped) break;
+        const angry = i < prologLines.length - 1;
         await this.dialog.say({
           name: this.entity.name,
-          text,
-          portrait: entityPortrait('whispering'),
-          tone: 'whisper'
+          text: prologLines[i],
+          portrait: entityPortrait(angry ? 'angry' : 'smirk'),
+          tone: angry ? 'loud' : ''
         });
       }
     }
