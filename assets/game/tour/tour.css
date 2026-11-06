@@ -1,0 +1,104 @@
+/* ============================================================================
+   assets/game/tour/tour.css  -  rupa panduan kali pertama (hab dan peta)
+   Markup ada dalam tour.html, tingkah laku dalam tour.js.
+   ============================================================================ */
+
+/* lapisan yang menghalang klik semasa panduan (supaya murid ikut langkah demi langkah) */
+.tour-sekat {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+}
+
+/* tiada benda ditunjuk (cth. langkah terakhir di peta): gelapkan skrin sedikit */
+.tour-sekat.tanpa-sasaran {
+  background: rgba(8, 4, 20, 0.55);
+}
+
+/* cincin bercahaya di sekeliling butang / benda yang sedang diterangkan.
+   Bayang yang sangat besar menggelapkan semua yang lain. */
+.tour-cincin {
+  position: absolute;
+  z-index: 41;
+  border: 3px solid #f3c76b;
+  border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(8, 4, 20, 0.62), 0 0 18px #f3c76b;
+  pointer-events: none;
+  transition: left 0.25s ease, top 0.25s ease, width 0.25s ease, height 0.25s ease;
+  animation: tour-denyut 1s ease-in-out infinite alternate;
+}
+
+.tour-cincin.hidden {
+  display: none;
+}
+
+@keyframes tour-denyut {
+  from { border-color: #f3c76b; }
+  to   { border-color: #fff3c9; }
+}
+
+/* kad Pendekar Bayang */
+.tour-kad {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 620px;
+  max-width: 94%;
+  z-index: 42;
+  display: flex;
+  gap: 14px;
+  padding: 12px 14px;
+}
+
+.tour-kad.di-bawah { bottom: 26px; }
+.tour-kad.di-atas  { top: 22px; }
+
+.tour-potret {
+  flex: 0 0 92px;
+  height: 112px;
+}
+
+.tour-potret .entity-portrait,
+.tour-potret img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+}
+
+.tour-badan {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tour-teks {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.25;
+}
+
+.tour-bawah {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.tour-langkah {
+  margin-right: auto;
+  font-family: var(--font-pixel);
+  font-size: 9px;
+  opacity: 0.8;
+}
+
+/* butang Buku Sejarah bersinar selepas panduan hab, menunggu murid menekannya */
+.hub-item.tour-sinar {
+  animation: tour-sinar 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes tour-sinar {
+  from { filter: drop-shadow(0 0 4px #f3c76b); }
+  to   { filter: drop-shadow(0 0 18px #ffe9a8); transform: scale(1.04); }
+}

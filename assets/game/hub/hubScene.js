@@ -10,6 +10,7 @@ import { speech } from '../core/speech.js';
 import { HUB_BG, HUB_BG_DAY, HUB_BUBBLE, HUB_OBJECTS, HUB_PENDEKAR, HUB_STUDENT, HUB_THEME } from './hubConfig.js';
 import { applyHubPicture, getHubTheme, placeStudent, saveHubTheme } from './hubHelpers.js';
 import { entityPortrait, spriteEl } from '../npc/entity.js';
+import { TOUR_UCAPAN, Tour, tourPaksa, tourSudah, tourTanda } from '../tour/tour.js';
 
 /* ========================================================================== */
 /* HubScene  (the study room)                                                 */
@@ -67,9 +68,13 @@ export class HubScene extends GameScene {
     if (this.editing) this.startEditor();
 
     await this.entity.load(0);
-    this.say(HUB_UCAPAN.sapaan);                       // sapaan masuk bilik
+    // PANDUAN kali pertama: hanya selepas prolog (params.tour) atau bila alamat ada ?tour=1
+    this.touring = !!(params.tour || tourPaksa());
+    if (this.touring) this.runFlow(() => this.panduHub());
+    else this.say(HUB_UCAPAN.sapaan);                  // sapaan masuk bilik
     let kali = 0;
     this.every(() => {
+      if (this.touring) return;                        // semasa panduan, Pendekar tidak mengusik
       if (document.querySelector('.dlg:not(.hidden)')) return;
       kali += 1;
       // kali pertama (kira-kira 15 saat murid diam): usikan santai sekali sahaja; selepas itu kata-kata biasa di meja
@@ -79,6 +84,36 @@ export class HubScene extends GameScene {
     if (params.afterEpilogue) {
       this.root.querySelector('.hub-keys-hint').textContent = 'Kau sudah pulang. Buku itu kini tenang.';
     }
+  }
+
+  /**
+   * PANDUAN HAB (kali pertama sahaja): Pendekar Bayang menerangkan setiap benda di bilik ini
+   * dengan cincin bercahaya pada benda sebenar. BUKU SEJARAH di hujung, kerana dari situ
+   * murid ke peta dan mula bermain. Ayat ada di tour/tour.js (TOUR_UCAPAN.hub).
+   */
+  async panduHub() {
+    const T = TOUR_UCAPAN.hub;
+    const benda = (id) => this.itemEls[HUB_OBJECTS.findIndex((o) => o.id === id)];
+    const langkah = [
+      // Pintu: gambar pintu.png ada ruang kosong luas, jadi kedudukan cincin ditetapkan dengan tangan.
+      // kotak = peratus pentas (x, y = penjuru kiri atas; w, h = lebar, tinggi). Laraskan jika perlu.
+      { sasaran: benda('door'),     teks: T.door, kotak: { x: 4.8, y: 14.5, w: 16.4, h: 35.3 } },
+      { sasaran: benda('mirror'),   teks: T.mirror },
+      { sasaran: benda('notebook'), teks: T.notebook },
+      { sasaran: benda('trophy'),   teks: T.trophy },
+      { sasaran: benda('replay'),   teks: T.replay },
+      { sasaran: this.themeBtn,     teks: T.tema },
+      { sasaran: benda('book'),     teks: T.book }
+    ];
+    await this.gate(new Tour(this).run(langkah));
+
+    // panduan hab tamat (atau dilangkau): tanda, kemudian suruh murid menekan Buku Sejarah
+    tourTanda(this.student.studentID, 'hub');
+    const buku = benda('book');
+    buku.classList.add('tour-sinar');
+    this.select(HUB_OBJECTS.findIndex((o) => o.id === 'book'));
+    this.say(T.buka);
+    clearTimeout(this._bubbleTimer);                   // gelembung kekal sehingga buku ditekan
   }
 
   /** the room picture for the current mode (day_hub.jpg by day, hub.jpg at night) */

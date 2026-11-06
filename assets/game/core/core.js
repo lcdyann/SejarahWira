@@ -28,6 +28,7 @@ const TEMPLATE_FILES = [
   'dialogue/dialogue.html',
   'transition/transition.html',
   'hub/hub.html',
+  'tour/tour.html',
   'story/story.html',
   'quests/quests.html',
   'support/support.html',

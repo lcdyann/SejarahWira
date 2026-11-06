@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head><meta charset="UTF-8"><title>Templat panduan</title></head>
+<body>
+<!--
+  ============================================================================
+  tour/tour.html  -  kotak (templat) bagi modul "tour" (panduan kali pertama)
+  Templat di sini: tpl-tour-kad
+  Cara ia berfungsi: core/core.js tpl('nama') menyalin <template id="tpl-nama">,
+  mengisi [data-text] dan mendedahkan [data-ref] sebagai elemen.refs.nama.
+  Rupa (warna / saiz) ada dalam tour.css. Ayat Pendekar Bayang ada di atas tour.js.
+  ============================================================================
+-->
+
+  <!-- 1. KAD PANDUAN ------------------------------------------------------
+       Kad kecil Pendekar Bayang yang menerangkan satu perkara pada satu masa.
+       Ia dipaparkan di ATAS skrin sebenar (hab atau peta), bukan skrin tiruan.
+       Cincin bercahaya (dibuat oleh tour.js) menunjuk butang / benda yang sedang diterangkan.
+       Kiri : potret Pendekar Bayang (dimasukkan oleh tour.js)
+       Kanan: ayat, nombor langkah, butang Langkau dan Seterusnya -->
+  <template id="tpl-tour-kad">
+    <div class="tour-kad px">
+      <div class="tour-potret" data-ref="potret"></div>
+      <div class="tour-badan">
+        <p class="tour-teks" data-ref="teks"></p>
+        <div class="tour-bawah">
+          <span class="tour-langkah" data-ref="langkah"></span>
+          <button type="button" class="btn-px small tour-langkau" data-ref="langkau">Langkau</button>
+          <button type="button" class="btn-px small gold tour-seterusnya" data-ref="seterusnya">Seterusnya</button>
+        </div>
+      </div>
+    </div>
+  </template>
+</body>
+</html>

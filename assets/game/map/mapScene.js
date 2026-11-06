@@ -16,6 +16,7 @@ import { GameScene } from '../core/scene.js';
 import { LANE_RADIUS, NODE_RADIUS, START, TALK_RADIUS, WORLD, WORLD_IMAGE, WORLD_MASK, nodeFor } from './mapConfig.js';
 import { entityPortrait } from '../npc/entity.js';
 import { AVATAR_FACES } from '../student/avatarConfig.js';
+import { TOUR_UCAPAN, Tour, tourPaksa, tourSudah, tourTanda } from '../tour/tour.js';
 
 const VIEW_W = 960;
 const VIEW_H = 540;
@@ -84,8 +85,33 @@ export class MapScene extends GameScene {
     this.own(() => cancelAnimationFrame(this._raf));
 
     await this.entity.load(0);
-    setTimeout(() => this.say(this.entity.remark('peta', { era: this.prevName(this.nodes.find((n) => n.era.status === 'locked')) })), 900);
-    this.every(() => { if (!this.paused) this.say(this.entity.remark('peta', { era: this.prevName(this.nodes.find((n) => n.era.status === 'locked')) })); }, 20000);
+    // PANDUAN PETA kali pertama: hanya selepas panduan hab selesai (atau bila alamat ada ?tour=1)
+    this.touring = tourPaksa() || (tourSudah(this.student.studentID, 'hub') && !tourSudah(this.student.studentID, 'peta'));
+    if (this.touring) this.runFlow(() => this.panduPeta());
+    else setTimeout(() => this.say(this.entity.remark('peta', { era: this.prevName(this.nodes.find((n) => n.era.status === 'locked')) })), 900);
+    this.every(() => { if (!this.paused && !this.touring) this.say(this.entity.remark('peta', { era: this.prevName(this.nodes.find((n) => n.era.status === 'locked')) })); }, 20000);
+  }
+
+  /**
+   * PANDUAN PETA (kali pertama sahaja): cara berjalan, penanda era, Esc, dan akhirnya
+   * Pendekar Bayang menyuruh murid berjalan ke era pertama dan menekan Mulakan misi.
+   * Peta dibekukan (paused) semasa panduan supaya wira tidak bergerak. Ayat: tour/tour.js (TOUR_UCAPAN.peta).
+   */
+  async panduPeta() {
+    const T = TOUR_UCAPAN.peta;
+    this.paused = true;
+    this.own(() => { this.paused = false; });
+    const langkah = [
+      { sasaran: null, teks: T.gerak },
+      { sasaran: null, teks: T.era },
+      { sasaran: this.root.querySelector('.map-top'), teks: T.jeda },
+      { sasaran: null, teks: T.mula, butang: 'Faham, mari mula!' }
+    ];
+    await this.gate(new Tour(this).run(langkah));
+    tourTanda(this.student.studentID, 'peta');
+    this.touring = false;
+    this.paused = false;
+    this.say(T.buka);
   }
 
   prevName(node) {

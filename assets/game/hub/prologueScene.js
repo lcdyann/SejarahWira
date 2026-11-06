@@ -9,6 +9,7 @@ import { HUB_BG } from './hubConfig.js';
 import { applyHubPicture, placeStudent, probeImage } from './hubHelpers.js';
 import { PROLOGUE_BG, PROLOGUE_BOOK, PROLOGUE_CAPTION, PROLOGUE_HAND_WIDTH, PROLOGUE_STUDENT_LINES } from './prologueConfig.js';
 import { entityPortrait, spriteEl } from '../npc/entity.js';
+import { tourTanda } from '../tour/tour.js';
 
 /* ========================================================================== */
 /* PrologueScene                                                              */
@@ -135,7 +136,12 @@ export class PrologueScene extends GameScene {
       ms: skipped ? 2200 : 3800,
       middle: async () => {
         if (replay) await this.game.go('HubScene');
-        else await this.game.beginEra(this.eraID);
+        else {
+          // kali pertama: selepas prolog murid dibawa ke HAB untuk panduan (bukan terus ke era).
+          // Era pertama dimulakan sendiri oleh murid melalui Buku Sejarah -> Peta -> Mulakan misi.
+          tourTanda(this.student.studentID, 'prolog');
+          await this.game.go('HubScene', { tour: true });
+        }
       }
     });
   }

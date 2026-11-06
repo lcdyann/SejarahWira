@@ -71,6 +71,7 @@ import { AvatarScene } from './student/avatarScene.js';
 import { ProfileScene } from './student/profileScene.js';
 import { ProgressScene } from './student/progressScene.js';
 import { Transition } from './transition/transition.js';
+import { tourSudah } from './tour/tour.js';
 
 const SCENES = { HubScene, PrologueScene, DoorsScene, TrophyScene, EpilogueScene, CreditsScene, MapScene, MissionScene, TrainingScene, SiegeScene, AvatarScene, ProfileScene, ProgressScene };
 
@@ -139,11 +140,17 @@ export class Game {
     }
     await sleep(250);
     loading.remove();
-    // kali pertama: pilih avatar dahulu, kemudian prolog
-    if (this.progression.isFirstTime) {
+    // kali pertama: pilih avatar dahulu, kemudian prolog, kemudian panduan di hab
+    // (panduan TIDAK keluar ketika log masuk biasa; ia bermula hanya selepas prolog dimainkan)
+    const id = this.student.studentID;
+    if (this.progression.isFirstTime && !tourSudah(id, 'prolog')) {
       await this.go('AvatarScene', { first: true, next: { scene: 'PrologueScene', params: { full: true, eraID: this.eras[0].eraID } } });
     }
-    else await this.go('HubScene');
+    else {
+      // murid yang menutup permainan di tengah panduan hab disambung semula di hab
+      const sambungPandu = this.progression.isFirstTime && !tourSudah(id, 'hub');
+      await this.go('HubScene', { tour: sambungPandu });
+    }
   }
 
   fontsReady() {
@@ -152,7 +159,7 @@ export class Game {
 
   preload(avatarSrc, step) {
     const poses = ['smirk', 'laughing', 'angry', 'surprised', 'impressed', 'whispering'];
-    const srcs = [avatarSrc, ...poses.map((p) => `../assets/gameAsset/npc/pendekar_bayang_${p}.png`), '../assets/gameAsset/npc/pendekar_bayang_suprised.png'];
+    const srcs = [avatarSrc, ...poses.map((p) => `../assets/gameAsset/npc/pendekar_bayang_${p}.png`)];
     let n = 0;
     return Promise.race([
       Promise.all(srcs.map((s) => new Promise((r) => {
