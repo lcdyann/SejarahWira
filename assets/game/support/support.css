@@ -60,6 +60,9 @@
 
 .tt-steps li { margin-bottom: 3px; }
 
+/* ayat Pendekar Bayang tentang titisan dakwat (baris terakhir senarai langkah) */
+.tt-steps .tt-bayang { color: #8a5a00; font-style: italic; }
+
 /* tangan: kedudukan mutlak, digerakkan oleh @keyframes (loop 6s) */
 .tt-hand { position: absolute; left: 0; top: 0; font-size: 30px; z-index: 5; pointer-events: none; }
 

@@ -28,8 +28,8 @@
 .drop {
   width: 14px;
   height: 20px;
-  /* titisan air: biru jernih dengan kilauan di kiri atas */
-  background: radial-gradient(circle at 35% 30%, #d8f3ff 0 14%, #4fb6ff 40%, #1f78d1 100%);
+  /* titisan dakwat: biru-hitam pekat dengan kilauan kecil di kiri atas; garis tepi kekal cerah supaya nampak di atas latar gelap */
+  background: radial-gradient(circle at 35% 30%, #5f7a99 0 10%, #1a2530 32%, #0d1b2a 100%);
   border: 2px solid #8fd3ff;
   border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
   box-shadow: 0 0 6px #4fb6ff88;
