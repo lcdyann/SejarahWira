@@ -61,6 +61,8 @@ import { sound } from './core/sound.js';
 import { DialogueBox } from './dialogue/dialogueBox.js';
 import { CreditsScene } from './hub/creditsScene.js';
 import { EpilogueScene } from './hub/epilogueScene.js';
+import { HUB_BG, HUB_BG_DAY, HUB_OBJECTS, HUB_THEME } from './hub/hubConfig.js';
+import { getHubTheme } from './hub/hubHelpers.js';
 import { HubScene } from './hub/hubScene.js';
 import { PrologueScene } from './hub/prologueScene.js';
 import { MapScene } from './map/mapScene.js';
@@ -157,17 +159,33 @@ export class Game {
     return Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), sleep(2500)]);
   }
 
+  /**
+   * Skrin pemuat: muat dahulu SEMUA gambar yang akan dilihat murid sebaik sahaja skrin ini hilang,
+   * supaya hab terpapar penuh serta-merta (tiada emoji pemegang tempat, tiada bilik kosong).
+   *   - avatar murid + enam pose Pendekar Bayang
+   *   - hab: gambar bilik (siang/malam ikut pilihan murid), butang bulan/matahari, dan semua barang di meja
+   * Senarai hab diambil daripada hub/hubConfig.js, jadi jika barang ditambah di sana ia ikut dimuat di sini.
+   * Bar kemajuan bergerak mengikut gambar yang siap.
+   */
   preload(avatarSrc, step) {
     const poses = ['smirk', 'laughing', 'angry', 'surprised', 'impressed', 'whispering'];
-    const srcs = [avatarSrc, ...poses.map((p) => `../assets/gameAsset/npc/pendekar_bayang_${p}.png`)];
+    const siang = getHubTheme() === 'day';
+    const barangHab = HUB_OBJECTS.map((o) => (Array.isArray(o.img) ? o.img[0] : o.img));   // gambar pertama sahaja
+    const srcs = [...new Set([                                                             // Set: buang gambar yang sama
+      avatarSrc,
+      ...poses.map((p) => `../assets/gameAsset/npc/pendekar_bayang_${p}.png`),
+      siang ? HUB_BG_DAY : HUB_BG,
+      siang ? HUB_THEME.sun : HUB_THEME.moon,
+      ...barangHab
+    ].filter(Boolean))];
     let n = 0;
     return Promise.race([
       Promise.all(srcs.map((s) => new Promise((r) => {
         const i = new Image();
-        i.onload = i.onerror = () => { n += 1; step(60 + Math.round((n / srcs.length) * 38)); r(); };
+        i.onload = i.onerror = () => { n += 1; step(60 + Math.round((n / srcs.length) * 38)); r(); };   // gambar hilang pun diteruskan
         i.src = s;
       }))),
-      sleep(4000)
+      sleep(20000)   // jaring keselamatan sahaja (dahulu 4 saat): jika rangkaian sangat lambat, permainan tetap bermula
     ]);
   }
 
