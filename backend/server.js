@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -75,28 +74,6 @@ const isBlockedPath = (rawPath) => {
 };
  
 app.use((req, res, next) => (isBlockedPath(req.path) ? res.status(404).end() : next()));
-// ---------------------------------------------------------------------------
-// GAMBAR LATAR RINGAN (WebP)
-// Gambar latar PNG besar (3-5 MB setiap satu) melambatkan permainan di hos percuma.
-// Jika ada versi .webp di sebelah fail .png (nama sama) dan pelayar menyokong WebP, pelayan menghantar
-// WebP itu sebagai jawapan kepada permintaan .png. Kod permainan dan pangkalan data tidak berubah (masih
-// menyebut .png). Pelayar yang tidak menyokong WebP, atau gambar tanpa versi .webp, terus mendapat PNG asal.
-// ---------------------------------------------------------------------------
-const FOLDER_LATAR = path.join(PROJECT_ROOT, 'assets', 'gameAsset', 'background');
-app.get(/^\/assets\/gameAsset\/background\/[^/]+\.(png|jpe?g)$/i, (req, res, next) => {
-  res.setHeader('Vary', 'Accept');                                   // jawapan bergantung pada Accept pelayar
-  if (!String(req.headers.accept || '').includes('image/webp')) return next();
-  let nama;
-  try { nama = path.basename(decodeURIComponent(req.path)); } catch { return next(); }
-  const webp = path.join(FOLDER_LATAR, nama.replace(/\.(png|jpe?g)$/i, '.webp'));   // hanya dalam folder latar
-  fs.access(webp, (err) => {
-    if (err) return next();                                          // tiada .webp: hantar PNG asal
-    res.setHeader('Cache-Control', 'public, max-age=86400');         // simpan dalam cache pelayar 1 hari
-    res.type('image/webp');
-    res.sendFile(webp);
-  });
-});
-
 // Fail JS/CSS/HTML: pelayar WAJIB menyemak semula setiap kali (no-cache), supaya perubahan kod terus kelihatan
 // tanpa perlu "hard refresh". Gambar dan bunyi masih boleh disimpan dalam cache.
 app.use(express.static(PROJECT_ROOT, {
